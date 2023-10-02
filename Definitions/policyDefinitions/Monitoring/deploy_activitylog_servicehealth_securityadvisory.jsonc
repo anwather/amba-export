@@ -1,0 +1,306 @@
+{
+  "name": "Deploy_activitylog_ServiceHealth_SecurityAdvisory",
+  "properties": {
+    "displayName": "Deploy Service Health Security Advisory Alert",
+    "description": "Policy to Deploy Service Health Security Advisory Alert",
+    "mode": "All",
+    "metadata": {
+      "version": "1.1.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True",
+      "alzCloudEnvironments": [
+        "AzureCloud"
+      ],
+      "category": "Monitoring"
+    },
+    "parameters": {
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "alertResourceGroupName": {
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
+        "defaultValue": "AlzMonitoring-rg",
+        "type": "String"
+      },
+      "alertResourceGroupLocation": {
+        "metadata": {
+          "description": "Location of the Resource group the alert is placed in",
+          "displayName": "Resource Group Location"
+        },
+        "defaultValue": "centralus",
+        "type": "String"
+      },
+      "alertResourceGroupTags": {
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
+        "type": "Object"
+      },
+      "monitorDisable": {
+        "metadata": {
+          "description": "Tag name to disable monitoring  Subscription level alerts. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
+      "alzMonitorActionGroupEmail": {
+        "metadata": {
+          "description": "Email address to send alerts to",
+          "displayName": "Action Group Email"
+        },
+        "defaultValue": "action@mail.com",
+        "type": "String"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Resources/subscriptions"
+          },
+          {
+            "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
+            "notEquals": "true"
+          }
+        ]
+      },
+      "then": {
+        "effect": "deployIfNotExists",
+        "details": {
+          "type": "Microsoft.Insights/activityLogAlerts",
+          "existenceCondition": {
+            "allOf": [
+              {
+                "field": "Microsoft.Insights/ActivityLogAlerts/enabled",
+                "equals": "[parameters('enabled')]"
+              },
+              {
+                "equals": 2,
+                "count": {
+                  "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*]",
+                  "where": {
+                    "anyOf": [
+                      {
+                        "allOf": [
+                          {
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field",
+                            "equals": "category"
+                          },
+                          {
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals",
+                            "equals": "ServiceHealth"
+                          }
+                        ]
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field",
+                            "equals": "properties.incidentType"
+                          },
+                          {
+                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals",
+                            "equals": "Security"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
+          "deployment": {
+            "properties": {
+              "parameters": {
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
+                "alertResourceGroupName": {
+                  "value": "[parameters('alertResourceGroupName')]"
+                },
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
+                },
+                "alertResourceGroupTags": {
+                  "value": "[parameters('alertResourceGroupTags')]"
+                },
+                "ALZMonitorActionGroupEmail": {
+                  "value": "[parameters('ALZMonitorActionGroupEmail')]"
+                }
+              },
+              "mode": "incremental",
+              "template": {
+                "parameters": {
+                  "enabled": {
+                    "type": "string"
+                  },
+                  "alertResourceGroupName": {
+                    "type": "string"
+                  },
+                  "alertResourceGroupLocation": {
+                    "type": "string"
+                  },
+                  "alertResourceGroupTags": {
+                    "type": "object"
+                  },
+                  "ALZMonitorActionGroupEmail": {
+                    "type": "string"
+                  }
+                },
+                "contentVersion": "1.0.0.0",
+                "resources": [
+                  {
+                    "type": "Microsoft.Resources/resourceGroups",
+                    "apiVersion": "2021-04-01",
+                    "name": "[parameters('alertResourceGroupName')]",
+                    "location": "[parameters('alertResourceGroupLocation')]",
+                    "tags": "[parameters('alertResourceGroupTags')]"
+                  },
+                  {
+                    "resourceGroup": "[parameters('alertResourceGroupName')]",
+                    "type": "Microsoft.Resources/deployments",
+                    "properties": {
+                      "parameters": {
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
+                        "alertResourceGroupName": {
+                          "value": "[parameters('alertResourceGroupName')]"
+                        },
+                        "ALZMonitorActionGroupEmail": {
+                          "value": "[parameters('ALZMonitorActionGroupEmail')]"
+                        }
+                      },
+                      "mode": "Incremental",
+                      "template": {
+                        "parameters": {
+                          "enabled": {
+                            "type": "string"
+                          },
+                          "alertResourceGroupName": {
+                            "type": "string"
+                          },
+                          "ALZMonitorActionGroupEmail": {
+                            "type": "string"
+                          }
+                        },
+                        "contentVersion": "1.0.0.0",
+                        "resources": [
+                          {
+                            "type": "microsoft.insights/activityLogAlerts",
+                            "properties": {
+                              "description": "Service Health Security Alert",
+                              "parameters": {
+                                "enabled": {
+                                  "value": "[parameters('enabled')]"
+                                }
+                              },
+                              "enabled": "[parameters('enabled')]",
+                              "scopes": [
+                                "[subscription().id]"
+                              ],
+                              "condition": {
+                                "allOf": [
+                                  {
+                                    "field": "category",
+                                    "equals": "ServiceHealth"
+                                  },
+                                  {
+                                    "field": "properties.incidentType",
+                                    "equals": "Security"
+                                  }
+                                ]
+                              },
+                              "actions": {
+                                "actionGroups": [
+                                  {
+                                    "actionGroupId": "[concat(subscription().Id, '/resourceGroups/', parameters('alertResourceGroupName'), '/providers/Microsoft.Insights/actionGroups/AlzActionGrp')]"
+                                  }
+                                ]
+                              }
+                            },
+                            "apiVersion": "2020-10-01",
+                            "name": "ServiceHealthSecurityIncident",
+                            "location": "global",
+                            "tags": {
+                              "_deployed_by_amba": true
+                            },
+                            "dependsOn": [
+                              "[concat(subscription().Id, '/resourceGroups/', parameters('alertResourceGroupName'), '/providers/Microsoft.Insights/actionGroups/AlzActionGrp')]"
+                            ]
+                          },
+                          {
+                            "type": "Microsoft.Insights/actionGroups",
+                            "properties": {
+                              "enabled": true,
+                              "groupShortName": "AlzActionGrp",
+                              "copy": [
+                                {
+                                  "name": "emailReceivers",
+                                  "mode": "serial",
+                                  "count": "[length(variables('varALZMonitorActionGroupEmail'))]",
+                                  "input": {
+                                    "name": "[concat('AlzMail-', indexOf(variables('varALZMonitorActionGroupEmail'), variables('varALZMonitorActionGroupEmail')[copyIndex('emailReceivers')]))]",
+                                    "useCommonSchema": true,
+                                    "emailAddress": "[trim(variables('varALZMonitorActionGroupEmail')[copyIndex('emailReceivers')])]"
+                                  }
+                                }
+                              ]
+                            },
+                            "apiVersion": "2022-06-01",
+                            "name": "AlzActionGrp",
+                            "location": "global",
+                            "tags": {
+                              "_deployed_by_amba": true
+                            }
+                          }
+                        ],
+                        "variables": {},
+                        "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
+                      }
+                    },
+                    "apiVersion": "2019-10-01",
+                    "name": "ServiceSecurityIncident",
+                    "dependsOn": [
+                      "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
+                    ]
+                  }
+                ],
+                "variables": {
+                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
+                },
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
+              }
+            },
+            "location": "australiaeast"
+          },
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "existenceScope": "resourcegroup",
+          "deploymentScope": "subscription"
+        }
+      }
+    }
+  }
+}

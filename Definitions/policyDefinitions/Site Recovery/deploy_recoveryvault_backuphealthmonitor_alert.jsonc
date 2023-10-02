@@ -1,0 +1,79 @@
+{
+  "name": "Deploy_RecoveryVault_BackupHealthMonitor_Alert",
+  "properties": {
+    "displayName": "Deploy RV Backup Health Monitoring Alerts",
+    "description": "Policy to audit/update Recovery Vault Backup Health Alerting to Azure monitor alerts",
+    "mode": "All",
+    "metadata": {
+      "version": "1.0.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True",
+      "alzCloudEnvironments": [
+        "AzureCloud"
+      ],
+      "category": "Site Recovery"
+    },
+    "parameters": {
+      "effect": {
+        "allowedValues": [
+          "modify",
+          "audit",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "defaultValue": "modify",
+        "type": "String"
+      },
+      "monitorDisable": {
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.RecoveryServices/Vaults"
+          },
+          {
+            "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
+            "notEquals": "true"
+          },
+          {
+            "field": "Microsoft.RecoveryServices/vaults/monitoringSettings.azureMonitorAlertSettings.alertsForAllJobFailures",
+            "notEquals": "Enabled"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
+          "conflictEffect": "audit",
+          "operations": [
+            {
+              "value": "Disabled",
+              "field": "Microsoft.RecoveryServices/vaults/monitoringSettings.classicAlertSettings.alertsForCriticalOperations",
+              "operation": "addOrReplace"
+            },
+            {
+              "value": "Enabled",
+              "field": "Microsoft.RecoveryServices/vaults/monitoringSettings.azureMonitorAlertSettings.alertsForAllJobFailures",
+              "operation": "addOrReplace"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
