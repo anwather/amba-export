@@ -20,7 +20,7 @@ $gs = @"
             "pacSelector": "amba",
             "cloud": "AzureCloud",
             "tenantId": "$tenantId",
-            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/alz"
+            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/amba"
         }
     ]
 }
