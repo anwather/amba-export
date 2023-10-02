@@ -1,0 +1,4526 @@
+{
+  "name": "Alerting-Connectivity",
+  "properties": {
+    "displayName": "Deploy Azure Monitor Baseline Alerts for Connectivity",
+    "description": "Initiative to deploy AMBA alerts relevant to the ALZ Connectivity management group",
+    "metadata": {
+      "version": "1.0.2",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": true,
+      "alzCloudEnvironments": [
+        "AzureCloud"
+      ],
+      "category": "Monitoring"
+    },
+    "parameters": {
+      "alzMonitorResourceGroupLocation": {
+        "metadata": {
+          "description": "Location of the resource group where the ALZ Monitor resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Location"
+        },
+        "defaultValue": "centralus",
+        "type": "String"
+      },
+      "alzMonitorResourceGroupName": {
+        "metadata": {
+          "description": "Name of the resource group where the ALZ Monitor resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Name"
+        },
+        "defaultValue": "ALZ-Monitoring-RG",
+        "type": "String"
+      },
+      "alzMonitorResourceGroupTags": {
+        "metadata": {
+          "description": "Tags to be applied to the resource group where the ALZ Monitor resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Tags"
+        },
+        "defaultValue": {
+          "_deployed_by_alz_monitor": true
+        },
+        "type": "Object"
+      },
+      "lbGlobalBackendAvailabilityEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "LB Global Backend Availability Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "lbDatapathAvailabilityEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "LB Data path Availability Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "lbGlobalBackendAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "LB Global Backend Availability Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "lbGlobalBackendAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "LB Global Backend Availability Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "lbHealthProbeStatusEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "LB Health Probe Status Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "pipvipAvailabilityEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PIP VIP Availability Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "lbGlobalBackendAvailabilityWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "LB Global Backend Availability Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "lbGlobalBackendAvailabilityAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "LB Global Backend Availability Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "lbDatapathAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "LB Data path Availability Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "pipPacketsInDDoSEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PIP Packets In DDoS Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "lbUsedSNATPortsEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "LB Used SNAT Ports Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "lbDatapathAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "LB Data path Availability Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "pipBytesInDDoSEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PIP Bytes In DDoS Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetddosAttackEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VNET DDoS Attack Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "lbDatapathAvailabilityWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "LB Data path Availability Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "lbDatapathAvailabilityAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "LB Data path Availability Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "lbHealthProbeStatusAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "LB Health Probe Status Alert Severity"
+        },
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "pipdDoSAttackEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PIP DDoS Attack Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "lbHealthProbeStatusPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "LB Health Probe Status Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "pipvipAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PIP VIP Availability Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "pipvipAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PIP VIP Availability Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "lbHealthProbeStatusAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "LB Health Probe Status Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pipPacketsInDDoSAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PIP Packets In DDoS Alert Severity"
+        },
+        "defaultValue": "4",
+        "type": "String"
+      },
+      "lbHealthProbeStatusWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "LB Health Probe Status Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "pipvipAvailabilityWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PIP VIP Availability Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "pipvipAvailabilityAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PIP VIP Availability Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pipPacketsInDDoSPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PIP Packets In DDoS Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "lbUsedSNATPortsAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "LB Used SNAT Ports Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "activityNSGDeleteAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Activity NSG Delete Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "lbUsedSNATPortsPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "LB Used SNAT Ports Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "activityUDRUpdateAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Activity UDR Update Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pipvipAvailabilityThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PIP VIP Availability Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vnetddosAttackAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VNET DDoS Attack Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "pipBytesInDDoSAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PIP Bytes In DDoS Alert Severity"
+        },
+        "defaultValue": "4",
+        "type": "String"
+      },
+      "pipPacketsInDDoSWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PIP Packets In DDoS Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "pipPacketsInDDoSAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PIP Packets In DDoS Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pipBytesInDDoSPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PIP Bytes In DDoS Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "pipdDoSAttackAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PIP DDoS Attack Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "vnetddosAttackPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VNET DDoS Attack Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "lbUsedSNATPortsWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "LB Used SNAT Ports Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "pipdDoSAttackPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PIP DDoS Attack Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "lbUsedSNATPortsAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "LB Used SNAT Ports Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pipPacketsInDDoSThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PIP Packets In DDoS Threshold"
+        },
+        "defaultValue": "40000",
+        "type": "string"
+      },
+      "vnetddosAttackWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VNET DDoS Attack Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetddosAttackAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VNET DDoS Attack Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pipBytesInDDoSAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PIP Bytes In DDoS Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pipBytesInDDoSWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PIP Bytes In DDoS Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "pipBytesInDDoSThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PIP Bytes In DDoS Threshold"
+        },
+        "defaultValue": "8000000",
+        "type": "string"
+      },
+      "pipdDoSAttackWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PIP DDoS Attack Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "pipdDoSAttackAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PIP DDoS Attack Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetddosAttackThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "VNET DDoS Attack Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "pipdDoSAttackThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PIP DDoS Attack Threshold"
+        },
+        "defaultValue": "0",
+        "type": "string"
+      },
+      "erGwExpressRouteCpuUtilEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ER Gw Express Route Cpu Util Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "erGwExpressRouteCpuUtilPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ER Gw Express Route Cpu Util Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erGwExpressRouteCpuUtilAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ER Gw Express Route Cpu Util Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erGwExpressRouteCpuUtilThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "ER Gw Express Route Cpu Util Threshold"
+        },
+        "defaultValue": "80",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsInAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ER Gw Express Route Bits In Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "vnetGwTunnelEgressPacketDropCountAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Count Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "vnetGwTunnelEgressPacketDropCountWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Count Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressPacketDropCountEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Count Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressPacketDropCountPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Count Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressPacketDropCountAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Count Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressPacketDropMismatchAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Mismatch Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vnetGwTunnelEgressPacketDropMismatchWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Mismatch Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressPacketDropMismatchEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Mismatch Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressPacketDropMismatchPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Mismatch Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressPacketDropMismatchAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Packet Drop Mismatch Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetGwExpressRouteBitsPerSecondAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Express Route Bits Per Second Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "vnetGwExpressRouteBitsPerSecondWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Express Route Bits Per Second Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwExpressRouteBitsPerSecondEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw Express Route Bits Per Second Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "vnetGwExpressRouteBitsPerSecondPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw Express Route Bits Per Second Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vnetGwExpressRouteBitsPerSecondAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw Express Route Bits Per Second Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetGwExpressRouteBitsPerSecondThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Vnet Gw Express Route Bits Per Second Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPacketDropMismatchAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Mismatch Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vnetGwTunnelIngressPacketDropMismatchWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Mismatch Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPacketDropMismatchEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Mismatch Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPacketDropMismatchPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Mismatch Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPacketDropMismatchAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Mismatch Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPacketDropCountAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Count Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vnetGwTunnelIngressPacketDropCountWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Count Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPacketDropCountEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Count Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPacketDropCountPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Count Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPacketDropCountAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Packet Drop Count Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "ercirBgpAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERCIR Bgp Availability Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "ercirBgpAvailabilityWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERCIR Bgp Availability Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "ercirBgpAvailabilityEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERCIR Bgp Availability Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "ercirBgpAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERCIR Bgp Availability Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "ercirBgpAvailabilityAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERCIR Bgp Availability Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "ercirBgpAvailabilityThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "ERCIR Bgp Availability Threshold"
+        },
+        "defaultValue": "90",
+        "type": "string"
+      },
+      "ercirArpAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERCIR Arp Availability Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "ercirArpAvailabilityWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERCIR Arp Availability Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "ercirArpAvailabilityFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERCIR Arp Availability Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "ercirArpAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERCIR ARP Availability Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "ercirArpAvailabilityAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERCIR Arp Availability Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "ercirArpAvailabilityThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "ERCIR Arp Availability Threshold"
+        },
+        "defaultValue": "90",
+        "type": "string"
+      },
+      "afwsnatPortUtilizationWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "AFW SNAT Port Utilization Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "afwsnatPortUtilizationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "AFW SNAT Port Utilization Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "afwsnatPortUtilizationPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "AFW SNAT Port Utilization Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "afwsnatPortUtilizationAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "AFW SNAT Port Utilization Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "afwsnatPortUtilizationThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "AFW SNAT Port Utilization Threshold"
+        },
+        "defaultValue": "80",
+        "type": "string"
+      },
+      "firewallHealthAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Firewall Health Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "firewallHealthWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Firewall Health Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "firewallHealthEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Firewall Health Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "firewallHealthPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Firewall Health Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "firewallHealthAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Firewall Health Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "firewallHealthThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Firewall Health Threshold"
+        },
+        "defaultValue": "90",
+        "type": "string"
+      },
+      "activityFWDeleteAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Activity FW Delete Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pdnszRegistrationCapacityUtilThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PDNSZ Registration Capacity Util Threshold"
+        },
+        "defaultValue": "80",
+        "type": "string"
+      },
+      "pdnszRegistrationCapacityUtilAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PDNSZ Registration Capacity Util Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "activityVPNGWDeleteAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Activity VPN GW Delete Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pdnszRegistrationCapacityUtilPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PDNSZ Registration Capacity Util Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vpngwBandWidthUtilAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VPN GW Band Width Util Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pdnszRegistrationCapacityUtilEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PDNSZ Registration Capacity Util Evaluation Frequency"
+        },
+        "defaultValue": "PT1H",
+        "type": "string"
+      },
+      "pdnszRegistrationCapacityUtilWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PDNSZ Registration Capacity Util Window Size"
+        },
+        "defaultValue": "PT1H",
+        "type": "string"
+      },
+      "pdnszRegistrationCapacityUtilAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PDNSZ Registration Capacity Util Alert Severity"
+        },
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "pdnszRecordSetCapacityThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PDNSZ Record Set Capacity Threshold"
+        },
+        "defaultValue": "80",
+        "type": "string"
+      },
+      "pdnszRecordSetCapacityAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PDNSZ Record Set Capacity Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pdnszRecordSetCapacityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PDNSZ Record Set Capacity Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "pdnszRecordSetCapacityEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PDNSZ Record Set Capacity Evaluation Frequency"
+        },
+        "defaultValue": "PT1H",
+        "type": "string"
+      },
+      "pdnszRecordSetCapacityWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PDNSZ Record Set Capacity Window Size"
+        },
+        "defaultValue": "PT1H",
+        "type": "string"
+      },
+      "pdnszRecordSetCapacityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PDNSZ Record Set Capacity Alert Severity"
+        },
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "pdnszQueryVolumeThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PDNSZ Query Volume Threshold"
+        },
+        "defaultValue": "500",
+        "type": "string"
+      },
+      "pdnszQueryVolumeAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PDNSZ Query Volume Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pdnszQueryVolumePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PDNSZ Query Volume Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "pdnszQueryVolumeEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PDNSZ Query Volume Evaluation Frequency"
+        },
+        "defaultValue": "PT1H",
+        "type": "string"
+      },
+      "pdnszQueryVolumeWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PDNSZ Query Volume Window Size"
+        },
+        "defaultValue": "PT1H",
+        "type": "string"
+      },
+      "pdnszQueryVolumeAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PDNSZ Query Volume Alert Severity"
+        },
+        "defaultValue": "4",
+        "type": "String"
+      },
+      "pdnszCapacityUtilThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PDNSZ Capacity Util Threshold"
+        },
+        "defaultValue": "80",
+        "type": "string"
+      },
+      "pdnszCapacityUtilAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PDNSZ Capacity Util Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pdnszCapacityUtilPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PDNSZ Capacity Util Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erpBitsInPerSecondAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERP Bits In Per Second Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "erpBitsInPerSecondWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERP Bits In Per Second Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erpBitsInPerSecondEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERP Bits In Per Second Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "erpBitsInPerSecondPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERP Bits In Per Second Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erpBitsInPerSecondAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERP Bits In Per Second Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erpBitsOutPerSecondAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERP Bits Out Per Second Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "erpBitsOutPerSecondWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERP Bits Out Per Second Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erpBitsOutPerSecondEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERP Bits Out Per Second Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "erpBitsOutPerSecondPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERP Bits Out Per Second Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erpBitsOutPerSecondAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERP Bits Out Per Second Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erpLineProtocolAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERP Line Protocol Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "erpLineProtocolWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERP Line Protocol Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erpLineProtocolEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERP Line Protocol Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "erpLineProtocolPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERP Line Protocol Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erpLineProtocolAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERP Line Protocol Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erpRxLightLevelHighAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERP Rx Light Level High Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "erpRxLightLevelHighWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERP Rx Light Level High Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erpRxLightLevelHighEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERP Rx Light Level High Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "erpRxLightLevelHighPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERP Rx Light Level High Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erpRxLightLevelHighAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERP Rx Light Level High Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erpRxLightLevelLowAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERP Rx Light Level Low Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "erpRxLightLevelLowWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERP Rx Light Level Low Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erpRxLightLevelLowEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERP Rx Light Level Low Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "erpRxLightLevelLowPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERP Rx Light Level Low Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erpRxLightLevelLowAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERP Rx Light Level Low Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erpTxLightLevelHighAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERP Tx Light Level High Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "erpTxLightLevelHighWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERP Tx Light Level High Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erpTxLightLevelHighEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERP Tx Light Level High Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "erpTxLightLevelHighPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERP Tx Light Level High Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erpTxLightLevelHighAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERP Tx Light Level High Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erpTxLightLevelLowAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERP Tx Light Level Low Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "erpTxLightLevelLowWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERP Tx Light Level Low Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erpTxLightLevelLowEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERP Tx Light Level Low Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "erpTxLightLevelLowPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERP Tx Light Level Low Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "erpTxLightLevelLowAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERP Tx Light Level Low Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "ercirQoSDropBitsinPerSecAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Alert Severity"
+        },
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "ercirQoSDropBitsinPerSecWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "ercirQoSDropBitsinPerSecEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "ercirQoSDropBitsinPerSecPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "ercirQoSDropBitsinPerSecAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "ercirQoSDropBitsoutPerSecAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Alert Severity"
+        },
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "ercirQoSDropBitsoutPerSecWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "ercirQoSDropBitsoutPerSecEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "ercirQoSDropBitsoutPerSecPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "ercirQoSDropBitsoutPerSecAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vpnGwBGPPeerStatusAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN Gw BGP Peer Status Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vpnGwBGPPeerStatusWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN Gw BGP Peer Status Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpnGwBGPPeerStatusEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN Gw BGP Peer Status Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpnGwBGPPeerStatusPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN Gw BGP Peer Status Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vpnGwBGPPeerStatusAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VPN Gw BGP Peer Status Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vpnGwBGPPeerStatusThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "VPN Gw BGP Peer Status Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vnetGwERCpuUtilAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw ER Cpu Util Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vnetGwERCpuUtilWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw ER Cpu Util Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwERCpuUtilEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw ER Cpu Util Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "vnetGwERCpuUtilPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw ER Cpu Util Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vnetGwERCpuUtilAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw ER Cpu Util Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetGwERCpuUtilThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Vnet Gw ER Cpu Util Threshold"
+        },
+        "defaultValue": "80",
+        "type": "string"
+      },
+      "vnetGwTunnelBWAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Tunnel BW Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "vnetGwTunnelBWWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Tunnel BW Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelBWEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw Tunnel BW Evaluation Frequency"
+        },
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "afwsnatPortUtilizationAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "AFW SNAT Port Utilization Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "vnetGwTunnelBWAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw Tunnel BW Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetGwTunnelBWThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Vnet Gw Tunnel BW Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Tunnel Egress Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "vnetGwTunnelEgressWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw Tunnel Egress Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetGwTunnelEgressThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Vnet Gw Tunnel Egress Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "vnetGwTunnelIngressWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vnetGwTunnelIngressThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Vnet Gw Tunnel Ingress Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vpngwBandWidthUtilAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN GW Band Width Util Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "vpngwBandWidthUtilWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN GW Band Width Util Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwBandWidthUtilEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN GW Band Width Util Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwBandWidthUtilPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN GW Band Width Util Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vpngwBandWidthUtilThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "VPN GW Band Width Util Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vpngwEgressAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN GW Egress Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "vpngwEgressWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN GW Egress Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwEgressEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN GW Egress Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwEgressPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN GW Egress Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "vpngwEgressAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VPN GW Egress Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vpngwEgressThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "VPN GW Egress Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vpngwTunnelEgressPacketDropCountAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Count Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vpngwTunnelEgressPacketDropCountWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Count Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwTunnelEgressPacketDropCountFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Count Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwTunnelEgressPacketDropCountPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Count Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vpngwTunnelEgressPacketDropCountAlertState": {
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vpngwTunnelEgressPacketDropMismatchAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Mismatch Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vpngwTunnelEgressPacketDropMismatchWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Mismatch Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwTunnelEgressPacketDropMismatchFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Mismatch Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwTunnelEgressPacketDropMismatchPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Mismatch Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vpngwTunnelEgressPacketDropMismatchAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VPN GW Tunnel Egress Packet Drop Mismatch Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vpngwIngressAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN GW Ingress Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "string"
+      },
+      "vpngwIngressWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN GW Ingress Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwIngressEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN GW Ingress Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwIngressPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN GW Ingress Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "vpngwIngressAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VPN GW Ingress Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vpngwIngressThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "VPN GW Ingress Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "vpngwIngressAutoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "VPN GW Ingress Auto Mitigate"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vpngwTunnelIngressPacketDropCountAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Count Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vpngwTunnelIngressPacketDropCountWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Count Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwTunnelIngressPacketDropCountFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Count Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwTunnelIngressPacketDropCountPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Count Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vpngwTunnelIngressPacketDropCountAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Count Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "vpngwTunnelIngressPacketDropMismatchAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Mismatch Alert Severity"
+        },
+        "defaultValue": "3",
+        "type": "String"
+      },
+      "vpngwTunnelIngressPacketDropMismatchWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Mismatch Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwTunnelIngressPacketDropMismatchFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Mismatch Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vpngwTunnelIngressPacketDropMismatchPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Mismatch Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "vpngwTunnelIngressPacketDropMismatchAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VPN GW Tunnel Ingress Packet Drop Mismatch Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "pdnszCapacityUtilAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PDNSZ Capacity Util Alert Severity"
+        },
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "pdnszCapacityUtilWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PDNSZ Capacity Util Window Size"
+        },
+        "defaultValue": "PT1H",
+        "type": "string"
+      },
+      "pdnszCapacityUtilEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PDNSZ Capacity Util Evaluation Frequency"
+        },
+        "defaultValue": "PT1H",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsInWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ER Gw Express Route Bits In Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsInEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ER Gw Express Route Bits In Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsInPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ER Gw Express Route Bits In Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsInAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ER Gw Express Route Bits In Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsInThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "ER Gw Express Route Bits In Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsOutAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ER Gw Express Route Bits Out Alert Severity"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
+      "erGwExpressRouteBitsOutWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ER Gw Express Route Bits Out Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsOutEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ER Gw Express Route Bits Out Evaluation Frequency"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsOutPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ER Gw Express Route Bits Out Policy Effect"
+        },
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsOutAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ER Gw Express Route Bits Out Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "erGwExpressRouteBitsOutThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "ER Gw Express Route Bits Out Threshold"
+        },
+        "defaultValue": "1",
+        "type": "string"
+      },
+      "erGwExpressRouteCpuUtilAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ER Gw Express Route Cpu Util Alert Severity"
+        },
+        "defaultValue": "1",
+        "type": "String"
+      },
+      "erGwExpressRouteCpuUtilWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ER Gw Express Route Cpu Util Window Size"
+        },
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "vnetGwTunnelBWPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw Tunnel BW Policy Effect"
+        },
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      }
+    },
+    "policyDefinitions": [
+      {
+        "policyDefinitionReferenceId": "ALZ_ERCIRQoSDropBitsinPerSec",
+        "policyDefinitionName": "Deploy_ERCIR_QosDropBitsInPerSecond_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERCIRQoSDropBitsinPerSecEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERCIRQoSDropBitsinPerSecPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERCIRQoSDropBitsinPerSecAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERCIRQoSDropBitsinPerSecWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERCIRQoSDropBitsinPerSecAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERCIRQoSDropBitsoutPerSec",
+        "policyDefinitionName": "Deploy_ERCIR_QosDropBitsOutPerSecond_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERCIRQoSDropBitsoutPerSecEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERCIRQoSDropBitsoutPerSecPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERCIRQoSDropBitsoutPerSecAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERCIRQoSDropBitsoutPerSecWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERCIRQoSDropBitsoutPerSecAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VPNGwBGPPeerStatus",
+        "policyDefinitionName": "Deploy_VPNGw_BGPPeerStatus_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VPNGwBGPPeerStatusThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGwBGPPeerStatusPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VPNGwBGPPeerStatusEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VPNGwBGPPeerStatusAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGwBGPPeerStatusAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VPNGwBGPPeerStatusWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwERCpuUtil",
+        "policyDefinitionName": "Deploy_VnetGw_ExpressRouteCpuUtil_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VnetGwERCpuUtilThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwERCpuUtilPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwERCpuUtilEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwERCpuUtilAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwERCpuUtilAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwERCpuUtilWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwTunnelBW",
+        "policyDefinitionName": "Deploy_VnetGw_TunnelBandwidth_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VnetGwTunnelBWThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelBWPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwTunnelBWEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwTunnelBWAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwTunnelBWAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwTunnelBWWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwTunnelEgress",
+        "policyDefinitionName": "Deploy_VnetGw_TunnelEgress_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VnetGwTunnelEgressThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelEgressPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwTunnelEgressEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwTunnelEgressAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwTunnelEgressAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwTunnelEgressWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwTunnelIngress",
+        "policyDefinitionName": "Deploy_VnetGw_TunnelIngress_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VnetGwTunnelIngressThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelIngressPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwTunnelIngressEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwTunnelIngressAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwTunnelIngressAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwTunnelIngressWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VPNGWBandWidthUtil",
+        "policyDefinitionName": "Deploy_VPNGw_BandwidthUtil_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VPNGWBandWidthUtilThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWBandWidthUtilPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VPNGWBandWidthUtilEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VPNGWBandWidthUtilAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGWBandWidthUtilAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VPNGWBandWidthUtilWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VPNGWEgress",
+        "policyDefinitionName": "Deploy_VPNGw_Egress_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VPNGWEgressThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWEgressPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VPNGWEgressEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VPNGWEgressAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGWEgressAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VPNGWEgressWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VPNGWTunnelEgressPacketDropCount",
+        "policyDefinitionName": "Deploy_VPNGw_TunnelEgressPacketDropCount_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropCountFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropCountPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropCountAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropCountWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropCountAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VPNGWTunnelEgressPacketDropMismatch",
+        "policyDefinitionName": "Deploy_VPNGw_TunnelEgressPacketDropMismatch_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VPNGWIngress",
+        "policyDefinitionName": "Deploy_VPNGw_Ingress_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VPNGWIngressThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWIngressPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VPNGWIngressEvaluationFrequency')]"
+          },
+          "autoMitigate": {
+            "value": "[parameters('VPNGWIngressAutoMitigate')]"
+          },
+          "enabled": {
+            "value": "[parameters('VPNGWIngressAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGWIngressAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VPNGWIngressWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VPNGWTunnelIngressPacketDropCount",
+        "policyDefinitionName": "Deploy_VPNGw_TunnelIngressPacketDropCount_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropCountFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropCountPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropCountAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropCountWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropCountAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VPNGWTunnelIngressPacketDropMismatch",
+        "policyDefinitionName": "Deploy_VPNGw_TunnelIngressPacketDropMismatch_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_PDNSZCapacityUtil",
+        "policyDefinitionName": "Deploy_PDNSZ_CapacityUtil_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('PDNSZCapacityUtilThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('PDNSZCapacityUtilPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('PDNSZCapacityUtilEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('PDNSZCapacityUtilAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('PDNSZCapacityUtilAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('PDNSZCapacityUtilWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_PDNSZQueryVolume",
+        "policyDefinitionName": "Deploy_PDNSZ_QueryVolume_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('PDNSZQueryVolumeThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('PDNSZQueryVolumePolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('PDNSZQueryVolumeEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('PDNSZQueryVolumeAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('PDNSZQueryVolumeAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('PDNSZQueryVolumeWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_PDNSZRecordSetCapacity",
+        "policyDefinitionName": "Deploy_PDNSZ_RecordSetCapacity_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('PDNSZRecordSetCapacityThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('PDNSZRecordSetCapacityPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('PDNSZRecordSetCapacityEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('PDNSZRecordSetCapacityAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('PDNSZRecordSetCapacityAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('PDNSZRecordSetCapacityWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_PDNSZRegistrationCapacityUtil",
+        "policyDefinitionName": "Deploy_DNSZ_RegistrationCapacityUtil_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('PDNSZRegistrationCapacityUtilThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('PDNSZRegistrationCapacityUtilPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('PDNSZRegistrationCapacityUtilEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('PDNSZRegistrationCapacityUtilAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('PDNSZRegistrationCapacityUtilAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('PDNSZRegistrationCapacityUtilWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERGwExpressRouteBitsIn",
+        "policyDefinitionName": "Deploy_ERGw_ExpressRouteBitsIn_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('ERGwExpressRouteBitsInThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('ERGwExpressRouteBitsInPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('ERGwExpressRouteBitsInEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERGwExpressRouteBitsInAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('ERGwExpressRouteBitsInAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERGwExpressRouteBitsInWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERGwExpressRouteBitsOut",
+        "policyDefinitionName": "Deploy_ERGw_ExpressRouteBitsOut_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('ERGwExpressRouteBitsOutThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('ERGwExpressRouteBitsOutPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('ERGwExpressRouteBitsOutEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERGwExpressRouteBitsOutAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('ERGwExpressRouteBitsOutAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERGwExpressRouteBitsOutWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERGwExpressRouteCpuUtil",
+        "policyDefinitionName": "Deploy_ERGw_ExpressRouteCpuUtil_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('ERGwExpressRouteCpuUtilThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('ERGwExpressRouteCpuUtilPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('ERGwExpressRouteCpuUtilEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERGwExpressRouteCpuUtilAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('ERGwExpressRouteCpuUtilAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERGwExpressRouteCpuUtilWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwTunnelEgressPacketDropCount",
+        "policyDefinitionName": "Deploy_VnetGw_TunnelEgressPacketDropCount_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropCountEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropCountPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropCountAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropCountWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropCountAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwTunnelEgressPacketDropMismatch",
+        "policyDefinitionName": "Deploy_VnetGw_TunnelEgressPacketDropMismatch_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwExpressRouteBitsPerSecond",
+        "policyDefinitionName": "Deploy_VnetGw_ExpressRouteBitsPerSecond_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VnetGwExpressRouteBitsPerSecondThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwExpressRouteBitsPerSecondPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwExpressRouteBitsPerSecondEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwExpressRouteBitsPerSecondAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwExpressRouteBitsPerSecondAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwExpressRouteBitsPerSecondWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwTunnelIngressPacketDropMismatchWindowSize",
+        "policyDefinitionName": "Deploy_VnetGw_TunnelIngressPacketDropMismatch_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VnetGwTunnelIngressPacketDropCountWindowSize",
+        "policyDefinitionName": "Deploy_VnetGw_TunnelIngressPacketDropCount_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropCountEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropCountPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropCountAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropCountWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropCountAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERCIRBgpAvailability",
+        "policyDefinitionName": "Deploy_ERCIR_BgpAvailability_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('ERCIRBgpAvailabilityThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('ERCIRBgpAvailabilityPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('ERCIRBgpAvailabilityEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERCIRBgpAvailabilityAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('ERCIRBgpAvailabilityAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERCIRBgpAvailabilityWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERCIRArpAvailability",
+        "policyDefinitionName": "Deploy_ERCIR_ArpAvailability_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('ERCIRArpAvailabilityThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('ERCIRArpAvailabilityPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('ERCIRArpAvailabilityFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERCIRArpAvailabilityAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('ERCIRArpAvailabilityAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERCIRArpAvailabilityWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_AFWSNATPortUtilization",
+        "policyDefinitionName": "Deploy_AFW_SNATPortUtilization_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('AFWSNATPortUtilizationThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('AFWSNATPortUtilizationPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('AFWSNATPortUtilizationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('AFWSNATPortUtilizationAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('AFWSNATPortUtilizationAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('AFWSNATPortUtilizationWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_PIPBytesInDDoSEvaluationFrequency",
+        "policyDefinitionName": "Deploy_PublicIp_BytesInDDoSAttack_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('PIPBytesInDDoSThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPBytesInDDoSPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('PIPBytesInDDoSEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('PIPBytesInDDoSAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('PIPBytesInDDoSAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('PIPBytesInDDoSWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_PIPDDoSAttack",
+        "policyDefinitionName": "Deploy_PublicIp_DDoSAttack_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('PIPDDoSAttackThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPDDoSAttackPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('PIPDDoSAttackEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('PIPDDoSAttackAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('PIPDDoSAttackAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('PIPDDoSAttackWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_PIPPacketsInDDoS",
+        "policyDefinitionName": "Deploy_PublicIp_PacketsInDDoSAttack_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('PIPPacketsInDDoSThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPPacketsInDDoSPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('PIPPacketsInDDoSEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('PIPPacketsInDDoSAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('PIPPacketsInDDoSAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('PIPPacketsInDDoSWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_PIPVIPAvailability",
+        "policyDefinitionName": "Deploy_PublicIp_VIPAvailability_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('PIPVIPAvailabilityThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPVIPAvailabilityPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('PIPVIPAvailabilityEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('PIPVIPAvailabilityAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('PIPVIPAvailabilityAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('PIPVIPAvailabilityWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_VNETDDOSAttack",
+        "policyDefinitionName": "Deploy_VNET_DDoSAttack_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('VNETDDOSAttackThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('VNETDDOSAttackPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VNETDDOSAttackEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('VNETDDOSAttackAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('VNETDDOSAttackAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VNETDDOSAttackWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_FirewallHealth",
+        "policyDefinitionName": "Deploy_AFW_FirewallHealth_Alert",
+        "parameters": {
+          "threshold": {
+            "value": "[parameters('FirewallHealthThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('FirewallHealthPolicyEffect')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('FirewallHealthEvaluationFrequency')]"
+          },
+          "enabled": {
+            "value": "[parameters('FirewallHealthAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('FirewallHealthAlertSeverity')]"
+          },
+          "windowSize": {
+            "value": "[parameters('FirewallHealthWindowSize')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_activityFWDelete",
+        "policyDefinitionName": "Deploy_activitylog_Firewall_Delete",
+        "parameters": {
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityFWDeleteAlertState')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_activityNSGDelete",
+        "policyDefinitionName": "Deploy_activitylog_NSG_Delete",
+        "parameters": {
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityNSGDeleteAlertState')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_activityUDRUpdate",
+        "policyDefinitionName": "Deploy_activitylog_RouteTable_Update",
+        "parameters": {
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityUDRUpdateAlertState')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_activityVPNGWDelete",
+        "policyDefinitionName": "Deploy_activitylog_VPNGateway_Delete",
+        "parameters": {
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityVPNGWDeleteAlertState')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_LBDataPathAvailability",
+        "policyDefinitionName": "Deploy_ALB_DataPathAvailability_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('LBDataPathAvailabilityEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('LBDataPathAvailabilityPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('LBDataPathAvailabilityAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('LBDataPathAvailabilityWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('LBDataPathAvailabilityAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_LBGlobalBackendAvailability",
+        "policyDefinitionName": "Deploy_ALB_GlobalBackendAvailability_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('LBGlobalBackendAvailabilityEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('LBGlobalBackendAvailabilityPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('LBGlobalBackendAvailabilityAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('LBGlobalBackendAvailabilityWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('LBGlobalBackendAvailabilityAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_LBHealthProbeStatus",
+        "policyDefinitionName": "Deploy_ALB_HealthProbeStatus_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('LBHealthProbeStatusEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('LBHealthProbeStatusPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('LBHealthProbeStatusAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('LBHealthProbeStatusWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('LBHealthProbeStatusAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_LBUsedSNATPorts",
+        "policyDefinitionName": "Deploy_ALB_UsedSNATPorts_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('LBUsedSNATPortsEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('LBUsedSNATPortsPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('LBUsedSNATPortsAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('LBUsedSNATPortsWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('LBUsedSNATPortsAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERPBitsInPerSecond",
+        "policyDefinitionName": "Deploy_ERP_ExpressRouteBitsIn_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERPBitsInPerSecondEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPBitsInPerSecondPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERPBitsInPerSecondAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERPBitsInPerSecondWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERPBitsInPerSecondAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERPBitsOutPerSecond",
+        "policyDefinitionName": "Deploy_ERP_ExpressRouteBitsOut_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERPBitsOutPerSecondEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPBitsOutPerSecondPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERPBitsOutPerSecondAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERPBitsOutPerSecondWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERPBitsOutPerSecondAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERPLineProtocol",
+        "policyDefinitionName": "Deploy_ERP_ExpressRoutLineProtocol_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERPLineProtocolEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPLineProtocolPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERPLineProtocolAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERPLineProtocolWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERPLineProtocolAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERPRxLightLevelHigh",
+        "policyDefinitionName": "Deploy_ERP_ExpressRoutRxLightLevell_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERPRxLightLevelHighEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPRxLightLevelHighPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERPRxLightLevelHighAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERPRxLightLevelHighWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERPRxLightLevelHighAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERPRxLightLevelLow",
+        "policyDefinitionName": "Deploy_ERP_ExpressRoutRxLightLevellow_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERPRxLightLevelLowEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPRxLightLevelLowPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERPRxLightLevelLowAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERPRxLightLevelLowWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERPRxLightLevelLowAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERPTxLightLevelHigh",
+        "policyDefinitionName": "Deploy_ERP_ExpressRoutTxLightLevell_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERPTxLightLevelHighEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPTxLightLevelHighPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERPTxLightLevelHighAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERPTxLightLevelHighWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERPTxLightLevelHighAlertSeverity')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_ERPTxLightLevelLow",
+        "policyDefinitionName": "Deploy_ERP_ExpressRoutTxLightLevellow_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('ERPTxLightLevelLowEvaluationFrequency')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPTxLightLevelLowPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('ERPTxLightLevelLowAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('ERPTxLightLevelLowWindowSize')]"
+          },
+          "severity": {
+            "value": "[parameters('ERPTxLightLevelLowAlertSeverity')]"
+          }
+        }
+      }
+    ]
+  }
+}
