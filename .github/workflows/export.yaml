@@ -1,0 +1,45 @@
+name: Sync Monitor Policies
+
+env:
+  REVIEWER: anwather
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Extract Policies
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+        - shell: pwsh
+          name: Install Required Modules
+          run: |
+            Install-Module Az.ResourceGraph -Force -AllowClobber
+            Install-Module Az.Resources -Force -AllowClobber
+            Install-Module EnterprisePolicyAsCode -Force
+        - name: Azure Login
+          uses: Azure/login@v1
+          with:
+            creds: '{"clientId":"${{ secrets.CLIENT_ID }}","clientSecret":"${{ secrets.CLIENT_SECRET }}","subscriptionId":"${{ secrets.SUBSCRIPTION_ID }}","tenantId":"${{ secrets.TENANT_ID }}"}'
+            enable-AzPSSession: true
+        - name: Extract Policies
+          uses: azure/powershell@v1
+          with:
+            inlineScript: |
+              ./extract-policies.ps1 -TenantId ${{ secrets.TENANT_ID }} -Location australiaeast
+            azPSVersion: "latest"
+        -   shell: pwsh
+            name: Create PR
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run: |
+              $branchName = "automated-pr-$(Get-Date -Format yyyy-MM-dd-HH-mm)"
+              git config user.name "GitHub Actions Bot"
+              git config user.email "<>"
+              git checkout -b $branchName
+              git reset ./assets/mg-structure.json
+              git add .
+              git commit -m "Extracted policy commit"
+              git push --set-upstream origin $branchName
+              gh pr create -B main -H $branchName --title "Approval Required for Policy Extraction - $branchName" --body "Policy extraction review" --reviewer $env:REVIEWER
