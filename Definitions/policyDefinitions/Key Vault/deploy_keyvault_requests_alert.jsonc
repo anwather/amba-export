@@ -5,13 +5,13 @@
     "description": "Policy to audit/deploy KeyVault Requests Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.0.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "_deployed_by_amba": "True",
+      "version": "1.0.1",
+      "category": "Key Vault",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "category": "Key Vault"
+      ]
     },
     "parameters": {
       "evaluationFrequency": {
@@ -22,11 +22,11 @@
           "PT30M",
           "PT1H"
         ],
+        "defaultValue": "PT5M",
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
         },
-        "defaultValue": "PT5M",
         "type": "String"
       },
       "autoMitigate": {
@@ -34,11 +34,11 @@
           "true",
           "false"
         ],
+        "defaultValue": "true",
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
         },
-        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
@@ -52,11 +52,11 @@
           "PT12H",
           "P1D"
         ],
+        "defaultValue": "PT5M",
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
         },
-        "defaultValue": "PT5M",
         "type": "String"
       },
       "enabled": {
@@ -64,11 +64,11 @@
           "true",
           "false"
         ],
+        "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Alert State"
         },
-        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
@@ -79,11 +79,11 @@
           "3",
           "4"
         ],
+        "defaultValue": "2",
         "metadata": {
           "description": "Severity of the Alert",
           "displayName": "Severity"
         },
-        "defaultValue": "2",
         "type": "String"
       },
       "effect": {
@@ -91,19 +91,19 @@
           "deployIfNotExists",
           "disabled"
         ],
+        "defaultValue": "disabled",
         "metadata": {
           "description": "Effect of the policy",
           "displayName": "Effect"
         },
-        "defaultValue": "disabled",
         "type": "String"
       },
       "monitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -172,7 +172,6 @@
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -211,6 +210,7 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for KeyVault Requests",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -228,7 +228,6 @@
                           "value": "[parameters('severity')]"
                         }
                       },
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
@@ -237,12 +236,12 @@
                         "allOf": [
                           {
                             "timeAggregation": "Average",
-                            "name": "ServiceApiResult",
                             "operator": "GreaterThan",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
+                            "name": "ServiceApiResult",
                             "metricNamespace": "microsoft.keyvault/vaults",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "ServiceApiResult",
@@ -256,8 +255,8 @@
                       ]
                     },
                     "apiVersion": "2018-03-01",
-                    "name": "[concat(parameters('resourceName'), '-RequestsAlert')]",
                     "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-RequestsAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -265,7 +264,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

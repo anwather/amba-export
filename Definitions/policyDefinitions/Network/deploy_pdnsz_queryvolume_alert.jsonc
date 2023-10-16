@@ -5,13 +5,13 @@
     "description": "Policy to audit/deploy Private DNS Zone Query Volume Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.0.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "_deployed_by_amba": "True",
+      "version": "1.0.1",
+      "category": "Network",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "category": "Network"
+      ]
     },
     "parameters": {
       "evaluationFrequency": {
@@ -22,11 +22,11 @@
           "PT30M",
           "PT1H"
         ],
+        "defaultValue": "PT1H",
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
         },
-        "defaultValue": "PT1H",
         "type": "String"
       },
       "autoMitigate": {
@@ -34,11 +34,11 @@
           "true",
           "false"
         ],
+        "defaultValue": "true",
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
         },
-        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
@@ -52,11 +52,11 @@
           "PT12H",
           "P1D"
         ],
+        "defaultValue": "PT1H",
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
         },
-        "defaultValue": "PT1H",
         "type": "String"
       },
       "enabled": {
@@ -64,11 +64,11 @@
           "true",
           "false"
         ],
+        "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Alert State"
         },
-        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
@@ -79,19 +79,19 @@
           "3",
           "4"
         ],
+        "defaultValue": "4",
         "metadata": {
           "description": "Severity of the Alert",
           "displayName": "Severity"
         },
-        "defaultValue": "4",
         "type": "String"
       },
       "threshold": {
+        "defaultValue": "500",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
-        "defaultValue": "500",
         "type": "String"
       },
       "effect": {
@@ -99,19 +99,19 @@
           "deployIfNotExists",
           "disabled"
         ],
+        "defaultValue": "disabled",
         "metadata": {
           "description": "Effect of the policy",
           "displayName": "Effect"
         },
-        "defaultValue": "disabled",
         "type": "String"
       },
       "monitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -183,7 +183,6 @@
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -225,6 +224,7 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Private DNS Query Volume",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -245,7 +245,6 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
@@ -255,8 +254,8 @@
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Total",
-                            "name": "QueryVolume",
                             "operator": "GreaterThanOrEqual",
+                            "name": "QueryVolume",
                             "metricNamespace": "Microsoft.Network/privateDnsZones",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "QueryVolume"
@@ -269,8 +268,8 @@
                       ]
                     },
                     "apiVersion": "2018-03-01",
-                    "name": "[concat(parameters('resourceName'), '-QueryVolumeAlert')]",
                     "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-QueryVolumeAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -278,7 +277,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

@@ -5,9 +5,9 @@
     "description": "Policy to audit/deploy Azure Load Balancer Used SNAT Ports Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.0.1",
       "_deployed_by_amba": "True",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.1",
       "Category": "Networking"
     },
     "parameters": {
@@ -19,23 +19,11 @@
           "PT30M",
           "PT1H"
         ],
+        "defaultValue": "PT1M",
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
         },
-        "defaultValue": "PT1M",
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
@@ -49,11 +37,11 @@
           "PT12H",
           "P1D"
         ],
+        "defaultValue": "PT5M",
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
         },
-        "defaultValue": "PT5M",
         "type": "String"
       },
       "enabled": {
@@ -61,11 +49,11 @@
           "true",
           "false"
         ],
+        "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Alert State"
         },
-        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
@@ -76,19 +64,11 @@
           "3",
           "4"
         ],
+        "defaultValue": "1",
         "metadata": {
           "description": "Severity of the Alert",
           "displayName": "Severity"
         },
-        "defaultValue": "1",
-        "type": "String"
-      },
-      "threshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "defaultValue": "900",
         "type": "String"
       },
       "effect": {
@@ -96,19 +76,39 @@
           "deployIfNotExists",
           "disabled"
         ],
+        "defaultValue": "deployIfNotExists",
         "metadata": {
           "description": "Effect of the policy",
           "displayName": "Effect"
         },
-        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
+      "threshold": {
+        "defaultValue": "900",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "type": "String"
       },
       "monitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -161,9 +161,6 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -176,11 +173,13 @@
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -193,9 +192,6 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
                   "windowSize": {
                     "type": "String"
                   },
@@ -206,6 +202,9 @@
                     "type": "String"
                   },
                   "threshold": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -222,12 +221,10 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for ALB Used SNAT Ports",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
@@ -240,13 +237,15 @@
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         }
                       },
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
@@ -265,17 +264,18 @@
                         "[parameters('resourceId')]"
                       ]
                     },
+                    "location": "global",
                     "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-ALBUsedSNATPorts')]",
-                    "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
-                "variables": {},
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                "variables": {}
+              },
+              "mode": "incremental"
             }
           }
         }
