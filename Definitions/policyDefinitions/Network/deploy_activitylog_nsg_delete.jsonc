@@ -5,9 +5,9 @@
     "description": "Policy to Deploy Activity Log NSG Delete Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.0.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.2",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
@@ -19,46 +19,46 @@
           "true",
           "false"
         ],
+        "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Alert State"
         },
-        "defaultValue": "true",
-        "type": "String"
-      },
-      "alertResourceGroupName": {
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "defaultValue": "AlzMonitoring-rg",
         "type": "String"
       },
       "alertResourceGroupLocation": {
+        "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
           "displayName": "Resource Group Location"
         },
-        "defaultValue": "centralus",
+        "type": "String"
+      },
+      "alertResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
         "type": "String"
       },
       "alertResourceGroupTags": {
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
         "defaultValue": {
           "_deployed_by_amba": true,
           "environment": "test"
         },
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
         "type": "Object"
       },
       "monitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring on resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -131,26 +131,25 @@
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "alertResourceGroupName": {
-                  "value": "[parameters('alertResourceGroupName')]"
-                },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
+                },
+                "alertResourceGroupName": {
+                  "value": "[parameters('alertResourceGroupName')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "enabled": {
                     "type": "string"
                   },
-                  "alertResourceGroupName": {
+                  "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "alertResourceGroupLocation": {
+                  "alertResourceGroupName": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
@@ -161,9 +160,9 @@
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
+                    "location": "[parameters('alertResourceGroupLocation')]",
                     "apiVersion": "2021-04-01",
                     "name": "[parameters('alertResourceGroupName')]",
-                    "location": "[parameters('alertResourceGroupLocation')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
@@ -178,7 +177,6 @@
                           "value": "[parameters('alertResourceGroupName')]"
                         }
                       },
-                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
@@ -222,17 +220,18 @@
                                 ]
                               }
                             },
+                            "location": "global",
                             "apiVersion": "2020-10-01",
                             "name": "ActivityNSGDelete",
-                            "location": "global",
                             "tags": {
                               "_deployed_by_amba": true
                             }
                           }
                         ],
-                        "variables": {},
-                        "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      }
+                        "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                        "variables": {}
+                      },
+                      "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
                     "name": "ActivityNSGDelete",
@@ -241,15 +240,16 @@
                     ]
                   }
                 ],
-                "variables": {},
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                "variables": {}
+              },
+              "mode": "incremental"
             },
             "location": "australiaeast"
           },
+          "deploymentScope": "subscription",
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "existenceScope": "resourcegroup",
-          "deploymentScope": "subscription"
+          "existenceScope": "resourcegroup"
         }
       }
     }

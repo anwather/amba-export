@@ -5,56 +5,56 @@
     "description": "Policy to Deploy Deploy Alert Processing Rule with Action Group",
     "mode": "All",
     "metadata": {
-      "version": "1.0.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "_deployed_by_amba": "True",
+      "version": "1.0.2",
+      "category": "Monitoring",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "category": "Monitoring"
+      ]
     },
     "parameters": {
       "monitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring at subscription. Set to true if monitoring process rule should be disabled",
           "displayName": "Effect"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "alzMonitorActionGroupEmail": {
+        "defaultValue": "action@mail.com",
         "metadata": {
           "description": "Email address to send alerts to",
           "displayName": "Action Group Email"
         },
-        "defaultValue": "action@mail.com",
         "type": "String"
       },
       "alzMonitorResourceGroupLocation": {
+        "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
           "displayName": "Resource Group Location"
         },
-        "defaultValue": "centralus",
-        "type": "String"
-      },
-      "alzMonitorResourceGroupName": {
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "defaultValue": "AlzMonitoring-rg",
         "type": "String"
       },
       "alzMonitorResourceGroupTags": {
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
         "metadata": {
           "description": "Tags on the Resource group the alert is placed in",
           "displayName": "Resource Group Tags"
         },
-        "defaultValue": {
-          "_deployed_by_amba": true
-        },
         "type": "Object"
+      },
+      "alzMonitorResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
+        "type": "String"
       }
     },
     "policyRule": {
@@ -78,7 +78,7 @@
             "allOf": [
               {
                 "field": "Microsoft.AlertsManagement/actionRules/description",
-                "equals": "Alz Alert Processing Rule for Subscription"
+                "equals": "AMBA Alert Processing Rule for Subscription"
               }
             ]
           },
@@ -101,7 +101,6 @@
                   "value": "[parameters('ALZMonitorResourceGroupTags')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "ALZMonitorActionGroupEmail": {
@@ -122,8 +121,8 @@
                   {
                     "type": "Microsoft.Resources/resourceGroups",
                     "apiVersion": "2021-04-01",
-                    "name": "[parameters('ALZMonitorResourceGroupName')]",
                     "location": "[parameters('ALZMonitorResourceGroupLocation')]",
+                    "name": "[parameters('ALZMonitorResourceGroupName')]",
                     "tags": "[parameters('ALZMonitorResourceGroupTags')]"
                   },
                   {
@@ -138,7 +137,6 @@
                           "value": "[parameters('ALZMonitorResourceGroupName')]"
                         }
                       },
-                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "ALZMonitorActionGroupEmail": {
@@ -154,7 +152,7 @@
                             "type": "Microsoft.Insights/actionGroups",
                             "properties": {
                               "enabled": true,
-                              "groupShortName": "AlzActionGrp",
+                              "groupShortName": "AmbaActionGr",
                               "copy": [
                                 {
                                   "name": "emailReceivers",
@@ -169,8 +167,8 @@
                               ]
                             },
                             "apiVersion": "2022-06-01",
-                            "name": "AlzActionGrp",
                             "location": "Global",
+                            "name": "AmbaActionGr",
                             "tags": {
                               "_deployed_by_amba": true
                             }
@@ -178,7 +176,7 @@
                           {
                             "type": "Microsoft.AlertsManagement/actionRules",
                             "properties": {
-                              "description": "Alz Alert Processing Rule for Subscription",
+                              "description": "AMBA Alert Processing Rule for Subscription",
                               "enabled": true,
                               "scopes": [
                                 "[subscription().Id]"
@@ -186,26 +184,27 @@
                               "actions": [
                                 {
                                   "actiongroupIds": [
-                                    "[[concat(subscription().Id, '/resourceGroups/', parameters('ALZMonitorResourceGroupName'), '/providers/Microsoft.Insights/actionGroups/AlzActionGrp')]"
+                                    "[[concat(subscription().Id, '/resourceGroups/', parameters('ALZMonitorResourceGroupName'), '/providers/Microsoft.Insights/actionGroups/AmbaActionGr')]"
                                   ],
                                   "actionType": "AddActionGroups"
                                 }
                               ]
                             },
                             "apiVersion": "2021-08-08",
-                            "name": "Alz Alert Processing Rule",
                             "location": "Global",
+                            "name": "AMBA Alert Processing Rule",
                             "tags": {
                               "_deployed_by_amba": true
                             },
                             "dependsOn": [
-                              "[concat('Microsoft.Insights/actionGroups/', 'AlzActionGrp')]"
+                              "[concat('Microsoft.Insights/actionGroups/', 'AmbaActionGr')]"
                             ]
                           }
                         ],
                         "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      }
+                      },
+                      "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
                     "name": "ActionGroupDeployment",
@@ -218,13 +217,14 @@
                   "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
                 },
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             },
             "location": "australiaeast"
           },
           "resourceGroupName": "[parameters('ALZMonitorResourceGroupName')]",
-          "existenceScope": "resourcegroup",
-          "deploymentScope": "subscription"
+          "deploymentScope": "subscription",
+          "existenceScope": "resourcegroup"
         }
       }
     }
