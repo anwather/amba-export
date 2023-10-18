@@ -5,13 +5,17 @@
     "description": "Policy to audit/deploy Azure Application Gateway ApplicationGatewayTotalTime Alert",
     "mode": "All",
     "metadata": {
-      "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "Category": "Networking",
       "version": "1.0.1",
-      "Category": "Networking"
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -20,13 +24,25 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
+        "type": "String"
+      },
+      "autoMitigate": {
         "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -38,25 +54,25 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
       "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -65,55 +81,39 @@
           "4"
         ],
         "defaultValue": "2",
+        "type": "String"
+      },
+      "monitorDisable": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
         "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
         "type": "String"
       },
       "alertSensitivity": {
+        "metadata": {
+          "description": "Alert Sensitivity for the alert",
+          "displayName": "Alert Sensitivity"
+        },
         "allowedValues": [
           "Low",
           "Medium",
           "High"
         ],
         "defaultValue": "Medium",
-        "metadata": {
-          "description": "Alert Sensitivity for the alert",
-          "displayName": "Alert Sensitivity"
-        },
         "type": "String"
       }
     },
@@ -121,8 +121,8 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Network/applicationgateways"
+            "equals": "Microsoft.Network/applicationgateways",
+            "field": "type"
           },
           {
             "field": "Microsoft.Network/applicationgateways/sku.name",
@@ -144,20 +144,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "Microsoft.Network/applicationgateways"
+                "equals": "Microsoft.Network/applicationgateways",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "ApplicationGatewayTotalTime"
+                "equals": "ApplicationGatewayTotalTime",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
               }
             ]
           },
@@ -173,6 +173,9 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -181,9 +184,6 @@
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -204,6 +204,9 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
                   "windowSize": {
                     "type": "String"
                   },
@@ -211,9 +214,6 @@
                     "type": "String"
                   },
                   "severity": {
-                    "type": "String"
-                  },
-                  "autoMitigate": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -228,15 +228,18 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for App Gateway ApplicationGatewayTotalTime",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
@@ -247,23 +250,21 @@
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
                         "alertSensitivity": {
                           "value": "[parameters('alertSensitivity')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Total",
-                            "name": "ApplicationGatewayTotalTime",
                             "operator": "GreaterThan",
+                            "name": "ApplicationGatewayTotalTime",
                             "metricNamespace": "Microsoft.Network/applicationgateways",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
@@ -280,16 +281,15 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "location": "global",
                     "apiVersion": "2018-03-01",
+                    "location": "global",
                     "name": "[concat(parameters('resourceName'), '-agApplicationGatewayTotalTime')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                "variables": {}
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
             }

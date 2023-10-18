@@ -5,16 +5,20 @@
     "description": "Policy to audit/deploy VM HeartBeat Alert for VMs in the resource group",
     "mode": "All",
     "metadata": {
-      "_deployed_by_amba": "True",
-      "version": "1.0.1",
       "category": "Compute",
+      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT5M",
           "PT15M",
@@ -22,25 +26,25 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
       "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT5M",
           "PT15M",
@@ -51,25 +55,25 @@
           "PT24H"
         ],
         "defaultValue": "PT15M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
       "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -78,21 +82,20 @@
           "4"
         ],
         "defaultValue": "1",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "type": "String"
       },
       "threshold": {
-        "defaultValue": "10",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
+        "defaultValue": "10",
         "type": "String"
       },
       "timeAggregation": {
+        "metadata": {
+          "displayName": "TimeAggregation"
+        },
         "allowedValues": [
           "Average",
           "Count",
@@ -101,24 +104,32 @@
           "Total"
         ],
         "defaultValue": "Average",
+        "type": "String"
+      },
+      "monitorDisable": {
         "metadata": {
-          "displayName": "TimeAggregation"
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
         "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "type": "String"
       },
       "operator": {
+        "metadata": {
+          "displayName": "Operator"
+        },
         "allowedValues": [
           "Equals",
           "GreaterThan",
@@ -127,37 +138,26 @@
           "LessThanOrEqual"
         ],
         "defaultValue": "GreaterThan",
-        "metadata": {
-          "displayName": "Operator"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
         "type": "String"
       },
       "autoResolveTime": {
-        "defaultValue": "true",
         "metadata": {
           "description": "Auto Resolve time for the alert in ISO 8601 format",
           "displayName": "Auto Resolve"
         },
+        "defaultValue": "true",
         "type": "String"
       },
       "autoResolve": {
+        "metadata": {
+          "description": "Auto Resolve for the alert",
+          "displayName": "Auto Resolve"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Resolve for the alert",
-          "displayName": "Auto Resolve"
-        },
         "type": "String"
       }
     },
@@ -165,8 +165,8 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Compute/virtualMachines"
+            "equals": "Microsoft.Compute/virtualMachines",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -181,16 +181,16 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
-                "equals": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]"
+                "equals": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]",
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
               },
               {
-                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name)]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name)]",
+                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/scheduledqueryrules/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/scheduledqueryrules/enabled"
               }
             ]
           },
@@ -265,13 +265,13 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/scheduledQueryRules",
                     "properties": {
                       "description": "Log Alert for Virtual Machine Heartbeat",
                       "displayName": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -298,6 +298,7 @@
                           "value": "[parameters('autoResolve')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
@@ -346,7 +347,6 @@
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
