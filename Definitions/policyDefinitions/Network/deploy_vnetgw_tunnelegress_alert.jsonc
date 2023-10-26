@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
   "name": "Deploy_VnetGw_TunnelEgress_Alert",
   "properties": {
     "displayName": "Deploy VNetG Tunnel Egress Alert",
@@ -26,6 +27,18 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -74,6 +87,22 @@
         },
         "type": "String"
       },
+      "threshold": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "type": "String"
+      },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -85,46 +114,18 @@
           "displayName": "Effect"
         },
         "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "1",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Network/virtualNetworkGateways"
+            "equals": "Microsoft.Network/virtualNetworkGateways",
+            "field": "type"
           },
           {
-            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType",
-            "equals": "VPN"
+            "equals": "VPN",
+            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -139,20 +140,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "Microsoft.Network/virtualNetworkGateways"
+                "equals": "Microsoft.Network/virtualNetworkGateways",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "TunnelEgressBytes"
+                "equals": "TunnelEgressBytes",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworkGateways/', field('fullName'))]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworkGateways/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
               }
             ]
           },
@@ -168,6 +169,9 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -179,9 +183,6 @@
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
-                },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -199,6 +200,9 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
                   "windowSize": {
                     "type": "String"
                   },
@@ -211,9 +215,6 @@
                   "threshold": {
                     "type": "String"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
                   "resourceName": {
                     "metadata": {
                       "description": "Name of the resource",
@@ -223,15 +224,20 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for VNet Gateway Tunnel Egress Bytes",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
@@ -244,22 +250,18 @@
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
                         }
                       },
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "name": "TunnelEgressBytes",
                             "operator": "LessThan",
+                            "name": "TunnelEgressBytes",
                             "metricNamespace": "Microsoft.Network/virtualNetworkGateways",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "TunnelEgressBytes"
@@ -271,16 +273,15 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "location": "global",
                     "apiVersion": "2018-03-01",
+                    "location": "global",
                     "name": "[concat(parameters('resourceName'), '-TunnelEgressAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                "variables": {}
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
             }

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
   "name": "Deploy_KeyVault_Requests_Alert",
   "properties": {
     "displayName": "Deploy KeyVault Requests Alert",
@@ -6,12 +7,12 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.0.1",
-      "category": "Key Vault",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.1",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "category": "Key Vault"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -86,6 +87,14 @@
         },
         "type": "String"
       },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -97,22 +106,14 @@
           "displayName": "Effect"
         },
         "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "microsoft.keyvault/vaults"
+            "equals": "microsoft.keyvault/vaults",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -127,20 +128,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "microsoft.keyvault/vaults"
+                "equals": "microsoft.keyvault/vaults",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "ServiceApiResult"
+                "equals": "ServiceApiResult",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.keyvault/vaults/', field('fullName'))]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.keyvault/vaults/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
               }
             ]
           },
@@ -205,12 +206,14 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for KeyVault Requests",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -228,7 +231,6 @@
                           "value": "[parameters('severity')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
@@ -262,7 +264,6 @@
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

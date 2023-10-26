@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
   "name": "Deploy_VnetGw_TunnelIngressPacketDropMismatch_Alert",
   "properties": {
     "displayName": "Deploy VNetG Ingress Packet Drop Mismatch Alert",
@@ -26,6 +27,18 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -74,6 +87,14 @@
         },
         "type": "String"
       },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -85,38 +106,18 @@
           "displayName": "Effect"
         },
         "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "microsoft.network/virtualNetworkGateways"
+            "equals": "microsoft.network/virtualNetworkGateways",
+            "field": "type"
           },
           {
-            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType",
-            "equals": "VPN"
+            "equals": "VPN",
+            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -131,20 +132,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "microsoft.network/virtualNetworkGateways"
+                "equals": "microsoft.network/virtualNetworkGateways",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "TunnelIngressPacketDropTSMismatch"
+                "equals": "TunnelIngressPacketDropTSMismatch",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/virtualNetworkGateways/', field('fullName'))]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/virtualNetworkGateways/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
               }
             ]
           },
@@ -160,6 +161,9 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -168,9 +172,6 @@
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -188,6 +189,9 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
                   "windowSize": {
                     "type": "String"
                   },
@@ -195,9 +199,6 @@
                     "type": "String"
                   },
                   "severity": {
-                    "type": "String"
-                  },
-                  "autoMitigate": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -209,15 +210,20 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Vnet Gateway tunnel TunnelIngressPacketDropTSMismatch",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
@@ -227,26 +233,22 @@
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
                         }
                       },
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
-                            "name": "TunnelIngressPacketDropTSMismatch",
                             "operator": "GreaterThan",
-                            "metricNamespace": "microsoft.network/virtualNetworkGateways",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
+                            "name": "TunnelIngressPacketDropTSMismatch",
+                            "metricNamespace": "microsoft.network/virtualNetworkGateways",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "TunnelIngressPacketDropTSMismatch",
                             "alertSensitivity": "Medium"
@@ -258,16 +260,15 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "location": "global",
                     "apiVersion": "2018-03-01",
+                    "location": "global",
                     "name": "[concat(parameters('resourceName'), '-TunnelIngressPacketDropTSMismatchAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                "variables": {}
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
             }

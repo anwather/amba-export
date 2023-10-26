@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
   "name": "Deploy_RecoveryVault_BackupHealthMonitor_Alert",
   "properties": {
     "displayName": "Deploy RV Backup Health Monitoring Alerts",
@@ -6,14 +7,22 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.0.0",
-      "category": "Site Recovery",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "category": "Site Recovery"
     },
     "parameters": {
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "modify",
@@ -26,22 +35,14 @@
           "displayName": "Effect"
         },
         "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.RecoveryServices/Vaults"
+            "equals": "Microsoft.RecoveryServices/Vaults",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
