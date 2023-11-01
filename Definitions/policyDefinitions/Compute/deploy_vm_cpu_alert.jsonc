@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM CPU Alert",
     "mode": "All",
     "metadata": {
-      "_deployed_by_amba": "True",
+      "category": "Compute",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "version": "1.0.1",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "category": "Compute"
+      "version": "1.0.1"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -29,6 +29,18 @@
         },
         "type": "String"
       },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
       "autoMitigate": {
         "allowedValues": [
           "true",
@@ -38,6 +50,18 @@
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -58,15 +82,11 @@
         },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "alertResourceGroupName": {
+        "defaultValue": "AlzMonitoring-rg",
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
         },
         "type": "String"
       },
@@ -82,14 +102,6 @@
         "metadata": {
           "description": "Severity of the Alert",
           "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "alertResourceGroupName": {
-        "defaultValue": "AlzMonitoring-rg",
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
         },
         "type": "String"
       },
@@ -109,6 +121,16 @@
         },
         "type": "String"
       },
+      "alertResourceGroupTags": {
+        "defaultValue": {
+          "environment": "test"
+        },
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "type": "Object"
+      },
       "timeAggregation": {
         "allowedValues": [
           "Average",
@@ -123,16 +145,6 @@
         },
         "type": "String"
       },
-      "alertResourceGroupTags": {
-        "defaultValue": {
-          "environment": "test"
-        },
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "type": "Object"
-      },
       "operator": {
         "allowedValues": [
           "Equals",
@@ -144,18 +156,6 @@
         "defaultValue": "GreaterThan",
         "metadata": {
           "displayName": "Operator"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -192,8 +192,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Compute/virtualMachines",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
           }
         ]
       },
@@ -204,16 +204,16 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[concat(subscription().displayName, '-VMHighCPUAlert')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
+                "equals": "[concat(subscription().displayName, '-VMHighCPUAlert')]"
               },
               {
-                "equals": "[subscription().id]",
-                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]"
+                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]",
+                "equals": "[subscription().id]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/scheduledqueryrules/enabled"
+                "field": "Microsoft.Insights/scheduledqueryrules/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -226,20 +226,20 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "alertResourceGroupName": {
+                  "value": "[parameters('alertResourceGroupName')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "alertResourceGroupName": {
-                  "value": "[parameters('alertResourceGroupName')]"
                 },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
@@ -247,11 +247,11 @@
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
-                "timeAggregation": {
-                  "value": "[parameters('timeAggregation')]"
-                },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
+                },
+                "timeAggregation": {
+                  "value": "[parameters('timeAggregation')]"
                 },
                 "operator": {
                   "value": "[parameters('operator')]"
@@ -266,9 +266,13 @@
                   "value": "[parameters('autoResolve')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
+                    "type": "String"
+                  },
+                  "enabled": {
                     "type": "String"
                   },
                   "autoMitigate": {
@@ -277,14 +281,11 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
-                    "type": "String"
+                  "alertResourceGroupName": {
+                    "type": "string"
                   },
                   "severity": {
                     "type": "String"
-                  },
-                  "alertResourceGroupName": {
-                    "type": "string"
                   },
                   "alertResourceGroupLocation": {
                     "type": "string"
@@ -292,11 +293,11 @@
                   "threshold": {
                     "type": "String"
                   },
-                  "timeAggregation": {
-                    "type": "String"
-                  },
                   "alertResourceGroupTags": {
                     "type": "object"
+                  },
+                  "timeAggregation": {
+                    "type": "String"
                   },
                   "operator": {
                     "type": "String"
@@ -312,12 +313,11 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "apiVersion": "2021-04-01",
                     "location": "[parameters('alertResourceGroupLocation')]",
+                    "apiVersion": "2021-04-01",
                     "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
@@ -336,6 +336,7 @@
                           "value": "[parameters('alertResourceGroupLocation')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
@@ -349,18 +350,18 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
                             "properties": {
                               "description": "Log Alert for Virtual Machine CPU",
                               "displayName": "[concat(subscription().displayName, '-VMHighCPUAlert')]",
-                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                              "autoMitigate": "[parameters('autoMitigate')]",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
+                                },
+                                "enabled": {
+                                  "value": "[parameters('enabled')]"
                                 },
                                 "autoMitigate": {
                                   "value": "[parameters('autoMitigate')]"
@@ -368,14 +369,11 @@
                                 "windowSize": {
                                   "value": "[parameters('windowSize')]"
                                 },
-                                "enabled": {
-                                  "value": "[parameters('enabled')]"
+                                "alertResourceGroupName": {
+                                  "value": "[parameters('alertResourceGroupName')]"
                                 },
                                 "severity": {
                                   "value": "[parameters('severity')]"
-                                },
-                                "alertResourceGroupName": {
-                                  "value": "[parameters('alertResourceGroupName')]"
                                 },
                                 "alertResourceGroupLocation": {
                                   "value": "[parameters('alertResourceGroupName')]"
@@ -393,8 +391,10 @@
                                   "value": "[parameters('autoResolve')]"
                                 }
                               },
-                              "windowSize": "[parameters('windowSize')]",
+                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
                               "enabled": "[parameters('enabled')]",
+                              "autoMitigate": "[parameters('autoMitigate')]",
+                              "windowSize": "[parameters('windowSize')]",
                               "severity": "[parameters('severity')]",
                               "criteria": {
                                 "allOf": [
@@ -410,8 +410,8 @@
                                     "resourceIdColumn": "_ResourceId",
                                     "dimensions": [
                                       {
-                                        "operator": "Include",
                                         "name": "Computer",
+                                        "operator": "Include",
                                         "values": [
                                           "*"
                                         ]
@@ -432,17 +432,17 @@
                                 "Microsoft.Compute/virtualMachines"
                               ]
                             },
-                            "apiVersion": "2022-08-01-preview",
                             "location": "[parameters('alertResourceGroupLocation')]",
+                            "apiVersion": "2022-08-01-preview",
                             "name": "[concat(subscription().displayName, '-VMHighCPUAlert')]",
                             "tags": {
                               "_deployed_by_amba": true
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
                     "apiVersion": "2019-10-01",
                     "name": "VMCPUAlert",
@@ -451,9 +451,9 @@
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },

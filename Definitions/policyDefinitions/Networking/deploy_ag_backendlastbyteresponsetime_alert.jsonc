@@ -6,10 +6,10 @@
     "description": "Policy to audit/deploy Azure Application Gateway BackendLastByteResponseTime Alert",
     "mode": "All",
     "metadata": {
-      "_deployed_by_amba": "True",
+      "Category": "Networking",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "version": "1.0.1",
-      "Category": "Networking"
+      "_deployed_by_amba": "True",
+      "version": "1.0.1"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -27,6 +27,18 @@
         },
         "type": "String"
       },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
       "autoMitigate": {
         "allowedValues": [
           "true",
@@ -36,6 +48,18 @@
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -54,18 +78,6 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
         },
         "type": "String"
       },
@@ -92,18 +104,6 @@
         },
         "type": "String"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "alertSensitivity": {
         "allowedValues": [
           "Low",
@@ -122,8 +122,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/applicationgateways",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/applicationgateways"
           },
           {
             "field": "Microsoft.Network/applicationgateways/sku.name",
@@ -145,20 +145,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Network/applicationgateways",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/applicationgateways"
               },
               {
-                "equals": "BackendLastByteResponseTime",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "BackendLastByteResponseTime"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -174,25 +174,26 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "resourceName": {
+                  "value": "[field('name')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "resourceName": {
-                  "value": "[field('name')]"
                 },
                 "alertSensitivity": {
                   "value": "[parameters('alertSensitivity')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -205,16 +206,13 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "enabled": {
+                    "type": "String"
+                  },
                   "autoMitigate": {
                     "type": "String"
                   },
                   "windowSize": {
-                    "type": "String"
-                  },
-                  "enabled": {
-                    "type": "String"
-                  },
-                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -224,31 +222,31 @@
                     },
                     "type": "String"
                   },
+                  "severity": {
+                    "type": "String"
+                  },
                   "alertSensitivity": {
                     "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for App Gateway BackendLastByteResponseTime",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
-                        },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
@@ -257,19 +255,21 @@
                           "value": "[parameters('alertSensitivity')]"
                         }
                       },
-                      "windowSize": "[parameters('windowSize')]",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "enabled": "[parameters('enabled')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
+                            "name": "BackendLastByteResponseTime",
                             "timeAggregation": "Total",
                             "operator": "GreaterThan",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "name": "BackendLastByteResponseTime",
                             "metricNamespace": "Microsoft.Network/applicationgateways",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "BackendLastByteResponseTime",
@@ -282,17 +282,17 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
+                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-agBackendLastByteResponseTime')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

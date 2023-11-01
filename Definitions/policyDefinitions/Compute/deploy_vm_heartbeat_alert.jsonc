@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM HeartBeat Alert for all VMs in the subscription",
     "mode": "All",
     "metadata": {
+      "category": "Compute",
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "version": "1.0.1",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "category": "Compute"
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -29,15 +29,15 @@
         },
         "type": "String"
       },
-      "autoMitigate": {
+      "effect": {
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
+        "defaultValue": "deployIfNotExists",
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -85,11 +85,15 @@
         },
         "type": "String"
       },
-      "alertResourceGroupName": {
-        "defaultValue": "AlzMonitoring-rg",
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -101,6 +105,14 @@
         },
         "type": "String"
       },
+      "alertResourceGroupName": {
+        "defaultValue": "AlzMonitoring-rg",
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
+        "type": "String"
+      },
       "threshold": {
         "defaultValue": "10",
         "metadata": {
@@ -108,6 +120,16 @@
           "displayName": "Threshold"
         },
         "type": "String"
+      },
+      "alertResourceGroupTags": {
+        "defaultValue": {
+          "environment": "test"
+        },
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "type": "Object"
       },
       "timeAggregation": {
         "allowedValues": [
@@ -123,16 +145,6 @@
         },
         "type": "String"
       },
-      "alertResourceGroupTags": {
-        "defaultValue": {
-          "environment": "test"
-        },
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "type": "Object"
-      },
       "operator": {
         "allowedValues": [
           "Equals",
@@ -144,18 +156,6 @@
         "defaultValue": "GreaterThan",
         "metadata": {
           "displayName": "Operator"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -200,8 +200,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Compute/virtualMachines",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
           }
         ]
       },
@@ -212,16 +212,16 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[concat(subscription().displayName, '-VMHeartBeatAlert')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
+                "equals": "[concat(subscription().displayName, '-VMHeartBeatAlert')]"
               },
               {
-                "equals": "[subscription().id]",
-                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]"
+                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]",
+                "equals": "[subscription().id]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/scheduledqueryrules/enabled"
+                "field": "Microsoft.Insights/scheduledqueryrules/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -234,9 +234,6 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -246,20 +243,23 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "alertResourceGroupName": {
-                  "value": "[parameters('alertResourceGroupName')]"
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
                 },
+                "alertResourceGroupName": {
+                  "value": "[parameters('alertResourceGroupName')]"
+                },
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
-                "timeAggregation": {
-                  "value": "[parameters('timeAggregation')]"
-                },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
+                },
+                "timeAggregation": {
+                  "value": "[parameters('timeAggregation')]"
                 },
                 "operator": {
                   "value": "[parameters('operator')]"
@@ -277,12 +277,10 @@
                   "value": "[parameters('autoResolve')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
-                    "type": "String"
-                  },
-                  "autoMitigate": {
                     "type": "String"
                   },
                   "windowSize": {
@@ -294,20 +292,23 @@
                   "severity": {
                     "type": "String"
                   },
-                  "alertResourceGroupName": {
-                    "type": "string"
+                  "autoMitigate": {
+                    "type": "String"
                   },
                   "alertResourceGroupLocation": {
+                    "type": "string"
+                  },
+                  "alertResourceGroupName": {
                     "type": "string"
                   },
                   "threshold": {
                     "type": "String"
                   },
-                  "timeAggregation": {
-                    "type": "String"
-                  },
                   "alertResourceGroupTags": {
                     "type": "object"
+                  },
+                  "timeAggregation": {
+                    "type": "String"
                   },
                   "operator": {
                     "type": "String"
@@ -326,13 +327,12 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "apiVersion": "2021-04-01",
-                    "location": "[parameters('alertResourceGroupLocation')]",
                     "name": "[parameters('alertResourceGroupName')]",
+                    "location": "[parameters('alertResourceGroupLocation')]",
+                    "apiVersion": "2021-04-01",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
@@ -343,41 +343,36 @@
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "alertResourceGroupName": {
-                          "value": "[parameters('alertResourceGroupName')]"
-                        },
                         "alertResourceGroupLocation": {
                           "value": "[parameters('alertResourceGroupLocation')]"
+                        },
+                        "alertResourceGroupName": {
+                          "value": "[parameters('alertResourceGroupName')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
                             "type": "string"
                           },
-                          "alertResourceGroupName": {
+                          "alertResourceGroupLocation": {
                             "type": "string"
                           },
-                          "alertResourceGroupLocation": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
                             "properties": {
                               "description": "Log Alert for Virtual Machine Heartbeat",
                               "displayName": "[concat(subscription().displayName, '-VMHeartBeatAlert')]",
-                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                              "autoMitigate": "[parameters('autoMitigate')]",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
-                                },
-                                "autoMitigate": {
-                                  "value": "[parameters('autoMitigate')]"
                                 },
                                 "windowSize": {
                                   "value": "[parameters('windowSize')]"
@@ -388,10 +383,13 @@
                                 "severity": {
                                   "value": "[parameters('severity')]"
                                 },
-                                "alertResourceGroupName": {
-                                  "value": "[parameters('alertResourceGroupName')]"
+                                "autoMitigate": {
+                                  "value": "[parameters('autoMitigate')]"
                                 },
                                 "alertResourceGroupLocation": {
+                                  "value": "[parameters('alertResourceGroupName')]"
+                                },
+                                "alertResourceGroupName": {
                                   "value": "[parameters('alertResourceGroupName')]"
                                 },
                                 "threshold": {
@@ -410,9 +408,11 @@
                                   "value": "[parameters('autoResolve')]"
                                 }
                               },
+                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
                               "windowSize": "[parameters('windowSize')]",
                               "enabled": "[parameters('enabled')]",
                               "severity": "[parameters('severity')]",
+                              "autoMitigate": "[parameters('autoMitigate')]",
                               "criteria": {
                                 "allOf": [
                                   {
@@ -427,8 +427,8 @@
                                     "resourceIdColumn": "_ResourceId",
                                     "dimensions": [
                                       {
-                                        "operator": "Include",
                                         "name": "Computer",
+                                        "operator": "Include",
                                         "values": [
                                           "*"
                                         ]
@@ -449,34 +449,34 @@
                                 "Microsoft.Compute/virtualMachines"
                               ]
                             },
-                            "apiVersion": "2022-08-01-preview",
-                            "location": "[parameters('alertResourceGroupLocation')]",
                             "name": "[concat(subscription().displayName, '-VMHeartBeatAlert')]",
+                            "location": "[parameters('alertResourceGroupLocation')]",
+                            "apiVersion": "2022-08-01-preview",
                             "tags": {
                               "_deployed_by_amba": true
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
-                    "apiVersion": "2019-10-01",
                     "name": "HeartBeatAlert",
+                    "apiVersion": "2019-10-01",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },
+          "existenceScope": "resourcegroup",
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "deploymentScope": "subscription",
-          "existenceScope": "resourcegroup"
+          "deploymentScope": "subscription"
         }
       }
     }
