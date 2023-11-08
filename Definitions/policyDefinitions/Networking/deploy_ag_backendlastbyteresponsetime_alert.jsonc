@@ -7,8 +7,8 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "version": "1.0.1",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "Category": "Networking"
     },
     "parameters": {
@@ -122,8 +122,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/applicationgateways",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/applicationgateways"
           },
           {
             "field": "Microsoft.Network/applicationgateways/sku.name",
@@ -145,20 +145,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Network/applicationgateways",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/applicationgateways"
               },
               {
-                "equals": "BackendLastByteResponseTime",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "BackendLastByteResponseTime"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -229,7 +229,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -264,14 +263,14 @@
                         "allOf": [
                           {
                             "timeAggregation": "Total",
+                            "metricNamespace": "Microsoft.Network/applicationgateways",
+                            "name": "BackendLastByteResponseTime",
+                            "criterionType": "DynamicThresholdCriterion",
                             "operator": "GreaterThan",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "name": "BackendLastByteResponseTime",
-                            "metricNamespace": "Microsoft.Network/applicationgateways",
-                            "criterionType": "DynamicThresholdCriterion",
                             "metricName": "BackendLastByteResponseTime",
                             "alertSensitivity": "[parameters('alertSensitivity')]"
                           }
@@ -290,6 +289,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

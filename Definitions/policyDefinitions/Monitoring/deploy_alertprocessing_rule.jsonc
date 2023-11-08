@@ -7,12 +7,12 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "version": "1.0.2",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Monitoring",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "category": "Monitoring"
+      ]
     },
     "parameters": {
       "monitorDisable": {
@@ -31,6 +31,14 @@
         },
         "type": "String"
       },
+      "alzMonitorResourceGroupLocation": {
+        "defaultValue": "centralus",
+        "metadata": {
+          "description": "Location of the Resource group the alert is placed in",
+          "displayName": "Resource Group Location"
+        },
+        "type": "String"
+      },
       "alzMonitorResourceGroupTags": {
         "defaultValue": {
           "_deployed_by_amba": true
@@ -40,14 +48,6 @@
           "displayName": "Resource Group Tags"
         },
         "type": "Object"
-      },
-      "alzMonitorResourceGroupLocation": {
-        "defaultValue": "centralus",
-        "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
-        },
-        "type": "String"
       },
       "alzMonitorResourceGroupName": {
         "defaultValue": "rg-amba-monitoring-001",
@@ -62,8 +62,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Resources/subscriptions",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Resources/subscriptions"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -78,8 +78,8 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "AMBA Alert Processing Rule for Subscription",
-                "field": "Microsoft.AlertsManagement/actionRules/description"
+                "field": "Microsoft.AlertsManagement/actionRules/description",
+                "equals": "AMBA Alert Processing Rule for Subscription"
               }
             ]
           },
@@ -118,9 +118,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {
-                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
-                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -151,7 +148,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/actionGroups",
@@ -206,6 +202,7 @@
                             ]
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -217,6 +214,9 @@
                     ]
                   }
                 ],
+                "variables": {
+                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
+                },
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
