@@ -7,8 +7,8 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "version": "1.0.1",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
@@ -85,6 +85,14 @@
         },
         "type": "String"
       },
+      "threshold": {
+        "defaultValue": "10",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "type": "String"
+      },
       "alertResourceGroupName": {
         "defaultValue": "AlzMonitoring-rg",
         "metadata": {
@@ -98,14 +106,6 @@
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
           "displayName": "Resource Group Location"
-        },
-        "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "10",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
         },
         "type": "String"
       },
@@ -133,6 +133,18 @@
         },
         "type": "Object"
       },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "operator": {
         "allowedValues": [
           "Equals",
@@ -144,18 +156,6 @@
         "defaultValue": "GreaterThan",
         "metadata": {
           "displayName": "Operator"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -209,6 +209,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/scheduledQueryRules",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -225,9 +228,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -246,14 +246,14 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
+                },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
-                },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
                 },
                 "timeAggregation": {
                   "value": "[parameters('timeAggregation')]"
@@ -294,14 +294,14 @@
                   "severity": {
                     "type": "String"
                   },
+                  "threshold": {
+                    "type": "String"
+                  },
                   "alertResourceGroupName": {
                     "type": "string"
                   },
                   "alertResourceGroupLocation": {
                     "type": "string"
-                  },
-                  "threshold": {
-                    "type": "String"
                   },
                   "timeAggregation": {
                     "type": "String"
@@ -388,14 +388,14 @@
                                 "severity": {
                                   "value": "[parameters('severity')]"
                                 },
+                                "threshold": {
+                                  "value": "[parameters('threshold')]"
+                                },
                                 "alertResourceGroupName": {
                                   "value": "[parameters('alertResourceGroupName')]"
                                 },
                                 "alertResourceGroupLocation": {
                                   "value": "[parameters('alertResourceGroupName')]"
-                                },
-                                "threshold": {
-                                  "value": "[parameters('threshold')]"
                                 },
                                 "failingPeriods": {
                                   "value": "[parameters('failingPeriods')]"
