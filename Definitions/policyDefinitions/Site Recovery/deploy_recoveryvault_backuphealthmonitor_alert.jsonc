@@ -6,23 +6,15 @@
     "description": "Policy to audit/update Recovery Vault Backup Health Alerting to Azure monitor alerts",
     "mode": "All",
     "metadata": {
+      "category": "Site Recovery",
       "_deployed_by_amba": "True",
       "version": "1.0.0",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "category": "Site Recovery"
+      ]
     },
     "parameters": {
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "effect": {
         "allowedValues": [
           "modify",
@@ -35,14 +27,22 @@
           "displayName": "Effect"
         },
         "type": "String"
+      },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.RecoveryServices/Vaults",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.RecoveryServices/Vaults"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -60,6 +60,7 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
+          "conflictEffect": "audit",
           "operations": [
             {
               "value": "Disabled",
@@ -71,8 +72,7 @@
               "field": "Microsoft.RecoveryServices/vaults/monitoringSettings.azureMonitorAlertSettings.alertsForAllJobFailures",
               "operation": "addOrReplace"
             }
-          ],
-          "conflictEffect": "audit"
+          ]
         }
       }
     }
