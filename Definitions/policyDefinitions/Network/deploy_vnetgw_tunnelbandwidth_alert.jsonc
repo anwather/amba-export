@@ -6,10 +6,10 @@
     "description": "Policy to audit/deploy Virtual Network Gateway Tunnel Bandwidth Alert",
     "mode": "All",
     "metadata": {
-      "category": "Network",
       "_deployed_by_amba": "True",
-      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.1",
+      "category": "Network",
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
@@ -120,12 +120,12 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/virtualNetworkGateways",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/virtualNetworkGateways"
           },
           {
-            "equals": "VPN",
-            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType"
+            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType",
+            "equals": "VPN"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -140,20 +140,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Network/virtualNetworkGateways",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/virtualNetworkGateways"
               },
               {
-                "equals": "TunnelAverageBandwidth",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "TunnelAverageBandwidth"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworkGateways/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworkGateways/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -188,6 +188,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -231,7 +232,6 @@
                       "description": "Metric Alert for VNet Gateway Tunnel Avg Bandwidth",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -252,6 +252,7 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
+                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -260,8 +261,8 @@
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
                             "operator": "LessThan",
-                            "metricNamespace": "Microsoft.Network/virtualNetworkGateways",
                             "name": "TunnelAverageBandwidth",
+                            "metricNamespace": "Microsoft.Network/virtualNetworkGateways",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "TunnelAverageBandwidth"
                           }
@@ -282,8 +283,7 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

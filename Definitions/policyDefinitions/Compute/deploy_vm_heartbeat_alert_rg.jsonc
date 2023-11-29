@@ -6,10 +6,10 @@
     "description": "Policy to audit/deploy VM HeartBeat Alert for VMs in the resource group",
     "mode": "All",
     "metadata": {
-      "category": "Compute",
       "_deployed_by_amba": "True",
-      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.1",
+      "category": "Compute",
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
@@ -107,20 +107,6 @@
         },
         "type": "String"
       },
-      "operator": {
-        "allowedValues": [
-          "Equals",
-          "GreaterThan",
-          "GreaterThanOrEqual",
-          "LessThan",
-          "LessThanOrEqual"
-        ],
-        "defaultValue": "GreaterThan",
-        "metadata": {
-          "displayName": "Operator"
-        },
-        "type": "String"
-      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -138,6 +124,20 @@
         "metadata": {
           "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
+        },
+        "type": "String"
+      },
+      "operator": {
+        "allowedValues": [
+          "Equals",
+          "GreaterThan",
+          "GreaterThanOrEqual",
+          "LessThan",
+          "LessThanOrEqual"
+        ],
+        "defaultValue": "GreaterThan",
+        "metadata": {
+          "displayName": "Operator"
         },
         "type": "String"
       },
@@ -166,8 +166,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Compute/virtualMachines",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -182,16 +182,16 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
+                "equals": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name)]",
-                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]"
+                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name)]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/scheduledqueryrules/enabled"
+                "field": "Microsoft.Insights/scheduledqueryrules/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -232,6 +232,7 @@
                   "value": "[parameters('autoResolve')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
@@ -274,7 +275,6 @@
                       "displayName": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -301,6 +301,7 @@
                           "value": "[parameters('autoResolve')]"
                         }
                       },
+                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -349,8 +350,7 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

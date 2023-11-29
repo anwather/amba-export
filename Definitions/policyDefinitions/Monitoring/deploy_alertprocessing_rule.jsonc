@@ -6,10 +6,10 @@
     "description": "Policy to Deploy Deploy Alert Processing Rule with Action Group",
     "mode": "All",
     "metadata": {
-      "category": "Monitoring",
       "_deployed_by_amba": "True",
-      "version": "1.0.2",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.2",
+      "category": "Monitoring",
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
@@ -31,6 +31,16 @@
         },
         "type": "String"
       },
+      "alzMonitorResourceGroupTags": {
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "type": "Object"
+      },
       "alzMonitorResourceGroupLocation": {
         "defaultValue": "centralus",
         "metadata": {
@@ -46,16 +56,6 @@
           "displayName": "Resource Group Name"
         },
         "type": "String"
-      },
-      "alzMonitorResourceGroupTags": {
-        "defaultValue": {
-          "_deployed_by_amba": true
-        },
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "type": "Object"
       }
     },
     "policyRule": {
@@ -102,6 +102,7 @@
                   "value": "[parameters('ALZMonitorResourceGroupTags')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "ALZMonitorActionGroupEmail": {
@@ -118,9 +119,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {
-                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
-                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -141,6 +139,7 @@
                           "value": "[parameters('ALZMonitorResourceGroupName')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "ALZMonitorActionGroupEmail": {
@@ -151,7 +150,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/actionGroups",
@@ -188,10 +186,10 @@
                               ],
                               "actions": [
                                 {
+                                  "actionType": "AddActionGroups",
                                   "actiongroupIds": [
                                     "[[concat(subscription().Id, '/resourceGroups/', parameters('ALZMonitorResourceGroupName'), '/providers/Microsoft.Insights/actionGroups/AmbaActionGr')]"
-                                  ],
-                                  "actionType": "AddActionGroups"
+                                  ]
                                 }
                               ]
                             },
@@ -206,9 +204,9 @@
                             ]
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
                     "apiVersion": "2019-10-01",
                     "name": "ActionGroupDeployment",
@@ -217,15 +215,17 @@
                     ]
                   }
                 ],
+                "variables": {
+                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
+                },
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },
           "resourceGroupName": "[parameters('ALZMonitorResourceGroupName')]",
-          "deploymentScope": "subscription",
-          "existenceScope": "resourcegroup"
+          "existenceScope": "resourcegroup",
+          "deploymentScope": "subscription"
         }
       }
     }

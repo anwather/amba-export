@@ -6,10 +6,10 @@
     "description": "Policy to audit/deploy KeyVault Latency Alert",
     "mode": "All",
     "metadata": {
-      "category": "Key Vault",
       "_deployed_by_amba": "True",
-      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.1",
+      "category": "Key Vault",
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
@@ -48,15 +48,15 @@
         },
         "type": "String"
       },
-      "autoMitigate": {
+      "effect": {
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
+        "defaultValue": "disabled",
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -95,15 +95,15 @@
         },
         "type": "String"
       },
-      "effect": {
+      "autoMitigate": {
         "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
+          "true",
+          "false"
         ],
-        "defaultValue": "disabled",
+        "defaultValue": "true",
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -168,9 +168,6 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
@@ -180,10 +177,14 @@
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -199,9 +200,6 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
                   "enabled": {
                     "type": "String"
                   },
@@ -209,6 +207,9 @@
                     "type": "String"
                   },
                   "threshold": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -234,9 +235,6 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
@@ -245,41 +243,43 @@
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         }
                       },
                       "windowSize": "[parameters('windowSize')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
                             "operator": "GreaterThan",
-                            "metricNamespace": "microsoft.keyvault/vaults",
                             "name": "ServiceApiLatency",
+                            "metricNamespace": "microsoft.keyvault/vaults",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "ServiceApiLatency"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
+                    "name": "[concat(parameters('resourceName'), '-LatencyAlert')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-LatencyAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

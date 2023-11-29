@@ -6,10 +6,10 @@
     "description": "Policy to audit/deploy VPN Gateway Ingress Alert",
     "mode": "All",
     "metadata": {
-      "category": "Network",
       "_deployed_by_amba": "True",
-      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.1",
+      "category": "Network",
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
@@ -120,8 +120,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "microsoft.network/vpngateways",
-            "field": "type"
+            "field": "type",
+            "equals": "microsoft.network/vpngateways"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -136,20 +136,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "microsoft.network/vpngateways",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "microsoft.network/vpngateways"
               },
               {
-                "equals": "tunnelingressbytes",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "tunnelingressbytes"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/vpngateways/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/vpngateways/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -184,6 +184,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -227,7 +228,6 @@
                       "description": "Metric Alert for VPN Gateway tunnel ingress bytes",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -248,6 +248,7 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
+                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -256,8 +257,8 @@
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
                             "operator": "LessThan",
-                            "metricNamespace": "microsoft.network/vpngateways",
                             "name": "tunnelingressbytes",
+                            "metricNamespace": "microsoft.network/vpngateways",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "tunnelingressbytes"
                           }
@@ -278,8 +279,7 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }
