@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM Network Out Alert",
     "mode": "All",
     "metadata": {
-      "category": "Compute",
       "_deployed_by_amba": "True",
+      "category": "Compute",
       "version": "1.0.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -26,6 +26,18 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -43,18 +55,6 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -119,18 +119,6 @@
         },
         "type": "Object"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "timeAggregation": {
         "allowedValues": [
           "Average",
@@ -142,6 +130,18 @@
         "defaultValue": "Average",
         "metadata": {
           "displayName": "TimeAggregation"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -220,8 +220,8 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Compute/virtualMachines"
+            "equals": "Microsoft.Compute/virtualMachines",
+            "field": "type"
           }
         ]
       },
@@ -232,16 +232,16 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
-                "equals": "[concat(subscription().displayName, '-VMHighNetworkOutAlert')]"
+                "equals": "[concat(subscription().displayName, '-VMHighNetworkOutAlert')]",
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
               },
               {
-                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]",
-                "equals": "[subscription().id]"
+                "equals": "[subscription().id]",
+                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/scheduledqueryrules/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/scheduledqueryrules/enabled"
               }
             ]
           },
@@ -254,11 +254,11 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
+                },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
@@ -308,10 +308,10 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "autoMitigate": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "enabled": {
@@ -358,7 +358,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -395,7 +394,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
@@ -403,15 +401,16 @@
                               "description": "Log Alert for Virtual Machine NetworkOut",
                               "displayName": "[concat(subscription().displayName, '-VMHighNetworkOutAlert')]",
                               "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                              "autoMitigate": "[parameters('autoMitigate')]",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
                                 },
-                                "windowSize": {
-                                  "value": "[parameters('windowSize')]"
-                                },
                                 "autoMitigate": {
                                   "value": "[parameters('autoMitigate')]"
+                                },
+                                "windowSize": {
+                                  "value": "[parameters('windowSize')]"
                                 },
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
@@ -448,7 +447,6 @@
                                 }
                               },
                               "windowSize": "[parameters('windowSize')]",
-                              "autoMitigate": "[parameters('autoMitigate')]",
                               "enabled": "[parameters('enabled')]",
                               "severity": "[parameters('severity')]",
                               "criteria": {
@@ -498,6 +496,7 @@
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -509,6 +508,7 @@
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

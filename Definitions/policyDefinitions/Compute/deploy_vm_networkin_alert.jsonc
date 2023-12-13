@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM Nework Read Alert",
     "mode": "All",
     "metadata": {
-      "category": "Compute",
       "_deployed_by_amba": "True",
+      "category": "Compute",
       "version": "1.0.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -85,11 +85,11 @@
         },
         "type": "String"
       },
-      "threshold": {
-        "defaultValue": "10000000",
+      "alertResourceGroupName": {
+        "defaultValue": "AlzMonitoring-rg",
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
         },
         "type": "String"
       },
@@ -101,13 +101,23 @@
         },
         "type": "String"
       },
-      "alertResourceGroupName": {
-        "defaultValue": "AlzMonitoring-rg",
+      "threshold": {
+        "defaultValue": "10000000",
         "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
         "type": "String"
+      },
+      "alertResourceGroupTags": {
+        "defaultValue": {
+          "environment": "test"
+        },
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "type": "Object"
       },
       "timeAggregation": {
         "allowedValues": [
@@ -120,6 +130,18 @@
         "defaultValue": "Average",
         "metadata": {
           "displayName": "TimeAggregation"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -137,33 +159,11 @@
         },
         "type": "String"
       },
-      "alertResourceGroupTags": {
-        "defaultValue": {
-          "environment": "test"
-        },
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "type": "Object"
-      },
       "failingPeriods": {
         "defaultValue": "1",
         "metadata": {
           "description": "Number of failing periods before alert is fired",
           "displayName": "Failing Periods"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -266,23 +266,23 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
+                "alertResourceGroupName": {
+                  "value": "[parameters('alertResourceGroupName')]"
                 },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
                 },
-                "alertResourceGroupName": {
-                  "value": "[parameters('alertResourceGroupName')]"
+                "threshold": {
+                  "value": "[parameters('threshold')]"
+                },
+                "alertResourceGroupTags": {
+                  "value": "[parameters('alertResourceGroupTags')]"
                 },
                 "timeAggregation": {
                   "value": "[parameters('timeAggregation')]"
                 },
                 "operator": {
                   "value": "[parameters('operator')]"
-                },
-                "alertResourceGroupTags": {
-                  "value": "[parameters('alertResourceGroupTags')]"
                 },
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
@@ -320,23 +320,23 @@
                   "severity": {
                     "type": "String"
                   },
-                  "threshold": {
-                    "type": "String"
+                  "alertResourceGroupName": {
+                    "type": "string"
                   },
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "alertResourceGroupName": {
-                    "type": "string"
+                  "threshold": {
+                    "type": "String"
+                  },
+                  "alertResourceGroupTags": {
+                    "type": "object"
                   },
                   "timeAggregation": {
                     "type": "String"
                   },
                   "operator": {
                     "type": "String"
-                  },
-                  "alertResourceGroupTags": {
-                    "type": "object"
                   },
                   "failingPeriods": {
                     "type": "String"
@@ -374,11 +374,11 @@
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "alertResourceGroupLocation": {
-                          "value": "[parameters('alertResourceGroupLocation')]"
-                        },
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
+                        },
+                        "alertResourceGroupLocation": {
+                          "value": "[parameters('alertResourceGroupLocation')]"
                         }
                       },
                       "template": {
@@ -386,10 +386,10 @@
                           "enabled": {
                             "type": "string"
                           },
-                          "alertResourceGroupLocation": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           },
-                          "alertResourceGroupName": {
+                          "alertResourceGroupLocation": {
                             "type": "string"
                           }
                         },
@@ -402,7 +402,6 @@
                               "displayName": "[concat(subscription().displayName, '-VMHighNetworkInAlert')]",
                               "evaluationFrequency": "[parameters('evaluationFrequency')]",
                               "autoMitigate": "[parameters('autoMitigate')]",
-                              "windowSize": "[parameters('windowSize')]",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
@@ -419,14 +418,14 @@
                                 "severity": {
                                   "value": "[parameters('severity')]"
                                 },
-                                "threshold": {
-                                  "value": "[parameters('threshold')]"
+                                "alertResourceGroupName": {
+                                  "value": "[parameters('alertResourceGroupName')]"
                                 },
                                 "alertResourceGroupLocation": {
                                   "value": "[parameters('alertResourceGroupName')]"
                                 },
-                                "alertResourceGroupName": {
-                                  "value": "[parameters('alertResourceGroupName')]"
+                                "threshold": {
+                                  "value": "[parameters('threshold')]"
                                 },
                                 "failingPeriods": {
                                   "value": "[parameters('failingPeriods')]"
@@ -447,6 +446,7 @@
                                   "value": "[parameters('networkInterfacesToInclude')]"
                                 }
                               },
+                              "windowSize": "[parameters('windowSize')]",
                               "enabled": "[parameters('enabled')]",
                               "severity": "[parameters('severity')]",
                               "criteria": {

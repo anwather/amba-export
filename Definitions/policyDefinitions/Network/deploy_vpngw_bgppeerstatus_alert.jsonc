@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VPN Gateway BGP Peer Status Alert",
     "mode": "All",
     "metadata": {
-      "category": "Network",
       "_deployed_by_amba": "True",
+      "category": "Network",
       "version": "1.0.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -27,6 +27,18 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -45,18 +57,6 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -120,8 +120,8 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "microsoft.network/vpngateways"
+            "equals": "microsoft.network/vpngateways",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -136,20 +136,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "microsoft.network/vpngateways"
+                "equals": "microsoft.network/vpngateways",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "bgppeerstatus"
+                "equals": "bgppeerstatus",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/vpngateways/', field('fullName'))]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/vpngateways/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
               }
             ]
           },
@@ -165,11 +165,11 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
+                },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
@@ -196,10 +196,10 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "autoMitigate": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "enabled": {
@@ -220,22 +220,22 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for VPN Gateway BGP peer status",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
+                        },
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
@@ -248,7 +248,6 @@
                         }
                       },
                       "windowSize": "[parameters('windowSize')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -277,6 +276,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
