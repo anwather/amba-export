@@ -6,8 +6,8 @@
     "description": "Policy to audit/deploy Private DNS Zone Registration Capacity Utilization Alert",
     "mode": "All",
     "metadata": {
-      "category": "Network",
       "_deployed_by_amba": "True",
+      "category": "Network",
       "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
@@ -27,6 +27,18 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -95,18 +107,6 @@
         },
         "type": "String"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "monitorDisable": {
         "defaultValue": "MonitorDisable",
         "metadata": {
@@ -120,8 +120,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/privateDnsZones",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/privateDnsZones"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -136,20 +136,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Network/privateDnsZones",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/privateDnsZones"
               },
               {
-                "equals": "VirtualNetworkWithRegistrationCapacityUtilization",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "VirtualNetworkWithRegistrationCapacityUtilization"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/privateDnsZones/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/privateDnsZones/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -184,6 +184,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -225,9 +226,6 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Private DNS Zone Registration Capacity Utilization",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -248,29 +246,32 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "timeAggregation": "Maximum",
-                            "operator": "GreaterThanOrEqual",
-                            "metricNamespace": "Microsoft.Network/privateDnsZones",
                             "name": "VirtualNetworkWithRegistrationCapacityUtilization",
+                            "timeAggregation": "Maximum",
+                            "metricNamespace": "Microsoft.Network/privateDnsZones",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "VirtualNetworkWithRegistrationCapacityUtilization"
+                            "metricName": "VirtualNetworkWithRegistrationCapacityUtilization",
+                            "operator": "GreaterThanOrEqual"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
+                    "name": "[concat(parameters('resourceName'), '-RequestsAlert')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-RequestsAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -278,8 +279,7 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

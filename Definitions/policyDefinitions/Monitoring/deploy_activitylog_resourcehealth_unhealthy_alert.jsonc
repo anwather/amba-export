@@ -6,8 +6,8 @@
     "description": "Policy to Deploy Resource Health Unhealthy Alert",
     "mode": "All",
     "metadata": {
-      "category": "Monitoring",
       "_deployed_by_amba": "True",
+      "category": "Monitoring",
       "version": "1.0.2",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
@@ -15,6 +15,18 @@
       ]
     },
     "parameters": {
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "enabled": {
         "allowedValues": [
           "true",
@@ -32,6 +44,14 @@
         "metadata": {
           "description": "Resource group the alert is placed in",
           "displayName": "Resource Group Name"
+        },
+        "type": "String"
+      },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring on subscription level alerts. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -53,26 +73,6 @@
           "displayName": "Resource Group Tags"
         },
         "type": "Object"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring on subscription level alerts. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
@@ -141,6 +141,7 @@
                   "value": "[parameters('alertResourceGroupTags')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "enabled": {
@@ -157,13 +158,12 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
+                    "name": "[parameters('alertResourceGroupName')]",
                     "apiVersion": "2021-04-01",
                     "location": "[parameters('alertResourceGroupLocation')]",
-                    "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
@@ -178,6 +178,7 @@
                           "value": "[parameters('alertResourceGroupName')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
@@ -188,7 +189,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -236,34 +236,34 @@
                                 ]
                               }
                             },
+                            "name": "ResourceHealthUnhealthyAlert",
                             "apiVersion": "2020-10-01",
                             "location": "global",
-                            "name": "ResourceHealthUnhealthyAlert",
                             "tags": {
                               "_deployed_by_amba": true
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
-                    "apiVersion": "2019-10-01",
                     "name": "ResourceHealtAlert",
+                    "apiVersion": "2019-10-01",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "existenceScope": "resourcegroup",
           "deploymentScope": "subscription",
-          "existenceScope": "resourcegroup"
+          "resourceGroupName": "[parameters('alertResourceGroupName')]"
         }
       }
     }

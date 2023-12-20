@@ -6,8 +6,8 @@
     "description": "Policy to audit/deploy Azure Application Gateway ComputeUnits Alert",
     "mode": "All",
     "metadata": {
-      "Category": "Networking",
       "_deployed_by_amba": "True",
+      "Category": "Networking",
       "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -27,6 +27,18 @@
         },
         "type": "String"
       },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
+        "type": "String"
+      },
       "windowSize": {
         "allowedValues": [
           "PT1M",
@@ -42,18 +54,6 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -169,11 +169,11 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
+                },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
@@ -200,10 +200,10 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "autoMitigate": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "enabled": {
@@ -224,22 +224,22 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for App Gateway Compute Units",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
+                        },
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
@@ -252,7 +252,6 @@
                         }
                       },
                       "windowSize": "[parameters('windowSize')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -261,8 +260,8 @@
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
                             "operator": "GreaterThan",
-                            "metricNamespace": "Microsoft.Network/applicationgateways",
                             "name": "ComputeUnits",
+                            "metricNamespace": "Microsoft.Network/applicationgateways",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "ComputeUnits"
                           }
@@ -281,6 +280,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

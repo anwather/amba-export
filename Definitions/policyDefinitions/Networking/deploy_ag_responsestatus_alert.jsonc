@@ -6,8 +6,8 @@
     "description": "Policy to audit/deploy Azure Application Gateway ResponseStatus Alert",
     "mode": "All",
     "metadata": {
-      "Category": "Networking",
       "_deployed_by_amba": "True",
+      "Category": "Networking",
       "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -122,8 +122,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/applicationgateways",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/applicationgateways"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -138,20 +138,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Network/applicationgateways",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/applicationgateways"
               },
               {
-                "equals": "ResponseStatus",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "ResponseStatus"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -229,7 +229,6 @@
                       "description": "Metric Alert for App Gateway ResponseStatus",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -250,6 +249,7 @@
                           "value": "[parameters('alertSensitivity')]"
                         }
                       },
+                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -261,8 +261,8 @@
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "metricNamespace": "Microsoft.Network/applicationgateways",
                             "name": "ResponseStatus",
+                            "metricNamespace": "Microsoft.Network/applicationgateways",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "ResponseStatus",
                             "alertSensitivity": "[parameters('alertSensitivity')]",

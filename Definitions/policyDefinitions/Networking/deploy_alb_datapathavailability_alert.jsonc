@@ -6,8 +6,8 @@
     "description": "Policy to audit/deploy Azure Load Balancer Data Path Availability Alert",
     "mode": "All",
     "metadata": {
-      "Category": "Networking",
       "_deployed_by_amba": "True",
+      "Category": "Networking",
       "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -117,8 +117,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/loadBalancers",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/loadBalancers"
           },
           {
             "field": "Microsoft.Network/loadBalancers/sku.name",
@@ -140,20 +140,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Network/loadBalancers",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/loadBalancers"
               },
               {
-                "equals": "VipAvailability",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "VipAvailability"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -231,7 +231,6 @@
                       "description": "Metric Alert for ALB Data Path Availability",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -252,6 +251,7 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
+                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -260,8 +260,8 @@
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
                             "operator": "LessThan",
-                            "metricNamespace": "Microsoft.Network/loadBalancers",
                             "name": "VipAvailability",
+                            "metricNamespace": "Microsoft.Network/loadBalancers",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "VipAvailability"
                           }
