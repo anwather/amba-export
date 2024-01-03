@@ -7,12 +7,12 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "category": "Monitoring",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.0.2",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "version": "1.0.2"
+      "category": "Monitoring"
     },
     "parameters": {
       "enabled": {
@@ -27,19 +27,11 @@
         },
         "type": "String"
       },
-      "alertResourceGroupLocation": {
-        "defaultValue": "centralus",
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
-        },
-        "type": "String"
-      },
-      "alertResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
+          "description": "Tag name to disable monitoring on subscription level alerts. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -55,6 +47,22 @@
         },
         "type": "String"
       },
+      "alertResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
+        "type": "String"
+      },
+      "alertResourceGroupLocation": {
+        "defaultValue": "centralus",
+        "metadata": {
+          "description": "Location of the Resource group the alert is placed in",
+          "displayName": "Resource Group Location"
+        },
+        "type": "String"
+      },
       "alertResourceGroupTags": {
         "defaultValue": {
           "_deployed_by_amba": true,
@@ -65,14 +73,6 @@
           "displayName": "Resource Group Tags"
         },
         "type": "Object"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring on subscription level alerts. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
@@ -92,6 +92,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -122,20 +125,17 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
-                },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
+                },
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
@@ -147,10 +147,10 @@
                   "enabled": {
                     "type": "string"
                   },
-                  "alertResourceGroupLocation": {
+                  "alertResourceGroupName": {
                     "type": "string"
                   },
-                  "alertResourceGroupName": {
+                  "alertResourceGroupLocation": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
@@ -261,9 +261,9 @@
             },
             "location": "australiaeast"
           },
+          "existenceScope": "resourcegroup",
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "deploymentScope": "subscription",
-          "existenceScope": "resourcegroup"
+          "deploymentScope": "subscription"
         }
       }
     }
