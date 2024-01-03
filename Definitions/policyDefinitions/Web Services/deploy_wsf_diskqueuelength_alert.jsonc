@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy App Service Plan Disk Queue Length Alert",
     "mode": "All",
     "metadata": {
-      "category": "Web Services",
       "_deployed_by_amba": "True",
-      "version": "1.0.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Web Services",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.1"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -112,8 +112,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Web/serverfarms",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Web/serverfarms"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -128,20 +128,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Web/serverfarms",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Web/serverfarms"
               },
               {
-                "equals": "DiskQueueLength",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "DiskQueueLength"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -173,6 +173,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -206,6 +207,7 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -213,7 +215,6 @@
                       "description": "Metric Alert for App Service Plan Disk Queue Length",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -231,22 +232,23 @@
                           "value": "[parameters('severity')]"
                         }
                       },
+                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
-                            "operator": "GreaterThan",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
+                            "operator": "GreaterThan",
                             "metricNamespace": "Microsoft.Web/serverfarms",
                             "name": "ServiceApiResult",
                             "criterionType": "DynamicThresholdCriterion",
-                            "metricName": "DiskQueueLength",
-                            "alertSensitivity": "Medium"
+                            "alertSensitivity": "Medium",
+                            "metricName": "DiskQueueLength"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
@@ -263,10 +265,8 @@
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }
