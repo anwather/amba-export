@@ -6,10 +6,10 @@
     "description": "Policy to audit/deploy Azure Application Gateway FailedRequests Alert",
     "mode": "All",
     "metadata": {
-      "_deployed_by_amba": "True",
-      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "Category": "Networking"
+      "Category": "Networking",
+      "version": "1.0.1",
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -57,6 +57,18 @@
         },
         "type": "String"
       },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
       "severity": {
         "allowedValues": [
           "0",
@@ -72,26 +84,6 @@
         },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -103,14 +95,22 @@
           "displayName": "Effect"
         },
         "type": "String"
+      },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Network/applicationgateways"
+            "equals": "Microsoft.Network/applicationgateways",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -122,29 +122,29 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "Microsoft.Network/applicationgateways"
+                "equals": "Microsoft.Network/applicationgateways",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "FailedRequests"
+                "equals": "FailedRequests",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/applicationgateways/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
               }
             ]
           },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -160,17 +160,16 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -189,10 +188,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -212,7 +211,6 @@
                       "description": "Metric Alert for App Gateway FailedRequests",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -223,29 +221,30 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
-                      "severity": "[parameters('severity')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Total",
-                            "metricNamespace": "Microsoft.Network/applicationgateways",
-                            "criterionType": "DynamicThresholdCriterion",
-                            "metricName": "FailedRequests",
-                            "name": "FailedRequests",
                             "operator": "GreaterThan",
-                            "alertSensitivity": "Medium",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
-                            }
+                            },
+                            "metricNamespace": "Microsoft.Network/applicationgateways",
+                            "name": "FailedRequests",
+                            "criterionType": "DynamicThresholdCriterion",
+                            "metricName": "FailedRequests",
+                            "alertSensitivity": "Medium"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
@@ -263,7 +262,8 @@
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

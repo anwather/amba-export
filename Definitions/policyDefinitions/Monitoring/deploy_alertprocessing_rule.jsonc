@@ -6,13 +6,13 @@
     "description": "Policy to Deploy Deploy Alert Processing Rule with Action Group",
     "mode": "All",
     "metadata": {
-      "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Monitoring",
       "version": "1.0.2",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Monitoring"
+      ]
     },
     "parameters": {
       "monitorDisable": {
@@ -39,6 +39,14 @@
         },
         "type": "String"
       },
+      "alzMonitorResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
+        "type": "String"
+      },
       "alzMonitorResourceGroupTags": {
         "defaultValue": {
           "_deployed_by_amba": true
@@ -48,14 +56,6 @@
           "displayName": "Resource Group Tags"
         },
         "type": "Object"
-      },
-      "alzMonitorResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
@@ -118,6 +118,9 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {
+                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
+                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -148,6 +151,7 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
+                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/actionGroups",
@@ -184,10 +188,10 @@
                               ],
                               "actions": [
                                 {
+                                  "actionType": "AddActionGroups",
                                   "actiongroupIds": [
                                     "[[concat(subscription().Id, '/resourceGroups/', parameters('ALZMonitorResourceGroupName'), '/providers/Microsoft.Insights/actionGroups/AmbaActionGr')]"
-                                  ],
-                                  "actionType": "AddActionGroups"
+                                  ]
                                 }
                               ]
                             },
@@ -202,7 +206,6 @@
                             ]
                           }
                         ],
-                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -214,9 +217,6 @@
                     ]
                   }
                 ],
-                "variables": {
-                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
-                },
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
