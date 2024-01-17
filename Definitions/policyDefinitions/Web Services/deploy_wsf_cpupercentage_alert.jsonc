@@ -6,9 +6,9 @@
     "description": "Policy to audit/deploy App Service Plan CPU Percentage  Alert",
     "mode": "All",
     "metadata": {
+      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "Category": "Web Services",
-      "version": "1.0.1",
       "_deployed_by_amba": "True"
     },
     "parameters": {
@@ -84,14 +84,6 @@
         },
         "type": "String"
       },
-      "threshold": {
-        "defaultValue": "90",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -101,6 +93,14 @@
         "metadata": {
           "description": "Effect of the policy",
           "displayName": "Effect"
+        },
+        "type": "String"
+      },
+      "threshold": {
+        "defaultValue": "90",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
         "type": "String"
       },
@@ -117,8 +117,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Web/serverfarms",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Web/serverfarms"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -133,20 +133,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Web/serverfarms",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Web/serverfarms"
               },
               {
-                "equals": "CpuPercentage",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "CpuPercentage"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -181,6 +181,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -217,14 +218,11 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for App Service Plan CPU Percentage",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -245,6 +243,8 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
@@ -253,9 +253,9 @@
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
+                            "name": "CpuPercentage",
                             "operator": "GreaterThan",
                             "metricNamespace": "Microsoft.Web/serverfarms",
-                            "name": "CpuPercentage",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "CpuPercentage"
                           }
@@ -266,17 +266,17 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
+                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-CpuPercentage')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM HeartBeat Alert for VMs in the resource group",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Compute",
       "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "category": "Compute",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -85,6 +85,18 @@
         },
         "type": "String"
       },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "threshold": {
         "defaultValue": "10",
         "metadata": {
@@ -107,26 +119,6 @@
         },
         "type": "String"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "operator": {
         "allowedValues": [
           "Equals",
@@ -138,6 +130,14 @@
         "defaultValue": "GreaterThan",
         "metadata": {
           "displayName": "Operator"
+        },
+        "type": "String"
+      },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -166,8 +166,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Compute/virtualMachines",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -182,16 +182,16 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
+                "equals": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name)]",
-                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]"
+                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name)]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/scheduledqueryrules/enabled"
+                "field": "Microsoft.Insights/scheduledqueryrules/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -232,6 +232,7 @@
                   "value": "[parameters('autoResolve')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
@@ -266,15 +267,12 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/scheduledQueryRules",
                     "properties": {
                       "description": "Log Alert for Virtual Machine Heartbeat",
                       "displayName": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -301,6 +299,8 @@
                           "value": "[parameters('autoResolve')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
@@ -318,8 +318,8 @@
                             "resourceIdColumn": "_ResourceId",
                             "dimensions": [
                               {
-                                "operator": "Include",
                                 "name": "Computer",
+                                "operator": "Include",
                                 "values": [
                                   "*"
                                 ]
@@ -340,17 +340,17 @@
                         "Microsoft.Compute/virtualMachines"
                       ]
                     },
-                    "apiVersion": "2022-08-01-preview",
                     "location": "[resourceGroup().location]",
+                    "apiVersion": "2022-08-01-preview",
                     "name": "[concat(resourceGroup().name, '-VMHeartBeatAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM HeartBeat Alert for all VMs in the subscription",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Compute",
       "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "category": "Compute",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -41,18 +41,6 @@
         },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "type": "String"
-      },
       "windowSize": {
         "allowedValues": [
           "PT5M",
@@ -67,6 +55,45 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
+        },
+        "type": "String"
+      },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
+      "severity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "1",
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -86,18 +113,11 @@
         },
         "type": "String"
       },
-      "severity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "1",
+      "threshold": {
+        "defaultValue": "10",
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
         "type": "String"
       },
@@ -111,26 +131,6 @@
         },
         "type": "Object"
       },
-      "threshold": {
-        "defaultValue": "10",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "timeAggregation": {
         "allowedValues": [
           "Average",
@@ -142,14 +142,6 @@
         "defaultValue": "Average",
         "metadata": {
           "displayName": "TimeAggregation"
-        },
-        "type": "String"
-      },
-      "failingPeriods": {
-        "defaultValue": "1",
-        "metadata": {
-          "description": "Number of failing periods before alert is fired",
-          "displayName": "Failing Periods"
         },
         "type": "String"
       },
@@ -167,11 +159,11 @@
         },
         "type": "String"
       },
-      "evaluationPeriods": {
+      "failingPeriods": {
         "defaultValue": "1",
         "metadata": {
-          "description": "The number of aggregated lookback points.",
-          "displayName": "Evaluation Periods"
+          "description": "Number of failing periods before alert is fired",
+          "displayName": "Failing Periods"
         },
         "type": "String"
       },
@@ -180,6 +172,14 @@
         "metadata": {
           "description": "Auto Resolve time for the alert in ISO 8601 format",
           "displayName": "Auto Resolve"
+        },
+        "type": "String"
+      },
+      "evaluationPeriods": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "The number of aggregated lookback points.",
+          "displayName": "Evaluation Periods"
         },
         "type": "String"
       },
@@ -200,8 +200,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Compute/virtualMachines",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
           }
         ]
       },
@@ -212,16 +212,16 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[concat(subscription().displayName, '-VMHeartBeatAlert')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
+                "equals": "[concat(subscription().displayName, '-VMHeartBeatAlert')]"
               },
               {
-                "equals": "[subscription().id]",
-                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]"
+                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]",
+                "equals": "[subscription().id]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/scheduledqueryrules/enabled"
+                "field": "Microsoft.Insights/scheduledqueryrules/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -237,11 +237,14 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
+                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
@@ -249,34 +252,32 @@
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
                 "timeAggregation": {
                   "value": "[parameters('timeAggregation')]"
-                },
-                "failingPeriods": {
-                  "value": "[parameters('failingPeriods')]"
                 },
                 "operator": {
                   "value": "[parameters('operator')]"
                 },
-                "evaluationPeriods": {
-                  "value": "[parameters('evaluationPeriods')]"
+                "failingPeriods": {
+                  "value": "[parameters('failingPeriods')]"
                 },
                 "autoResolveTime": {
                   "value": "[parameters('autoResolveTime')]"
+                },
+                "evaluationPeriods": {
+                  "value": "[parameters('evaluationPeriods')]"
                 },
                 "autoResolve": {
                   "value": "[parameters('autoResolve')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
@@ -285,10 +286,13 @@
                   "autoMitigate": {
                     "type": "String"
                   },
+                  "windowSize": {
+                    "type": "String"
+                  },
                   "enabled": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "severity": {
                     "type": "String"
                   },
                   "alertResourceGroupName": {
@@ -297,28 +301,25 @@
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "severity": {
+                  "threshold": {
                     "type": "String"
                   },
                   "alertResourceGroupTags": {
                     "type": "object"
                   },
-                  "threshold": {
-                    "type": "String"
-                  },
                   "timeAggregation": {
-                    "type": "String"
-                  },
-                  "failingPeriods": {
                     "type": "String"
                   },
                   "operator": {
                     "type": "String"
                   },
-                  "evaluationPeriods": {
+                  "failingPeriods": {
                     "type": "String"
                   },
                   "autoResolveTime": {
+                    "type": "String"
+                  },
+                  "evaluationPeriods": {
                     "type": "String"
                   },
                   "autoResolve": {
@@ -329,8 +330,8 @@
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "apiVersion": "2021-04-01",
                     "location": "[parameters('alertResourceGroupLocation')]",
+                    "apiVersion": "2021-04-01",
                     "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
@@ -349,6 +350,7 @@
                           "value": "[parameters('alertResourceGroupLocation')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
@@ -368,7 +370,6 @@
                             "properties": {
                               "description": "Log Alert for Virtual Machine Heartbeat",
                               "displayName": "[concat(subscription().displayName, '-VMHeartBeatAlert')]",
-                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
@@ -376,11 +377,14 @@
                                 "autoMitigate": {
                                   "value": "[parameters('autoMitigate')]"
                                 },
+                                "windowSize": {
+                                  "value": "[parameters('windowSize')]"
+                                },
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
                                 },
-                                "windowSize": {
-                                  "value": "[parameters('windowSize')]"
+                                "severity": {
+                                  "value": "[parameters('severity')]"
                                 },
                                 "alertResourceGroupName": {
                                   "value": "[parameters('alertResourceGroupName')]"
@@ -388,40 +392,37 @@
                                 "alertResourceGroupLocation": {
                                   "value": "[parameters('alertResourceGroupName')]"
                                 },
-                                "severity": {
-                                  "value": "[parameters('severity')]"
-                                },
                                 "threshold": {
                                   "value": "[parameters('threshold')]"
                                 },
                                 "failingPeriods": {
                                   "value": "[parameters('failingPeriods')]"
                                 },
-                                "evaluationPeriods": {
-                                  "value": "[parameters('evaluationPeriods')]"
-                                },
                                 "autoResolveTime": {
                                   "value": "[parameters('autoResolveTime')]"
+                                },
+                                "evaluationPeriods": {
+                                  "value": "[parameters('evaluationPeriods')]"
                                 },
                                 "autoResolve": {
                                   "value": "[parameters('autoResolve')]"
                                 }
                               },
+                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
                               "autoMitigate": "[parameters('autoMitigate')]",
-                              "enabled": "[parameters('enabled')]",
                               "windowSize": "[parameters('windowSize')]",
+                              "enabled": "[parameters('enabled')]",
                               "severity": "[parameters('severity')]",
                               "criteria": {
                                 "allOf": [
                                   {
                                     "threshold": "[parameters('threshold')]",
                                     "timeAggregation": "[parameters('timeAggregation')]",
+                                    "operator": "[parameters('operator')]",
                                     "failingPeriods": {
                                       "numberOfEvaluationPeriods": "[parameters('evaluationPeriods')]",
                                       "minFailingPeriodsToAlert": "[parameters('failingPeriods')]"
                                     },
-                                    "operator": "[parameters('operator')]",
-                                    "query": "Heartbeat| summarize TimeGenerated=max(TimeGenerated) by Computer, _ResourceId| extend Duration = datetime_diff('minute',now(),TimeGenerated)| summarize AggregatedValue = min(Duration) by Computer, bin(TimeGenerated,5m), _ResourceId",
                                     "metricMeasureColumn": "AggregatedValue",
                                     "resourceIdColumn": "_ResourceId",
                                     "dimensions": [
@@ -432,23 +433,24 @@
                                           "*"
                                         ]
                                       }
-                                    ]
+                                    ],
+                                    "query": "Heartbeat| summarize TimeGenerated=max(TimeGenerated) by Computer, _ResourceId| extend Duration = datetime_diff('minute',now(),TimeGenerated)| summarize AggregatedValue = min(Duration) by Computer, bin(TimeGenerated,5m), _ResourceId"
                                   }
                                 ]
                               },
                               "scopes": [
                                 "[subscription().Id]"
                               ],
+                              "ruleResolveConfiguration": {
+                                "timeToResolve": "[parameters('autoResolveTime')]",
+                                "autoResolved": "[parameters('autoResolve')]"
+                              },
                               "targetResourceTypes": [
                                 "Microsoft.Compute/virtualMachines"
-                              ],
-                              "ruleResolveConfiguration": {
-                                "autoResolved": "[parameters('autoResolve')]",
-                                "timeToResolve": "[parameters('autoResolveTime')]"
-                              }
+                              ]
                             },
-                            "apiVersion": "2022-08-01-preview",
                             "location": "[parameters('alertResourceGroupLocation')]",
+                            "apiVersion": "2022-08-01-preview",
                             "name": "[concat(subscription().displayName, '-VMHeartBeatAlert')]",
                             "tags": {
                               "_deployed_by_amba": true
@@ -457,8 +459,7 @@
                         ],
                         "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
                     "apiVersion": "2019-10-01",
                     "name": "HeartBeatAlert",
@@ -469,8 +470,7 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },

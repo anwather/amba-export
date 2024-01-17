@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy Vnet Gateway Egress Packet Drop Count Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Network",
       "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "category": "Network",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -42,18 +42,6 @@
         },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "type": "String"
-      },
       "windowSize": {
         "allowedValues": [
           "PT1M",
@@ -69,6 +57,18 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
+        },
+        "type": "String"
+      },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
         "type": "String"
       },
@@ -112,12 +112,12 @@
       "if": {
         "allOf": [
           {
-            "equals": "microsoft.network/virtualNetworkGateways",
-            "field": "type"
+            "field": "type",
+            "equals": "microsoft.network/virtualNetworkGateways"
           },
           {
-            "equals": "VPN",
-            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType"
+            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType",
+            "equals": "VPN"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -132,20 +132,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "microsoft.network/virtualNetworkGateways",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "microsoft.network/virtualNetworkGateways"
               },
               {
-                "equals": "TunnelEgressPacketDropCount",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "TunnelEgressPacketDropCount"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/virtualNetworkGateways/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/virtualNetworkGateways/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -164,11 +164,11 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
@@ -177,6 +177,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -192,10 +193,10 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "windowSize": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "enabled": {
                     "type": "String"
                   },
                   "severity": {
@@ -215,7 +216,6 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Vnet Gateway tunnel TunnelEgressPacketDropCount",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -223,32 +223,33 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
+                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
                             "name": "TunnelEgressPacketDropCount",
-                            "metricNamespace": "microsoft.network/virtualNetworkGateways",
+                            "operator": "GreaterThan",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
+                            "metricNamespace": "microsoft.network/virtualNetworkGateways",
                             "criterionType": "DynamicThresholdCriterion",
-                            "operator": "GreaterThan",
                             "metricName": "TunnelEgressPacketDropCount",
                             "alertSensitivity": "Medium"
                           }
@@ -259,8 +260,8 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
+                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-TunnelEgressPacketDropCountAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
@@ -269,8 +270,7 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

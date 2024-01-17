@@ -6,9 +6,9 @@
     "description": "Policy to audit/deploy ER Direct TxLightLevel High Alert",
     "mode": "All",
     "metadata": {
+      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "Category": "Networking",
-      "version": "1.0.1",
       "_deployed_by_amba": "True"
     },
     "parameters": {
@@ -84,14 +84,6 @@
         },
         "type": "String"
       },
-      "threshold": {
-        "defaultValue": "0",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -101,6 +93,14 @@
         "metadata": {
           "description": "Effect of the policy",
           "displayName": "Effect"
+        },
+        "type": "String"
+      },
+      "threshold": {
+        "defaultValue": "0",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
         "type": "String"
       },
@@ -117,8 +117,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/expressRoutePorts",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/expressRoutePorts"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -133,24 +133,24 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Network/expressRoutePorts",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/expressRoutePorts"
               },
               {
-                "equals": "TxLightLevel",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "TxLightLevel"
               },
               {
-                "equals": "GreaterThan",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator",
+                "equals": "GreaterThan"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/expressRoutePorts/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/expressRoutePorts/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -185,6 +185,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -221,14 +222,11 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for ER Direct Connection TxLightLevelHigh",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -249,6 +247,8 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
@@ -257,9 +257,9 @@
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
+                            "name": "TxLightLevel",
                             "operator": "GreaterThan",
                             "metricNamespace": "Microsoft.Network/expressRoutePorts",
-                            "name": "TxLightLevel",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "TxLightLevel"
                           }
@@ -270,17 +270,17 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
+                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-DirectERTxLightLevelHighAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }
