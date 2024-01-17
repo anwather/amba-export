@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy Virtual Network Gateway Express Route CPU Utilization Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Network",
       "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "category": "Network",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -87,14 +87,6 @@
         },
         "type": "String"
       },
-      "threshold": {
-        "defaultValue": "80",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -104,6 +96,14 @@
         "metadata": {
           "description": "Effect of the policy",
           "displayName": "Effect"
+        },
+        "type": "String"
+      },
+      "threshold": {
+        "defaultValue": "80",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
         "type": "String"
       },
@@ -120,12 +120,12 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/virtualNetworkGateways",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/virtualNetworkGateways"
           },
           {
-            "equals": "ExpressRoute",
-            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType"
+            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType",
+            "equals": "ExpressRoute"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -140,20 +140,20 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Network/virtualNetworkGateways",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/virtualNetworkGateways"
               },
               {
-                "equals": "ExpressRouteGatewayCpuUtilization",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "ExpressRouteGatewayCpuUtilization"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworkGateways/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworkGateways/', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -188,6 +188,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -221,14 +222,11 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for VNet Gateway Express Route CPU Utilization",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -249,6 +247,8 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
@@ -257,9 +257,9 @@
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
+                            "name": "ExpressRouteGatewayCpuUtilization",
                             "operator": "GreaterThan",
                             "metricNamespace": "Microsoft.Network/virtualNetworkGateways",
-                            "name": "ExpressRouteGatewayCpuUtilization",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "ExpressRouteGatewayCpuUtilization"
                           }
@@ -270,17 +270,17 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
+                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-GatewayERCPUAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

@@ -6,13 +6,13 @@
     "description": "Policy to Deploy Deploy Alert Processing Rule with Action Group",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Monitoring",
       "version": "1.0.2",
-      "_deployed_by_amba": "True",
+      "category": "Monitoring",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "monitorDisable": {
@@ -39,14 +39,6 @@
         },
         "type": "String"
       },
-      "alzMonitorResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "type": "String"
-      },
       "alzMonitorResourceGroupTags": {
         "defaultValue": {
           "_deployed_by_amba": true
@@ -56,14 +48,22 @@
           "displayName": "Resource Group Tags"
         },
         "type": "Object"
+      },
+      "alzMonitorResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
+        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Resources/subscriptions",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Resources/subscriptions"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -78,8 +78,8 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "AMBA Alert Processing Rule for Subscription",
-                "field": "Microsoft.AlertsManagement/actionRules/description"
+                "field": "Microsoft.AlertsManagement/actionRules/description",
+                "equals": "AMBA Alert Processing Rule for Subscription"
               }
             ]
           },
@@ -102,6 +102,7 @@
                   "value": "[parameters('ALZMonitorResourceGroupTags')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "ALZMonitorActionGroupEmail": {
@@ -118,14 +119,11 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {
-                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
-                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "apiVersion": "2021-04-01",
                     "location": "[parameters('ALZMonitorResourceGroupLocation')]",
+                    "apiVersion": "2021-04-01",
                     "name": "[parameters('ALZMonitorResourceGroupName')]",
                     "tags": "[parameters('ALZMonitorResourceGroupTags')]"
                   },
@@ -141,6 +139,7 @@
                           "value": "[parameters('ALZMonitorResourceGroupName')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "ALZMonitorActionGroupEmail": {
@@ -151,13 +150,11 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/actionGroups",
                             "properties": {
                               "enabled": true,
-                              "groupShortName": "AmbaActionGr",
                               "copy": [
                                 {
                                   "name": "emailReceivers",
@@ -169,10 +166,11 @@
                                     "emailAddress": "[trim(variables('varALZMonitorActionGroupEmail')[copyIndex('emailReceivers')])]"
                                   }
                                 }
-                              ]
+                              ],
+                              "groupShortName": "AmbaActionGr"
                             },
-                            "apiVersion": "2022-06-01",
                             "location": "Global",
+                            "apiVersion": "2022-06-01",
                             "name": "AmbaActionGr",
                             "tags": {
                               "_deployed_by_amba": true
@@ -195,20 +193,20 @@
                                 }
                               ]
                             },
-                            "apiVersion": "2021-08-08",
                             "location": "Global",
+                            "apiVersion": "2021-08-08",
                             "name": "AMBA Alert Processing Rule",
-                            "tags": {
-                              "_deployed_by_amba": true
-                            },
                             "dependsOn": [
                               "[concat('Microsoft.Insights/actionGroups/', 'AmbaActionGr')]"
-                            ]
+                            ],
+                            "tags": {
+                              "_deployed_by_amba": true
+                            }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
                     "apiVersion": "2019-10-01",
                     "name": "ActionGroupDeployment",
@@ -217,9 +215,11 @@
                     ]
                   }
                 ],
+                "variables": {
+                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
+                },
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },

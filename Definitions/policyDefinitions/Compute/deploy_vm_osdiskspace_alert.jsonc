@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM OSDiskSpace Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Compute",
       "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "category": "Compute",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -85,11 +85,15 @@
         },
         "type": "String"
       },
-      "threshold": {
-        "defaultValue": "10",
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -109,17 +113,11 @@
         },
         "type": "String"
       },
-      "timeAggregation": {
-        "allowedValues": [
-          "Average",
-          "Count",
-          "Maximum",
-          "Minimum",
-          "Total"
-        ],
-        "defaultValue": "Average",
+      "threshold": {
+        "defaultValue": "10",
         "metadata": {
-          "displayName": "TimeAggregation"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
         "type": "String"
       },
@@ -133,15 +131,17 @@
         },
         "type": "Object"
       },
-      "effect": {
+      "timeAggregation": {
         "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
+          "Average",
+          "Count",
+          "Maximum",
+          "Minimum",
+          "Total"
         ],
-        "defaultValue": "deployIfNotExists",
+        "defaultValue": "Average",
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "displayName": "TimeAggregation"
         },
         "type": "String"
       },
@@ -183,16 +183,6 @@
         },
         "type": "String"
       },
-      "computersToInclude": {
-        "defaultValue": [
-          "*"
-        ],
-        "metadata": {
-          "description": "Array of Computer to be monitored",
-          "displayName": "Disks to be included to be monitored"
-        },
-        "type": "array"
-      },
       "autoResolve": {
         "allowedValues": [
           "true",
@@ -204,6 +194,16 @@
           "displayName": "Auto Resolve"
         },
         "type": "String"
+      },
+      "computersToInclude": {
+        "defaultValue": [
+          "*"
+        ],
+        "metadata": {
+          "description": "Array of Computer to be monitored",
+          "displayName": "Disks to be included to be monitored"
+        },
+        "type": "array"
       },
       "disksToInclude": {
         "defaultValue": [
@@ -221,8 +221,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Compute/virtualMachines",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
           }
         ]
       },
@@ -233,16 +233,16 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[concat(subscription().displayName, '-VMLowOSDiskSpaceAlert')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
+                "equals": "[concat(subscription().displayName, '-VMLowOSDiskSpaceAlert')]"
               },
               {
-                "equals": "[subscription().id]",
-                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]"
+                "field": "Microsoft.Insights/scheduledqueryrules/scopes[*]",
+                "equals": "[subscription().id]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/scheduledqueryrules/enabled"
+                "field": "Microsoft.Insights/scheduledqueryrules/enabled",
+                "equals": "[parameters('enabled')]"
               }
             ]
           },
@@ -267,20 +267,20 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
                 },
-                "timeAggregation": {
-                  "value": "[parameters('timeAggregation')]"
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
+                },
+                "timeAggregation": {
+                  "value": "[parameters('timeAggregation')]"
                 },
                 "operator": {
                   "value": "[parameters('operator')]"
@@ -294,16 +294,17 @@
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
                 },
-                "computersToInclude": {
-                  "value": "[parameters('computersToInclude')]"
-                },
                 "autoResolve": {
                   "value": "[parameters('autoResolve')]"
+                },
+                "computersToInclude": {
+                  "value": "[parameters('computersToInclude')]"
                 },
                 "disksToInclude": {
                   "value": "[parameters('disksToInclude')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
@@ -321,20 +322,20 @@
                   "severity": {
                     "type": "String"
                   },
-                  "threshold": {
-                    "type": "String"
-                  },
                   "alertResourceGroupName": {
                     "type": "string"
                   },
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "timeAggregation": {
+                  "threshold": {
                     "type": "String"
                   },
                   "alertResourceGroupTags": {
                     "type": "object"
+                  },
+                  "timeAggregation": {
+                    "type": "String"
                   },
                   "operator": {
                     "type": "String"
@@ -348,23 +349,22 @@
                   "evaluationPeriods": {
                     "type": "String"
                   },
-                  "computersToInclude": {
-                    "type": "array"
-                  },
                   "autoResolve": {
                     "type": "String"
+                  },
+                  "computersToInclude": {
+                    "type": "array"
                   },
                   "disksToInclude": {
                     "type": "array"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "apiVersion": "2021-04-01",
                     "location": "[parameters('alertResourceGroupLocation')]",
+                    "apiVersion": "2021-04-01",
                     "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
@@ -383,6 +383,7 @@
                           "value": "[parameters('alertResourceGroupLocation')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
@@ -396,15 +397,12 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
                             "properties": {
                               "description": "Log Alert for Virtual Machine OSDiskSpace",
                               "displayName": "[concat(subscription().displayName, '-VMLowOSDiskSpaceAlert')]",
-                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                              "autoMitigate": "[parameters('autoMitigate')]",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
@@ -421,14 +419,14 @@
                                 "severity": {
                                   "value": "[parameters('severity')]"
                                 },
-                                "threshold": {
-                                  "value": "[parameters('threshold')]"
-                                },
                                 "alertResourceGroupName": {
                                   "value": "[parameters('alertResourceGroupName')]"
                                 },
                                 "alertResourceGroupLocation": {
                                   "value": "[parameters('alertResourceGroupName')]"
+                                },
+                                "threshold": {
+                                  "value": "[parameters('threshold')]"
                                 },
                                 "failingPeriods": {
                                   "value": "[parameters('failingPeriods')]"
@@ -439,16 +437,18 @@
                                 "evaluationPeriods": {
                                   "value": "[parameters('evaluationPeriods')]"
                                 },
-                                "computersToInclude": {
-                                  "value": "[parameters('computersToInclude')]"
-                                },
                                 "autoResolve": {
                                   "value": "[parameters('autoResolve')]"
+                                },
+                                "computersToInclude": {
+                                  "value": "[parameters('computersToInclude')]"
                                 },
                                 "disksToInclude": {
                                   "value": "[parameters('disksToInclude')]"
                                 }
                               },
+                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                              "autoMitigate": "[parameters('autoMitigate')]",
                               "windowSize": "[parameters('windowSize')]",
                               "enabled": "[parameters('enabled')]",
                               "severity": "[parameters('severity')]",
@@ -466,13 +466,13 @@
                                     "resourceIdColumn": "_ResourceId",
                                     "dimensions": [
                                       {
-                                        "operator": "Include",
                                         "name": "Computer",
+                                        "operator": "Include",
                                         "values": "[parameters('computersToInclude')]"
                                       },
                                       {
-                                        "operator": "Include",
                                         "name": "Disk",
+                                        "operator": "Include",
                                         "values": "[parameters('disksToInclude')]"
                                       }
                                     ],
@@ -491,17 +491,17 @@
                                 "Microsoft.Compute/virtualMachines"
                               ]
                             },
-                            "apiVersion": "2022-08-01-preview",
                             "location": "[parameters('alertResourceGroupLocation')]",
+                            "apiVersion": "2022-08-01-preview",
                             "name": "[concat(subscription().displayName, '-VMLowOSDiskSpaceAlert')]",
                             "tags": {
                               "_deployed_by_amba": true
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
                     "apiVersion": "2019-10-01",
                     "name": "VMOSDiskSpaceAlert",
@@ -510,9 +510,9 @@
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },
