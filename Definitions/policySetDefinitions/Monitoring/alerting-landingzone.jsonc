@@ -5,15 +5,41 @@
     "displayName": "Deploy Azure Monitor Baseline Alerts for Landing Zone",
     "description": "Initiative to deploy AMBA alerts relevant to the ALZ LandingZone management group",
     "metadata": {
+      "_deployed_by_amba": true,
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Monitoring",
       "version": "1.0.4",
-      "_deployed_by_amba": true,
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
     },
     "parameters": {
+      "alzMonitorResourceGroupLocation": {
+        "defaultValue": "centralus",
+        "metadata": {
+          "displayName": "ALZ Monitor Resource Group Location",
+          "description": "Location of the resource group where the ALZ Monitor resources will be deployed"
+        },
+        "type": "String"
+      },
+      "alzMonitorResourceGroupName": {
+        "defaultValue": "ALZ-Monitoring-RG",
+        "metadata": {
+          "displayName": "ALZ Monitor Resource Group Name",
+          "description": "Name of the resource group where the ALZ Monitor resources will be deployed"
+        },
+        "type": "String"
+      },
+      "alzMonitorResourceGroupTags": {
+        "defaultValue": {
+          "_deployed_by_alz_monitor": true
+        },
+        "metadata": {
+          "displayName": "ALZ Monitor Resource Group Tags",
+          "description": "Tags for the resource group where the ALZ Monitor resources will be deployed"
+        },
+        "type": "Object"
+      },
       "lbGlobalBackendAvailabilityEvaluationFrequency": {
         "allowedValues": [
           "PT1M",
@@ -59,6 +85,36 @@
         },
         "type": "String"
       },
+      "kvLatencyAvailabilityEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "Key Vault Latency Availability Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "storageAccountAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "1",
+        "metadata": {
+          "displayName": "Storage Account Availability Alert Severity",
+          "description": "Severity of the alert for Storage Account Availability"
+        },
+        "type": "String"
+      },
       "lbGlobalBackendAvailabilityPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -68,6 +124,18 @@
         "metadata": {
           "displayName": "LB Global Backend Availability Policy Effect",
           "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
+        },
+        "type": "string"
+      },
+      "storageAccountAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "displayName": "Storage Account Availability Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
         },
         "type": "string"
       },
@@ -82,6 +150,21 @@
         "defaultValue": "PT1M",
         "metadata": {
           "displayName": "LB Health Probe Status Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "pipvipAvailabilityEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
+        "metadata": {
+          "displayName": "PIP VIP Availability Evaluation Frequency",
           "description": "Evaluation frequency for the alert"
         },
         "type": "string"
@@ -112,33 +195,29 @@
         },
         "type": "string"
       },
-      "pipvipAvailabilityEvaluationFrequency": {
+      "storageAccountAvailabilityWindowSize": {
         "allowedValues": [
           "PT1M",
           "PT5M",
           "PT15M",
           "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
-        "metadata": {
-          "displayName": "PIP VIP Availability Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "type": "string"
-      },
-      "pipPacketsInDDoSEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
         ],
         "defaultValue": "PT5M",
         "metadata": {
-          "displayName": "PIP Packets In DDoS Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
+          "displayName": "Storage Account Availability Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
+      "storageAccountAvailabilityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "Storage Account Availability Alert State",
+          "description": "Alert state for the alert"
         },
         "type": "string"
       },
@@ -157,6 +236,71 @@
         },
         "type": "String"
       },
+      "storageAccountAvailabilityFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "Storage Account Availability Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "storageAccountAvailabilityThreshold": {
+        "defaultValue": "90",
+        "metadata": {
+          "displayName": "Storage Account Availability Threshold",
+          "description": "Threshold for the alert"
+        },
+        "type": "string"
+      },
+      "pipPacketsInDDoSEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "PIP Packets In DDoS Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "kvLatencyAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "3",
+        "metadata": {
+          "displayName": "Key Vault Latency Availability Alert Severity",
+          "description": "Severity of the alert for Key Vault Latency Availability"
+        },
+        "type": "String"
+      },
+      "lbDatapathAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "displayName": "LB Data path Availability Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
+        },
+        "type": "string"
+      },
       "lbUsedSNATPortsEvaluationFrequency": {
         "allowedValues": [
           "PT1M",
@@ -172,30 +316,15 @@
         },
         "type": "string"
       },
-      "lbDatapathAvailabilityPolicyEffect": {
+      "kvLatencyAvailabilityPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
-        "defaultValue": "deployIfNotExists",
+        "defaultValue": "disabled",
         "metadata": {
-          "displayName": "LB Data path Availability Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
-        },
-        "type": "string"
-      },
-      "pipBytesInDDoSEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "PIP Bytes In DDoS Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
+          "displayName": "Key Vault Latency Availability Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
         },
         "type": "string"
       },
@@ -214,26 +343,46 @@
         },
         "type": "string"
       },
-      "lbHealthProbeStatusAlertSeverity": {
+      "kvAvailabilityEvaluationFrequency": {
         "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
         ],
-        "defaultValue": "2",
+        "defaultValue": "PT1M",
         "metadata": {
-          "displayName": "LB Health Probe Status Alert Severity",
-          "description": "Severity of the alert"
+          "displayName": "Key Vault Availability Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
         },
-        "type": "String"
+        "type": "string"
       },
-      "lbDatapathAvailabilityAlertState": {
-        "defaultValue": "true",
+      "pipBytesInDDoSEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
         "metadata": {
-          "displayName": "LB Data path Availability Alert State",
-          "description": "Alert state for the alert"
+          "displayName": "PIP Bytes In DDoS Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "rvBackupHealthMonitorPolicyEffect": {
+        "allowedValues": [
+          "modify",
+          "audit",
+          "disabled"
+        ],
+        "defaultValue": "modify",
+        "metadata": {
+          "displayName": "Recovery Vault Backup Health Monitor Policy Effect",
+          "description": "Policy effect for the alert, modify will modify the alert if it exists, or audit if it does not exist"
         },
         "type": "string"
       },
@@ -254,6 +403,29 @@
           "description": "Window size for the alert"
         },
         "type": "string"
+      },
+      "lbDatapathAvailabilityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "LB Data path Availability Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "lbHealthProbeStatusAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "LB Health Probe Status Alert Severity",
+          "description": "Severity of the alert"
+        },
+        "type": "String"
       },
       "pipdDoSAttackEvaluationFrequency": {
         "allowedValues": [
@@ -282,14 +454,6 @@
         },
         "type": "string"
       },
-      "alzMonitorResourceGroupLocation": {
-        "defaultValue": "centralus",
-        "metadata": {
-          "displayName": "ALZ Monitor Resource Group Location",
-          "description": "Location of the resource group where the ALZ Monitor resources will be deployed"
-        },
-        "type": "String"
-      },
       "pipvipAvailabilityAlertSeverity": {
         "allowedValues": [
           "0",
@@ -305,6 +469,32 @@
         },
         "type": "String"
       },
+      "kvLatencyAvailabilityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "Key Vault Latency Availability Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "kvLatencyAvailabilityWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "Key Vault Latency Availability Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
       "pipvipAvailabilityPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -314,6 +504,14 @@
         "metadata": {
           "displayName": "PIP VIP Availability Policy Effect",
           "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
+        },
+        "type": "string"
+      },
+      "kvLatencyAvailabilityThreshold": {
+        "defaultValue": "1000",
+        "metadata": {
+          "displayName": "Key Vault Latency Availability Threshold",
+          "description": "Threshold for the alert"
         },
         "type": "string"
       },
@@ -358,20 +556,20 @@
         },
         "type": "String"
       },
-      "lbUsedSNATPortsAlertSeverity": {
+      "kvCapacityEvaluationFrequency": {
         "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
         ],
-        "defaultValue": "1",
+        "defaultValue": "PT1M",
         "metadata": {
-          "displayName": "LB Used SNAT Ports Alert Severity",
-          "description": "Severity of the alert"
+          "displayName": "Key Vault Capacity Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
         },
-        "type": "String"
+        "type": "string"
       },
       "pipPacketsInDDoSPolicyEffect": {
         "allowedValues": [
@@ -385,11 +583,18 @@
         },
         "type": "string"
       },
-      "pipvipAvailabilityAlertState": {
-        "defaultValue": "true",
+      "kvRequestEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
         "metadata": {
-          "displayName": "PIP VIP Availability Alert State",
-          "description": "Alert state for the alert"
+          "displayName": "Key Vault Request Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
         },
         "type": "string"
       },
@@ -411,7 +616,15 @@
         },
         "type": "string"
       },
-      "pipBytesInDDoSAlertSeverity": {
+      "pipvipAvailabilityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "PIP VIP Availability Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "lbUsedSNATPortsAlertSeverity": {
         "allowedValues": [
           "0",
           "1",
@@ -419,17 +632,17 @@
           "3",
           "4"
         ],
-        "defaultValue": "4",
+        "defaultValue": "1",
         "metadata": {
-          "displayName": "PIP Bytes In DDoS Alert Severity",
-          "description": "Severity of the alert for PIP Bytes In DDoS"
+          "displayName": "LB Used SNAT Ports Alert Severity",
+          "description": "Severity of the alert"
         },
         "type": "String"
       },
-      "activityUDRUpdateAlertState": {
+      "activityNSGDeleteAlertState": {
         "defaultValue": "true",
         "metadata": {
-          "displayName": "Activity UDR Update Alert State",
+          "displayName": "Activity NSG Delete Alert State",
           "description": "Alert state for the alert"
         },
         "type": "string"
@@ -446,23 +659,20 @@
         },
         "type": "string"
       },
-      "activityNSGDeleteAlertState": {
-        "defaultValue": "true",
+      "pipBytesInDDoSAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "4",
         "metadata": {
-          "displayName": "Activity NSG Delete Alert State",
-          "description": "Alert state for the alert"
+          "displayName": "PIP Bytes In DDoS Alert Severity",
+          "description": "Severity of the alert for PIP Bytes In DDoS"
         },
-        "type": "string"
-      },
-      "alzMonitorResourceGroupTags": {
-        "defaultValue": {
-          "_deployed_by_alz_monitor": true
-        },
-        "metadata": {
-          "displayName": "ALZ Monitor Resource Group Tags",
-          "description": "Tags for the resource group where the ALZ Monitor resources will be deployed"
-        },
-        "type": "Object"
+        "type": "String"
       },
       "vnetddosAttackAlertSeverity": {
         "allowedValues": [
@@ -479,6 +689,29 @@
         },
         "type": "String"
       },
+      "kvAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "1",
+        "metadata": {
+          "displayName": "Key Vault Availability Alert Severity",
+          "description": "Severity of the alert for Key Vault Availability"
+        },
+        "type": "String"
+      },
+      "activityUDRUpdateAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "Activity UDR Update Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
       "pipvipAvailabilityThreshold": {
         "defaultValue": "1",
         "metadata": {
@@ -486,14 +719,6 @@
           "description": "Threshold for the alert"
         },
         "type": "string"
-      },
-      "alzMonitorResourceGroupName": {
-        "defaultValue": "ALZ-Monitoring-RG",
-        "metadata": {
-          "displayName": "ALZ Monitor Resource Group Name",
-          "description": "Name of the resource group where the ALZ Monitor resources will be deployed"
-        },
-        "type": "String"
       },
       "pipPacketsInDDoSAlertState": {
         "defaultValue": "true",
@@ -530,6 +755,38 @@
         },
         "type": "string"
       },
+      "kvAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "displayName": "Key Vault Availability Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
+        },
+        "type": "string"
+      },
+      "activityKVDeleteAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "Activity Key Vault Delete Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "pipBytesInDDoSPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "displayName": "PIP Bytes In DDoS Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
+        },
+        "type": "string"
+      },
       "pipPacketsInDDoSWindowSize": {
         "allowedValues": [
           "PT1M",
@@ -548,15 +805,11 @@
         },
         "type": "string"
       },
-      "pipBytesInDDoSPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
+      "lbUsedSNATPortsAlertState": {
+        "defaultValue": "true",
         "metadata": {
-          "displayName": "PIP Bytes In DDoS Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
+          "displayName": "LB Used SNAT Ports Alert State",
+          "description": "Alert state for the alert"
         },
         "type": "string"
       },
@@ -565,14 +818,6 @@
         "metadata": {
           "displayName": "PIP Packets In DDoS Threshold",
           "description": "Threshold for the alert"
-        },
-        "type": "string"
-      },
-      "lbUsedSNATPortsAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "LB Used SNAT Ports Alert State",
-          "description": "Alert state for the alert"
         },
         "type": "string"
       },
@@ -606,6 +851,32 @@
         },
         "type": "string"
       },
+      "pipBytesInDDoSAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "PIP Bytes In DDoS Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "vnetddosAttackWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "VNET DDoS Attack Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
       "pipBytesInDDoSWindowSize": {
         "allowedValues": [
           "PT1M",
@@ -632,7 +903,7 @@
         },
         "type": "string"
       },
-      "vnetddosAttackWindowSize": {
+      "kvAvailabilityWindowSize": {
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -643,28 +914,43 @@
           "PT12H",
           "P1D"
         ],
-        "defaultValue": "PT5M",
+        "defaultValue": "PT1M",
         "metadata": {
-          "displayName": "VNET DDoS Attack Window Size",
+          "displayName": "Key Vault Availability Window Size",
           "description": "Window size for the alert"
         },
         "type": "string"
       },
-      "pipBytesInDDoSAlertState": {
+      "kvAvailabilityAlertState": {
         "defaultValue": "true",
         "metadata": {
-          "displayName": "PIP Bytes In DDoS Alert State",
+          "displayName": "Key Vault Availability Alert State",
           "description": "Alert state for the alert"
         },
         "type": "string"
       },
-      "pipBytesInDDoSThreshold": {
-        "defaultValue": "8000000",
+      "kvAvailabilityThreshold": {
+        "defaultValue": "20",
         "metadata": {
-          "displayName": "PIP Bytes In DDoS Threshold",
+          "displayName": "Key Vault Availability Threshold",
           "description": "Threshold for the alert"
         },
         "type": "string"
+      },
+      "kvCapacityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "1",
+        "metadata": {
+          "displayName": "Key Vault Capacity Alert Severity",
+          "description": "Severity of the alert for Key Vault Capacity"
+        },
+        "type": "String"
       },
       "pipdDoSAttackWindowSize": {
         "allowedValues": [
@@ -684,6 +970,22 @@
         },
         "type": "string"
       },
+      "vnetddosAttackThreshold": {
+        "defaultValue": "1",
+        "metadata": {
+          "displayName": "VNET DDoS Attack Threshold",
+          "description": "Threshold for the alert"
+        },
+        "type": "string"
+      },
+      "pipBytesInDDoSThreshold": {
+        "defaultValue": "8000000",
+        "metadata": {
+          "displayName": "PIP Bytes In DDoS Threshold",
+          "description": "Threshold for the alert"
+        },
+        "type": "string"
+      },
       "pipdDoSAttackAlertState": {
         "defaultValue": "true",
         "metadata": {
@@ -692,11 +994,30 @@
         },
         "type": "string"
       },
-      "vnetddosAttackThreshold": {
-        "defaultValue": "1",
+      "kvRequestAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
         "metadata": {
-          "displayName": "VNET DDoS Attack Threshold",
-          "description": "Threshold for the alert"
+          "displayName": "Key Vault Request Alert Severity",
+          "description": "Severity of the alert for Key Vault Request"
+        },
+        "type": "String"
+      },
+      "kvCapacityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "displayName": "Key Vault Capacity Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
         },
         "type": "string"
       },
@@ -707,6 +1028,223 @@
           "description": "Threshold for the alert"
         },
         "type": "string"
+      },
+      "kvRequestPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "displayName": "Key Vault Request Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
+        },
+        "type": "string"
+      },
+      "kvCapacityWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "Key Vault Capacity Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
+      "kvCapacityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "Key Vault Capacity Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "kvRequestAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "Key Vault Request Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "kvRequestWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "Key Vault Request Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
+      "kvCapacityThreshold": {
+        "defaultValue": "75",
+        "metadata": {
+          "displayName": "Key Vault Capacity Threshold",
+          "description": "Threshold for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "1",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Alert Severity",
+          "description": "Severity of the alert for VM Heart Beat RG"
+        },
+        "type": "String"
+      },
+      "vmHeartBeatRGWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT15M",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGAutoMitigate": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGAutoResolve": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Auto Resolve",
+          "description": "Auto Resolve for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGAutoResolveTime": {
+        "defaultValue": "00:10:00",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Auto Resolve Time",
+          "description": "Auto Resolve Time for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGThreshold": {
+        "defaultValue": "10",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Threshold",
+          "description": "Threshold for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGOperator": {
+        "allowedValues": [
+          "Equals",
+          "GreaterThan",
+          "GreaterThanOrEqual",
+          "LessThan",
+          "LessThanOrEqual"
+        ],
+        "defaultValue": "GreaterThan",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Operator",
+          "description": "Operator for the alert"
+        },
+        "type": "string"
+      },
+      "vmHeartBeatRGTimeAggregation": {
+        "allowedValues": [
+          "Average",
+          "Count",
+          "Maximum",
+          "Minimum",
+          "Total"
+        ],
+        "defaultValue": "Average",
+        "metadata": {
+          "displayName": "VM Heart Beat RG Time Aggregation",
+          "description": "Time Aggregation for the alert"
+        },
+        "type": "string"
+      },
+      "vmNetworkInAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "VM Network In Alert Severity",
+          "description": "Severity of the alert for VM Network In"
+        },
+        "type": "String"
       },
       "vmNetworkInWindowSize": {
         "allowedValues": [
@@ -1924,6 +2462,14 @@
         },
         "type": "string"
       },
+      "vmDataDiskSpaceFailingPeriods": {
+        "defaultValue": "1",
+        "metadata": {
+          "displayName": "VM Data Disk Space Failing Periods",
+          "description": "Failing Periods for the alert"
+        },
+        "type": "string"
+      },
       "vmDataDiskSpaceDisksToInclude": {
         "defaultValue": [
           "*"
@@ -2212,6 +2758,21 @@
         "metadata": {
           "displayName": "VM Data Disk Write Latency Operator",
           "description": "Operator for the alert"
+        },
+        "type": "string"
+      },
+      "vmDataDiskWriteLatencyTimeAggregation": {
+        "allowedValues": [
+          "Average",
+          "Count",
+          "Maximum",
+          "Minimum",
+          "Total"
+        ],
+        "defaultValue": "Average",
+        "metadata": {
+          "displayName": "VM Data Disk Write Latency Time Aggregation",
+          "description": "Time Aggregation for the alert"
         },
         "type": "string"
       },
@@ -2795,218 +3356,6 @@
         },
         "type": "string"
       },
-      "storageAccountAvailabilityThreshold": {
-        "defaultValue": "90",
-        "metadata": {
-          "displayName": "Storage Account Availability Threshold",
-          "description": "Threshold for the alert"
-        },
-        "type": "string"
-      },
-      "kvRequestAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "metadata": {
-          "displayName": "Key Vault Request Alert Severity",
-          "description": "Severity of the alert for Key Vault Request"
-        },
-        "type": "String"
-      },
-      "kvRequestWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "Key Vault Request Window Size",
-          "description": "Window size for the alert"
-        },
-        "type": "string"
-      },
-      "kvRequestEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "Key Vault Request Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "type": "string"
-      },
-      "kvRequestPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "displayName": "Key Vault Request Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
-        },
-        "type": "string"
-      },
-      "kvRequestAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "Key Vault Request Alert State",
-          "description": "Alert state for the alert"
-        },
-        "type": "string"
-      },
-      "kvAvailabilityAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "1",
-        "metadata": {
-          "displayName": "Key Vault Availability Alert Severity",
-          "description": "Severity of the alert for Key Vault Availability"
-        },
-        "type": "String"
-      },
-      "kvAvailabilityWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT1M",
-        "metadata": {
-          "displayName": "Key Vault Availability Window Size",
-          "description": "Window size for the alert"
-        },
-        "type": "string"
-      },
-      "kvAvailabilityEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
-        "metadata": {
-          "displayName": "Key Vault Availability Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "type": "string"
-      },
-      "kvAvailabilityPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "displayName": "Key Vault Availability Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
-        },
-        "type": "string"
-      },
-      "kvAvailabilityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "Key Vault Availability Alert State",
-          "description": "Alert state for the alert"
-        },
-        "type": "string"
-      },
-      "kvAvailabilityThreshold": {
-        "defaultValue": "20",
-        "metadata": {
-          "displayName": "Key Vault Availability Threshold",
-          "description": "Threshold for the alert"
-        },
-        "type": "string"
-      },
-      "kvLatencyAvailabilityAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "3",
-        "metadata": {
-          "displayName": "Key Vault Latency Availability Alert Severity",
-          "description": "Severity of the alert for Key Vault Latency Availability"
-        },
-        "type": "String"
-      },
-      "kvLatencyAvailabilityWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "Key Vault Latency Availability Window Size",
-          "description": "Window size for the alert"
-        },
-        "type": "string"
-      },
-      "kvLatencyAvailabilityEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "Key Vault Latency Availability Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "type": "string"
-      },
-      "kvLatencyAvailabilityPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "displayName": "Key Vault Latency Availability Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
-        },
-        "type": "string"
-      },
       "cdnpOriginHealthPercentageAlertSeverity": {
         "allowedValues": [
           "0",
@@ -3211,20 +3560,20 @@
         },
         "type": "string"
       },
-      "vmDataDiskWriteLatencyTimeAggregation": {
+      "cdnpPercentage5XXAlertSeverity": {
         "allowedValues": [
-          "Average",
-          "Count",
-          "Maximum",
-          "Minimum",
-          "Total"
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
         ],
-        "defaultValue": "Average",
+        "defaultValue": "2",
         "metadata": {
-          "displayName": "VM Data Disk Write Latency Time Aggregation",
-          "description": "Time Aggregation for the alert"
+          "displayName": "CDN Percentage 5XX Alert Severity",
+          "description": "Severity of the alert"
         },
-        "type": "string"
+        "type": "String"
       },
       "cdnpPercentage5XXWindowSize": {
         "allowedValues": [
@@ -3754,355 +4103,6 @@
           "description": "Alert state for the alert"
         },
         "type": "string"
-      },
-      "kvLatencyAvailabilityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "Key Vault Latency Availability Alert State",
-          "description": "Alert state for the alert"
-        },
-        "type": "string"
-      },
-      "kvLatencyAvailabilityThreshold": {
-        "defaultValue": "1000",
-        "metadata": {
-          "displayName": "Key Vault Latency Availability Threshold",
-          "description": "Threshold for the alert"
-        },
-        "type": "string"
-      },
-      "kvCapacityAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "1",
-        "metadata": {
-          "displayName": "Key Vault Capacity Alert Severity",
-          "description": "Severity of the alert for Key Vault Capacity"
-        },
-        "type": "String"
-      },
-      "kvCapacityWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "Key Vault Capacity Window Size",
-          "description": "Window size for the alert"
-        },
-        "type": "string"
-      },
-      "kvCapacityEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
-        "metadata": {
-          "displayName": "Key Vault Capacity Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "type": "string"
-      },
-      "vmDataDiskSpaceFailingPeriods": {
-        "defaultValue": "1",
-        "metadata": {
-          "displayName": "VM Data Disk Space Failing Periods",
-          "description": "Failing Periods for the alert"
-        },
-        "type": "string"
-      },
-      "kvCapacityPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "displayName": "Key Vault Capacity Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
-        },
-        "type": "string"
-      },
-      "kvCapacityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "Key Vault Capacity Alert State",
-          "description": "Alert state for the alert"
-        },
-        "type": "string"
-      },
-      "kvCapacityThreshold": {
-        "defaultValue": "75",
-        "metadata": {
-          "displayName": "Key Vault Capacity Threshold",
-          "description": "Threshold for the alert"
-        },
-        "type": "string"
-      },
-      "activityKVDeleteAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "Activity Key Vault Delete Alert State",
-          "description": "Alert state for the alert"
-        },
-        "type": "string"
-      },
-      "storageAccountAvailabilityAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "1",
-        "metadata": {
-          "displayName": "Storage Account Availability Alert Severity",
-          "description": "Severity of the alert for Storage Account Availability"
-        },
-        "type": "String"
-      },
-      "storageAccountAvailabilityWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "Storage Account Availability Window Size",
-          "description": "Window size for the alert"
-        },
-        "type": "string"
-      },
-      "storageAccountAvailabilityFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "Storage Account Availability Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "type": "string"
-      },
-      "storageAccountAvailabilityPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "displayName": "Storage Account Availability Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
-        },
-        "type": "string"
-      },
-      "storageAccountAvailabilityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "Storage Account Availability Alert State",
-          "description": "Alert state for the alert"
-        },
-        "type": "string"
-      },
-      "rvBackupHealthMonitorPolicyEffect": {
-        "allowedValues": [
-          "modify",
-          "audit",
-          "disabled"
-        ],
-        "defaultValue": "modify",
-        "metadata": {
-          "displayName": "Recovery Vault Backup Health Monitor Policy Effect",
-          "description": "Policy effect for the alert, modify will modify the alert if it exists, or audit if it does not exist"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "1",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Alert Severity",
-          "description": "Severity of the alert for VM Heart Beat RG"
-        },
-        "type": "String"
-      },
-      "vmHeartBeatRGWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT15M",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Window Size",
-          "description": "Window size for the alert"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGAutoMitigate": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Auto Mitigate",
-          "description": "Auto Mitigate for the alert"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGAutoResolve": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Auto Resolve",
-          "description": "Auto Resolve for the alert"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGAutoResolveTime": {
-        "defaultValue": "00:10:00",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Auto Resolve Time",
-          "description": "Auto Resolve Time for the alert"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Alert State",
-          "description": "Alert state for the alert"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGThreshold": {
-        "defaultValue": "10",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Threshold",
-          "description": "Threshold for the alert"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGOperator": {
-        "allowedValues": [
-          "Equals",
-          "GreaterThan",
-          "GreaterThanOrEqual",
-          "LessThan",
-          "LessThanOrEqual"
-        ],
-        "defaultValue": "GreaterThan",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Operator",
-          "description": "Operator for the alert"
-        },
-        "type": "string"
-      },
-      "vmHeartBeatRGTimeAggregation": {
-        "allowedValues": [
-          "Average",
-          "Count",
-          "Maximum",
-          "Minimum",
-          "Total"
-        ],
-        "defaultValue": "Average",
-        "metadata": {
-          "displayName": "VM Heart Beat RG Time Aggregation",
-          "description": "Time Aggregation for the alert"
-        },
-        "type": "string"
-      },
-      "vmNetworkInAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "metadata": {
-          "displayName": "VM Network In Alert Severity",
-          "description": "Severity of the alert for VM Network In"
-        },
-        "type": "String"
-      },
-      "cdnpPercentage5XXAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "metadata": {
-          "displayName": "CDN Percentage 5XX Alert Severity",
-          "description": "Severity of the alert"
-        },
-        "type": "String"
       }
     },
     "policyDefinitions": [
@@ -4110,20 +4110,20 @@
         "policyDefinitionReferenceId": "ALZ_KVRequest",
         "policyDefinitionName": "Deploy_KeyVault_Requests_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('KVRequestAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('KVRequestEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('KVRequestAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('KVRequestPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('KVRequestWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('KVRequestEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('KVRequestPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('KVRequestAlertSeverity')]"
           }
         }
       },
@@ -4131,23 +4131,23 @@
         "policyDefinitionReferenceId": "ALZ_KvAvailability",
         "policyDefinitionName": "Deploy_KeyVault_Availability_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('KvAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('KvAvailabilityPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('KvAvailabilityAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('KvAvailabilityAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('KVAvailabilityThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('KvAvailabilityEvaluationFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('KvAvailabilityAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('KvAvailabilityPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('KvAvailabilityWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('KvAvailabilityAlertState')]"
           }
         }
       },
@@ -4155,23 +4155,23 @@
         "policyDefinitionReferenceId": "ALZ_KvLatencyAvailability",
         "policyDefinitionName": "Deploy_KeyVault_Latency_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('KvLatencyAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('KvLatencyAvailabilityPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('KvLatencyAvailabilityAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('KvLatencyAvailabilityAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('KvLatencyAvailabilityThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('KvLatencyAvailabilityEvaluationFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('KvLatencyAvailabilityAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('KvLatencyAvailabilityPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('KvLatencyAvailabilityWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('KvLatencyAvailabilityAlertState')]"
           }
         }
       },
@@ -4179,23 +4179,23 @@
         "policyDefinitionReferenceId": "ALZ_KVCapacity",
         "policyDefinitionName": "Deploy_KeyVault_Capacity_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('KVCapacityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('KVCapacityPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('KVCapacityAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('KVCapacityAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('KVCapacityThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('KVCapacityEvaluationFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('KVCapacityAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('KVCapacityPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('KVCapacityWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('KVCapacityAlertState')]"
           }
         }
       },
@@ -4203,8 +4203,8 @@
         "policyDefinitionReferenceId": "ALZ_activityKVDelete",
         "policyDefinitionName": "Deploy_activitylog_KeyVault_Delete",
         "parameters": {
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "enabled": {
             "value": "[parameters('activityKVDeleteAlertState')]"
@@ -4212,8 +4212,8 @@
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           }
         }
       },
@@ -4221,23 +4221,23 @@
         "policyDefinitionReferenceId": "ALZ_StorageAccountAvailability",
         "policyDefinitionName": "Deploy_StorageAccount_Availability_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('StorageAccountAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('StorageAccountAvailabilityPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('StorageAccountAvailabilityAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('StorageAccountAvailabilityAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('StorageAccountAvailabilityThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('StorageAccountAvailabilityFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('StorageAccountAvailabilityAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('StorageAccountAvailabilityPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('StorageAccountAvailabilityWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('StorageAccountAvailabilityAlertState')]"
           }
         }
       },
@@ -4245,23 +4245,23 @@
         "policyDefinitionReferenceId": "ALZ_PIPBytesInDDoS",
         "policyDefinitionName": "Deploy_PublicIp_BytesInDDoSAttack_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('PIPBytesInDDoSWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPBytesInDDoSPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('PIPBytesInDDoSAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('PIPBytesInDDoSAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('PIPBytesInDDoSThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('PIPBytesInDDoSEvaluationFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('PIPBytesInDDoSAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('PIPBytesInDDoSPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('PIPBytesInDDoSWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('PIPBytesInDDoSAlertState')]"
           }
         }
       },
@@ -4269,23 +4269,23 @@
         "policyDefinitionReferenceId": "ALZ_PIPDDoSAttack",
         "policyDefinitionName": "Deploy_PublicIp_DDoSAttack_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('PIPDDoSAttackWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPDDoSAttackPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('PIPDDoSAttackAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('PIPDDoSAttackAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('PIPDDoSAttackThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('PIPDDoSAttackEvaluationFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('PIPDDoSAttackAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('PIPDDoSAttackPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('PIPDDoSAttackWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('PIPDDoSAttackAlertState')]"
           }
         }
       },
@@ -4293,23 +4293,23 @@
         "policyDefinitionReferenceId": "ALZ_PIPPacketsInDDoS",
         "policyDefinitionName": "Deploy_PublicIp_PacketsInDDoSAttack_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('PIPPacketsInDDoSWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPPacketsInDDoSPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('PIPPacketsInDDoSAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('PIPPacketsInDDoSAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('PIPPacketsInDDoSThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('PIPPacketsInDDoSEvaluationFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('PIPPacketsInDDoSAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('PIPPacketsInDDoSPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('PIPPacketsInDDoSWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('PIPPacketsInDDoSAlertState')]"
           }
         }
       },
@@ -4317,23 +4317,23 @@
         "policyDefinitionReferenceId": "ALZ_PIPVIPAvailability",
         "policyDefinitionName": "Deploy_PublicIp_VIPAvailability_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('PIPVIPAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPVIPAvailabilityPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('PIPVIPAvailabilityAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('PIPVIPAvailabilityAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('PIPVIPAvailabilityThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('PIPVIPAvailabilityEvaluationFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('PIPVIPAvailabilityAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('PIPVIPAvailabilityPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('PIPVIPAvailabilityWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('PIPVIPAvailabilityAlertState')]"
           }
         }
       },
@@ -4341,8 +4341,8 @@
         "policyDefinitionReferenceId": "ALZ_activityNSGDelete",
         "policyDefinitionName": "Deploy_activitylog_NSG_Delete",
         "parameters": {
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "enabled": {
             "value": "[parameters('activityNSGDeleteAlertState')]"
@@ -4350,8 +4350,8 @@
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           }
         }
       },
@@ -4359,8 +4359,8 @@
         "policyDefinitionReferenceId": "ALZ_activityUDRUpdate",
         "policyDefinitionName": "Deploy_activitylog_RouteTable_Update",
         "parameters": {
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "enabled": {
             "value": "[parameters('activityUDRUpdateAlertState')]"
@@ -4368,8 +4368,8 @@
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           }
         }
       },
@@ -4386,23 +4386,23 @@
         "policyDefinitionReferenceId": "ALZ_VNETDDOSAttack",
         "policyDefinitionName": "Deploy_VNET_DDoSAttack_Alert",
         "parameters": {
+          "windowSize": {
+            "value": "[parameters('VNETDDOSAttackWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VNETDDOSAttackPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('VNETDDOSAttackAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('VNETDDOSAttackAlertState')]"
+          },
           "threshold": {
             "value": "[parameters('VNETDDOSAttackThreshold')]"
           },
           "evaluationFrequency": {
             "value": "[parameters('VNETDDOSAttackEvaluationFrequency')]"
-          },
-          "severity": {
-            "value": "[parameters('VNETDDOSAttackAlertSeverity')]"
-          },
-          "effect": {
-            "value": "[parameters('VNETDDOSAttackPolicyEffect')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VNETDDOSAttackWindowSize')]"
-          },
-          "enabled": {
-            "value": "[parameters('VNETDDOSAttackAlertState')]"
           }
         }
       },
@@ -4410,47 +4410,47 @@
         "policyDefinitionReferenceId": "ALZ_VMHeartBeatRG",
         "policyDefinitionName": "Deploy_VM_HeartBeat_Alert",
         "parameters": {
-          "threshold": {
-            "value": "[parameters('VMHeartBeatRGThreshold')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMHeartBeatRGTimeAggregation')]"
-          },
-          "effect": {
-            "value": "[parameters('VMHeartBeatRGPolicyEffect')]"
-          },
-          "evaluationFrequency": {
-            "value": "[parameters('VMHeartBeatRGEvaluationFrequency')]"
-          },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "autoResolveTime": {
-            "value": "[parameters('VMHeartBeatRGAutoResolveTime')]"
-          },
-          "operator": {
-            "value": "[parameters('VMHeartBeatRGOperator')]"
-          },
-          "autoMitigate": {
-            "value": "[parameters('VMHeartBeatRGAutoMitigate')]"
-          },
-          "autoResolve": {
-            "value": "[parameters('VMHeartBeatRGAutoResolve')]"
-          },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "windowSize": {
             "value": "[parameters('VMHeartBeatRGWindowSize')]"
           },
-          "enabled": {
-            "value": "[parameters('VMHeartBeatRGAlertState')]"
+          "autoMitigate": {
+            "value": "[parameters('VMHeartBeatRGAutoMitigate')]"
           },
           "severity": {
             "value": "[parameters('VMHeartBeatRGAlertSeverity')]"
+          },
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('VMHeartBeatRGPolicyEffect')]"
+          },
+          "timeAggregation": {
+            "value": "[parameters('VMHeartBeatRGTimeAggregation')]"
+          },
+          "threshold": {
+            "value": "[parameters('VMHeartBeatRGThreshold')]"
+          },
+          "autoResolveTime": {
+            "value": "[parameters('VMHeartBeatRGAutoResolveTime')]"
+          },
+          "enabled": {
+            "value": "[parameters('VMHeartBeatRGAlertState')]"
+          },
+          "autoResolve": {
+            "value": "[parameters('VMHeartBeatRGAutoResolve')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
+          },
+          "operator": {
+            "value": "[parameters('VMHeartBeatRGOperator')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VMHeartBeatRGEvaluationFrequency')]"
           }
         }
       },
@@ -4458,6 +4458,15 @@
         "policyDefinitionReferenceId": "ALZ_VMNetworkIn",
         "policyDefinitionName": "Deploy_VM_NetworkIn_Alert",
         "parameters": {
+          "severity": {
+            "value": "[parameters('VMNetworkInAlertSeverity')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VMNetworkInWindowSize')]"
+          },
           "autoResolveTime": {
             "value": "[parameters('VMNetworkInAutoResolveTime')]"
           },
@@ -4467,50 +4476,41 @@
           "effect": {
             "value": "[parameters('VMNetworkInPolicyEffect')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('VMNetworkInEvaluationFrequency')]"
+          "enabled": {
+            "value": "[parameters('VMNetworkInAlertState')]"
           },
           "autoMitigate": {
             "value": "[parameters('VMNetworkInAutoMitigate')]"
           },
-          "severity": {
-            "value": "[parameters('VMNetworkInAlertSeverity')]"
-          },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMNetworkInTimeAggregation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('VMNetworkInEvaluationPeriods')]"
           },
+          "networkInterfacesToInclude": {
+            "value": "[parameters('VMNetworkInNetworkInterfaceToInclude')]"
+          },
           "autoResolve": {
             "value": "[parameters('VMNetworkInAutoResolve')]"
+          },
+          "threshold": {
+            "value": "[parameters('VMNetworkInThreshold')]"
           },
           "computersToInclude": {
             "value": "[parameters('VMNetworkInComputersToInclude')]"
           },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VMNetworkInWindowSize')]"
+          "evaluationFrequency": {
+            "value": "[parameters('VMNetworkInEvaluationFrequency')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "networkInterfacesToInclude": {
-            "value": "[parameters('VMNetworkInNetworkInterfaceToInclude')]"
-          },
           "operator": {
             "value": "[parameters('VMNetworkInOperator')]"
           },
-          "enabled": {
-            "value": "[parameters('VMNetworkInAlertState')]"
-          },
-          "threshold": {
-            "value": "[parameters('VMNetworkInThreshold')]"
+          "timeAggregation": {
+            "value": "[parameters('VMNetworkInTimeAggregation')]"
           }
         }
       },
@@ -4518,6 +4518,15 @@
         "policyDefinitionReferenceId": "ALZ_VMNetworkOut",
         "policyDefinitionName": "Deploy_VM_NetworkOut_Alert",
         "parameters": {
+          "severity": {
+            "value": "[parameters('VMNetworkOutAlertSeverity')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VMNetworkOutWindowSize')]"
+          },
           "autoResolveTime": {
             "value": "[parameters('VMNetworkOutAutoResolveTime')]"
           },
@@ -4527,50 +4536,41 @@
           "effect": {
             "value": "[parameters('VMNetworkOutPolicyEffect')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('VMNetworkOutEvaluationFrequency')]"
+          "enabled": {
+            "value": "[parameters('VMNetworkOutAlertState')]"
           },
           "autoMitigate": {
             "value": "[parameters('VMNetworkOutAutoMitigate')]"
           },
-          "severity": {
-            "value": "[parameters('VMNetworkOutAlertSeverity')]"
-          },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMNetworkOutTimeAggregation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('VMNetworkOutEvaluationPeriods')]"
           },
+          "networkInterfacesToInclude": {
+            "value": "[parameters('VMNetworkOutNetworkInterfaceToInclude')]"
+          },
           "autoResolve": {
             "value": "[parameters('VMNetworkOutAutoResolve')]"
+          },
+          "threshold": {
+            "value": "[parameters('VMNetworkOutThreshold')]"
           },
           "computersToInclude": {
             "value": "[parameters('VMNetworkOutComputersToInclude')]"
           },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VMNetworkOutWindowSize')]"
+          "evaluationFrequency": {
+            "value": "[parameters('VMNetworkOutEvaluationFrequency')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "networkInterfacesToInclude": {
-            "value": "[parameters('VMNetworkOutNetworkInterfaceToInclude')]"
-          },
           "operator": {
             "value": "[parameters('VMNetworkOutOperator')]"
           },
-          "enabled": {
-            "value": "[parameters('VMNetworkOutAlertState')]"
-          },
-          "threshold": {
-            "value": "[parameters('VMNetworkOutThreshold')]"
+          "timeAggregation": {
+            "value": "[parameters('VMNetworkOutTimeAggregation')]"
           }
         }
       },
@@ -4578,6 +4578,18 @@
         "policyDefinitionReferenceId": "ALZ_VMOSDiskReadLatency",
         "policyDefinitionName": "Deploy_VM_OSDiskreadLatency_Alert",
         "parameters": {
+          "disksToInclude": {
+            "value": "[parameters('VMOSDiskReadLatencyDisksToInclude')]"
+          },
+          "severity": {
+            "value": "[parameters('VMOSDiskReadLatencyAlertSeverity')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VMOSDiskReadLatencyWindowSize')]"
+          },
           "autoResolveTime": {
             "value": "[parameters('VMOSDiskReadLatencyAutoResolveTime')]"
           },
@@ -4587,20 +4599,14 @@
           "effect": {
             "value": "[parameters('VMOSDiskReadLatencyPolicyEffect')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('VMOSDiskReadLatencyEvaluationFrequency')]"
+          "enabled": {
+            "value": "[parameters('VMOSDiskReadLatencyAlertState')]"
           },
           "autoMitigate": {
             "value": "[parameters('VMOSDiskReadLatencyAutoMitigate')]"
           },
-          "severity": {
-            "value": "[parameters('VMOSDiskReadLatencyAlertSeverity')]"
-          },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMOSDiskReadLatencyTimeAggregation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('VMOSDiskReadLatencyEvaluationPeriods')]"
@@ -4608,17 +4614,14 @@
           "autoResolve": {
             "value": "[parameters('VMOSDiskReadLatencyAutoResolve')]"
           },
+          "threshold": {
+            "value": "[parameters('VMOSDiskReadLatencyThreshold')]"
+          },
           "computersToInclude": {
             "value": "[parameters('VMOSDiskReadLatencyComputersToInclude')]"
           },
-          "disksToInclude": {
-            "value": "[parameters('VMOSDiskReadLatencyDisksToInclude')]"
-          },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VMOSDiskReadLatencyWindowSize')]"
+          "evaluationFrequency": {
+            "value": "[parameters('VMOSDiskReadLatencyEvaluationFrequency')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
@@ -4626,11 +4629,8 @@
           "operator": {
             "value": "[parameters('VMOSDiskReadLatencyOperator')]"
           },
-          "enabled": {
-            "value": "[parameters('VMOSDiskReadLatencyAlertState')]"
-          },
-          "threshold": {
-            "value": "[parameters('VMOSDiskReadLatencyThreshold')]"
+          "timeAggregation": {
+            "value": "[parameters('VMOSDiskReadLatencyTimeAggregation')]"
           }
         }
       },
@@ -4638,6 +4638,18 @@
         "policyDefinitionReferenceId": "ALZ_VMOSDiskWriteLatency",
         "policyDefinitionName": "Deploy_VM_OSDiskwriteLatency_Alert",
         "parameters": {
+          "disksToInclude": {
+            "value": "[parameters('VMOSDiskWriteLatencyDisksToInclude')]"
+          },
+          "severity": {
+            "value": "[parameters('VMOSDiskWriteLatencyAlertSeverity')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VMOSDiskWriteLatencyWindowSize')]"
+          },
           "autoResolveTime": {
             "value": "[parameters('VMOSDiskWriteLatencyAutoResolveTime')]"
           },
@@ -4647,20 +4659,14 @@
           "effect": {
             "value": "[parameters('VMOSDiskWriteLatencyPolicyEffect')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('VMOSDiskWriteLatencyEvaluationFrequency')]"
+          "enabled": {
+            "value": "[parameters('VMOSDiskWriteLatencyAlertState')]"
           },
           "autoMitigate": {
             "value": "[parameters('VMOSDiskWriteLatencyAutoMitigate')]"
           },
-          "severity": {
-            "value": "[parameters('VMOSDiskWriteLatencyAlertSeverity')]"
-          },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMOSDiskWriteLatencyTimeAggregation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('VMOSDiskWriteLatencyEvaluationPeriods')]"
@@ -4668,17 +4674,14 @@
           "autoResolve": {
             "value": "[parameters('VMOSDiskWriteLatencyAutoResolve')]"
           },
+          "threshold": {
+            "value": "[parameters('VMOSDiskWriteLatencyThreshold')]"
+          },
           "computersToInclude": {
             "value": "[parameters('VMOSDiskWriteLatencyComputersToInclude')]"
           },
-          "disksToInclude": {
-            "value": "[parameters('VMOSDiskWriteLatencyDisksToInclude')]"
-          },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VMOSDiskWriteLatencyWindowSize')]"
+          "evaluationFrequency": {
+            "value": "[parameters('VMOSDiskWriteLatencyEvaluationFrequency')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
@@ -4686,11 +4689,8 @@
           "operator": {
             "value": "[parameters('VMOSDiskWriteLatencyOperator')]"
           },
-          "enabled": {
-            "value": "[parameters('VMOSDiskWriteLatencyAlertState')]"
-          },
-          "threshold": {
-            "value": "[parameters('VMOSDiskWriteLatencyThreshold')]"
+          "timeAggregation": {
+            "value": "[parameters('VMOSDiskWriteLatencyTimeAggregation')]"
           }
         }
       },
@@ -4698,6 +4698,18 @@
         "policyDefinitionReferenceId": "ALZ_VMOSDiskSpace",
         "policyDefinitionName": "Deploy_VM_OSDiskSpace_Alert",
         "parameters": {
+          "disksToInclude": {
+            "value": "[parameters('VMOSDiskSpaceDisksToInclude')]"
+          },
+          "severity": {
+            "value": "[parameters('VMOSDiskSpaceAlertSeverity')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VMOSDiskSpaceWindowSize')]"
+          },
           "autoResolveTime": {
             "value": "[parameters('VMOSDiskSpaceAutoResolveTime')]"
           },
@@ -4707,20 +4719,14 @@
           "effect": {
             "value": "[parameters('VMOSDiskSpacePolicyEffect')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('VMOSDiskSpaceEvaluationFrequency')]"
+          "enabled": {
+            "value": "[parameters('VMOSDiskSpaceAlertState')]"
           },
           "autoMitigate": {
             "value": "[parameters('VMOSDiskSpaceAutoMitigate')]"
           },
-          "severity": {
-            "value": "[parameters('VMOSDiskSpaceAlertSeverity')]"
-          },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMOSDiskSpaceTimeAggregation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('VMOSDiskSpaceEvaluationPeriods')]"
@@ -4728,17 +4734,14 @@
           "autoResolve": {
             "value": "[parameters('VMOSDiskSpaceAutoResolve')]"
           },
+          "threshold": {
+            "value": "[parameters('VMOSDiskSpaceThreshold')]"
+          },
           "computersToInclude": {
             "value": "[parameters('VMOSDiskSpaceComputersToInclude')]"
           },
-          "disksToInclude": {
-            "value": "[parameters('VMOSDiskSpaceDisksToInclude')]"
-          },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VMOSDiskSpaceWindowSize')]"
+          "evaluationFrequency": {
+            "value": "[parameters('VMOSDiskSpaceEvaluationFrequency')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
@@ -4746,11 +4749,8 @@
           "operator": {
             "value": "[parameters('VMOSDiskSpaceOperator')]"
           },
-          "enabled": {
-            "value": "[parameters('VMOSDiskSpaceAlertState')]"
-          },
-          "threshold": {
-            "value": "[parameters('VMOSDiskSpaceThreshold')]"
+          "timeAggregation": {
+            "value": "[parameters('VMOSDiskSpaceTimeAggregation')]"
           }
         }
       },
@@ -4758,47 +4758,47 @@
         "policyDefinitionReferenceId": "ALZ_VMPercentCPU",
         "policyDefinitionName": "Deploy_VM_CPU_Alert",
         "parameters": {
-          "threshold": {
-            "value": "[parameters('VMPercentCPUThreshold')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMPercentCPUTimeAggregation')]"
-          },
-          "effect": {
-            "value": "[parameters('VMPercentCPUPolicyEffect')]"
-          },
-          "evaluationFrequency": {
-            "value": "[parameters('VMPercentCPUEvaluationFrequency')]"
-          },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "autoResolveTime": {
-            "value": "[parameters('VMPercentCPUAutoResolveTime')]"
-          },
-          "operator": {
-            "value": "[parameters('VMPercentCPUOperator')]"
-          },
-          "autoMitigate": {
-            "value": "[parameters('VMPercentCPUAutoMitigate')]"
-          },
-          "autoResolve": {
-            "value": "[parameters('VMPercentCPUAutoResolve')]"
-          },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "windowSize": {
             "value": "[parameters('VMPercentCPUWindowSize')]"
           },
-          "enabled": {
-            "value": "[parameters('VMPercentCPUAlertState')]"
+          "autoMitigate": {
+            "value": "[parameters('VMPercentCPUAutoMitigate')]"
           },
           "severity": {
             "value": "[parameters('VMPercentCPUAlertSeverity')]"
+          },
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('VMPercentCPUPolicyEffect')]"
+          },
+          "timeAggregation": {
+            "value": "[parameters('VMPercentCPUTimeAggregation')]"
+          },
+          "threshold": {
+            "value": "[parameters('VMPercentCPUThreshold')]"
+          },
+          "autoResolveTime": {
+            "value": "[parameters('VMPercentCPUAutoResolveTime')]"
+          },
+          "enabled": {
+            "value": "[parameters('VMPercentCPUAlertState')]"
+          },
+          "autoResolve": {
+            "value": "[parameters('VMPercentCPUAutoResolve')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
+          },
+          "operator": {
+            "value": "[parameters('VMPercentCPUOperator')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VMPercentCPUEvaluationFrequency')]"
           }
         }
       },
@@ -4806,47 +4806,47 @@
         "policyDefinitionReferenceId": "ALZ_VMPercentMemory",
         "policyDefinitionName": "Deploy_VM_Memory_Alert",
         "parameters": {
-          "threshold": {
-            "value": "[parameters('VMPercentMemoryThreshold')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMPercentMemoryTimeAggregation')]"
-          },
-          "effect": {
-            "value": "[parameters('VMPercentMemoryPolicyEffect')]"
-          },
-          "evaluationFrequency": {
-            "value": "[parameters('VMPercentMemoryEvaluationFrequency')]"
-          },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "autoResolveTime": {
-            "value": "[parameters('VMPercentMemoryAutoResolveTime')]"
-          },
-          "operator": {
-            "value": "[parameters('VMPercentMemoryOperator')]"
-          },
-          "autoMitigate": {
-            "value": "[parameters('VMPercentMemoryAutoMitigate')]"
-          },
-          "autoResolve": {
-            "value": "[parameters('VMPercentMemoryAutoResolve')]"
-          },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "windowSize": {
             "value": "[parameters('VMPercentMemoryWindowSize')]"
           },
-          "enabled": {
-            "value": "[parameters('VMPercentMemoryAlertState')]"
+          "autoMitigate": {
+            "value": "[parameters('VMPercentMemoryAutoMitigate')]"
           },
           "severity": {
             "value": "[parameters('VMPercentMemoryAlertSeverity')]"
+          },
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('VMPercentMemoryPolicyEffect')]"
+          },
+          "timeAggregation": {
+            "value": "[parameters('VMPercentMemoryTimeAggregation')]"
+          },
+          "threshold": {
+            "value": "[parameters('VMPercentMemoryThreshold')]"
+          },
+          "autoResolveTime": {
+            "value": "[parameters('VMPercentMemoryAutoResolveTime')]"
+          },
+          "enabled": {
+            "value": "[parameters('VMPercentMemoryAlertState')]"
+          },
+          "autoResolve": {
+            "value": "[parameters('VMPercentMemoryAutoResolve')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
+          },
+          "operator": {
+            "value": "[parameters('VMPercentMemoryOperator')]"
+          },
+          "evaluationFrequency": {
+            "value": "[parameters('VMPercentMemoryEvaluationFrequency')]"
           }
         }
       },
@@ -4854,8 +4854,23 @@
         "policyDefinitionReferenceId": "ALZ_VMDataDiskSpace",
         "policyDefinitionName": "Deploy_VM_dataDiskSpace_Alert",
         "parameters": {
+          "enabled": {
+            "value": "[parameters('VMDataDiskSpaceAlertState')]"
+          },
+          "autoResolve": {
+            "value": "[parameters('VMDataDiskSpaceAutoResolve')]"
+          },
+          "autoResolveTime": {
+            "value": "[parameters('VMDataDiskSpaceAutoResolveTime')]"
+          },
+          "severity": {
+            "value": "[parameters('VMDataDiskSpaceAlertSeverity')]"
+          },
           "effect": {
             "value": "[parameters('VMDataDiskSpacePolicyEffect')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "disksToInclude": {
             "value": "[parameters('VMDataDiskSpaceDisksToInclude')]"
@@ -4863,47 +4878,32 @@
           "timeAggregation": {
             "value": "[parameters('VMDataDiskSpaceTimeAggregation')]"
           },
-          "operator": {
-            "value": "[parameters('VMDataDiskSpaceOperator')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VMDataDiskSpaceWindowSize')]"
+          "autoMitigate": {
+            "value": "[parameters('VMDataDiskSpaceAutoMitigate')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('VMDataDiskSpaceEvaluationPeriods')]"
           },
-          "autoResolve": {
-            "value": "[parameters('VMDataDiskSpaceAutoResolve')]"
-          },
           "evaluationFrequency": {
             "value": "[parameters('VMDataDiskSpaceEvaluationFrequency')]"
           },
-          "autoMitigate": {
-            "value": "[parameters('VMDataDiskSpaceAutoMitigate')]"
-          },
-          "enabled": {
-            "value": "[parameters('VMDataDiskSpaceAlertState')]"
-          },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          "windowSize": {
+            "value": "[parameters('VMDataDiskSpaceWindowSize')]"
           },
           "threshold": {
             "value": "[parameters('VMDataDiskSpaceThreshold')]"
           },
+          "operator": {
+            "value": "[parameters('VMDataDiskSpaceOperator')]"
+          },
           "failingPeriods": {
             "value": "[parameters('VMDataDiskSpaceFailingPeriods')]"
-          },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
-          "autoResolveTime": {
-            "value": "[parameters('VMDataDiskSpaceAutoResolveTime')]"
-          },
-          "severity": {
-            "value": "[parameters('VMDataDiskSpaceAlertSeverity')]"
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           }
         }
       },
@@ -4911,6 +4911,18 @@
         "policyDefinitionReferenceId": "ALZ_VMDataDiskReadLatency",
         "policyDefinitionName": "Deploy_VM_dataDiskReadLatency_Alert",
         "parameters": {
+          "disksToInclude": {
+            "value": "[parameters('VMDataDiskReadLatencyDisksToInclude')]"
+          },
+          "severity": {
+            "value": "[parameters('VMDataDiskReadLatencyAlertSeverity')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VMDataDiskReadLatencyWindowSize')]"
+          },
           "autoResolveTime": {
             "value": "[parameters('VMDataDiskReadLatencyAutoResolveTime')]"
           },
@@ -4920,20 +4932,14 @@
           "effect": {
             "value": "[parameters('VMDataDiskReadLatencyPolicyEffect')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('VMDataDiskReadLatencyEvaluationFrequency')]"
+          "enabled": {
+            "value": "[parameters('VMDataDiskReadLatencyAlertState')]"
           },
           "autoMitigate": {
             "value": "[parameters('VMDataDiskReadLatencyAutoMitigate')]"
           },
-          "severity": {
-            "value": "[parameters('VMDataDiskReadLatencyAlertSeverity')]"
-          },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMDataDiskReadLatencyTimeAggregation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('VMDataDiskReadLatencyEvaluationPeriods')]"
@@ -4941,17 +4947,14 @@
           "autoResolve": {
             "value": "[parameters('VMDataDiskReadLatencyAutoResolve')]"
           },
+          "threshold": {
+            "value": "[parameters('VMDataDiskReadLatencyThreshold')]"
+          },
           "computersToInclude": {
             "value": "[parameters('VMDataDiskReadLatencyComputersToInclude')]"
           },
-          "disksToInclude": {
-            "value": "[parameters('VMDataDiskReadLatencyDisksToInclude')]"
-          },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VMDataDiskReadLatencyWindowSize')]"
+          "evaluationFrequency": {
+            "value": "[parameters('VMDataDiskReadLatencyEvaluationFrequency')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
@@ -4959,11 +4962,8 @@
           "operator": {
             "value": "[parameters('VMDataDiskReadLatencyOperator')]"
           },
-          "enabled": {
-            "value": "[parameters('VMDataDiskReadLatencyAlertState')]"
-          },
-          "threshold": {
-            "value": "[parameters('VMDataDiskReadLatencyThreshold')]"
+          "timeAggregation": {
+            "value": "[parameters('VMDataDiskReadLatencyTimeAggregation')]"
           }
         }
       },
@@ -4971,6 +4971,18 @@
         "policyDefinitionReferenceId": "ALZ_VMDataDiskWriteLatency",
         "policyDefinitionName": "Deploy_VM_dataDiskWriteLatency_Alert",
         "parameters": {
+          "disksToInclude": {
+            "value": "[parameters('VMDataDiskWriteLatencyDisksToInclude')]"
+          },
+          "severity": {
+            "value": "[parameters('VMDataDiskWriteLatencyAlertSeverity')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "windowSize": {
+            "value": "[parameters('VMDataDiskWriteLatencyWindowSize')]"
+          },
           "autoResolveTime": {
             "value": "[parameters('VMDataDiskWriteLatencyAutoResolveTime')]"
           },
@@ -4980,20 +4992,14 @@
           "effect": {
             "value": "[parameters('VMDataDiskWriteLatencyPolicyEffect')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('VMDataDiskWriteLatencyEvaluationFrequency')]"
+          "enabled": {
+            "value": "[parameters('VMDataDiskWriteLatencyAlertState')]"
           },
           "autoMitigate": {
             "value": "[parameters('VMDataDiskWriteLatencyAutoMitigate')]"
           },
-          "severity": {
-            "value": "[parameters('VMDataDiskWriteLatencyAlertSeverity')]"
-          },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
-          "timeAggregation": {
-            "value": "[parameters('VMDataDiskWriteLatencyTimeAggregation')]"
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('VMDataDiskWriteLatencyEvaluationPeriods')]"
@@ -5001,17 +5007,14 @@
           "autoResolve": {
             "value": "[parameters('VMDataDiskWriteLatencyAutoResolve')]"
           },
+          "threshold": {
+            "value": "[parameters('VMDataDiskWriteLatencyThreshold')]"
+          },
           "computersToInclude": {
             "value": "[parameters('VMDataDiskWriteLatencyComputersToInclude')]"
           },
-          "disksToInclude": {
-            "value": "[parameters('VMDataDiskWriteLatencyDisksToInclude')]"
-          },
-          "alertResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
-          "windowSize": {
-            "value": "[parameters('VMDataDiskWriteLatencyWindowSize')]"
+          "evaluationFrequency": {
+            "value": "[parameters('VMDataDiskWriteLatencyEvaluationFrequency')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
@@ -5019,11 +5022,8 @@
           "operator": {
             "value": "[parameters('VMDataDiskWriteLatencyOperator')]"
           },
-          "enabled": {
-            "value": "[parameters('VMDataDiskWriteLatencyAlertState')]"
-          },
-          "threshold": {
-            "value": "[parameters('VMDataDiskWriteLatencyThreshold')]"
+          "timeAggregation": {
+            "value": "[parameters('VMDataDiskWriteLatencyTimeAggregation')]"
           }
         }
       },
@@ -5031,20 +5031,20 @@
         "policyDefinitionReferenceId": "ALZ_AGWTotalTime",
         "policyDefinitionName": "Deploy_AG_ApplicationGatewayTotalTime_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('AGWApplicationGatewayTotalTimeAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('AGWApplicationGatewayTotalTimeEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('AGWApplicationGatewayTotalTimeAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('AGWApplicationGatewayTotalTimePolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AGWApplicationGatewayTotalTimeWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('AGWApplicationGatewayTotalTimeEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('AGWApplicationGatewayTotalTimePolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('AGWApplicationGatewayTotalTimeAlertSeverity')]"
           }
         }
       },
@@ -5052,20 +5052,20 @@
         "policyDefinitionReferenceId": "ALZ_AGWBackendLastByteResponseTime",
         "policyDefinitionName": "Deploy_AG_BackendLastByteResponseTime_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('AGWBackendLastByteResponseTimeAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('AGWBackendLastByteResponseTimeEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('AGWBackendLastByteResponseTimeAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('AGWBackendLastByteResponseTimePolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AGWBackendLastByteResponseTimeWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('AGWBackendLastByteResponseTimeEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('AGWBackendLastByteResponseTimePolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('AGWBackendLastByteResponseTimeAlertSeverity')]"
           }
         }
       },
@@ -5073,20 +5073,20 @@
         "policyDefinitionReferenceId": "ALZ_AGWCapacityUnits",
         "policyDefinitionName": "Deploy_AG_CapacityUnits_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('AGWCapacityUnitsAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('AGWCapacityUnitsEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('AGWCapacityUnitsAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('AGWCapacityUnitsPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AGWCapacityUnitsWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('AGWCapacityUnitsEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('AGWCapacityUnitsPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('AGWCapacityUnitsAlertSeverity')]"
           }
         }
       },
@@ -5094,20 +5094,20 @@
         "policyDefinitionReferenceId": "ALZ_AGWComputeUnits",
         "policyDefinitionName": "Deploy_AG_ComputeUnits_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('AGWComputeUnitsAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('AGWComputeUnitsEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('AGWComputeUnitsAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('AGWComputeUnitsPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AGWComputeUnitsWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('AGWComputeUnitsEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('AGWComputeUnitsPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('AGWComputeUnitsAlertSeverity')]"
           }
         }
       },
@@ -5115,20 +5115,20 @@
         "policyDefinitionReferenceId": "ALZ_AGWCPUUtilization",
         "policyDefinitionName": "Deploy_AG_CPUUtilization_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('AGWCPUUtilAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('AGWCPUUtilEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('AGWCPUUtilAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('AGWCPUUtilPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AGWCPUUtilWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('AGWCPUUtilEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('AGWCPUUtilPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('AGWCPUUtilAlertSeverity')]"
           }
         }
       },
@@ -5136,20 +5136,20 @@
         "policyDefinitionReferenceId": "ALZ_AGWFailedRequests",
         "policyDefinitionName": "Deploy_AG_FailedRequests_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('AGWFailedRequestsAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('AGWFailedRequestsEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('AGWFailedRequestsAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('AGWFailedRequestsPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AGWFailedRequestsWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('AGWFailedRequestsEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('AGWFailedRequestsPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('AGWFailedRequestsAlertSeverity')]"
           }
         }
       },
@@ -5157,20 +5157,20 @@
         "policyDefinitionReferenceId": "ALZ_AGWResponseStatus",
         "policyDefinitionName": "Deploy_AG_ResponseStatus_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('AGWResponseStatusAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('AGWResponseStatusEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('AGWResponseStatusAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('AGWResponseStatusPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AGWResponseStatusWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('AGWResponseStatusEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('AGWResponseStatusPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('AGWResponseStatusAlertSeverity')]"
           }
         }
       },
@@ -5178,20 +5178,20 @@
         "policyDefinitionReferenceId": "ALZ_AGWUnhealthyHostCount",
         "policyDefinitionName": "Deploy_AG_UnhealthyHostCount_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('AGWUnhealthyHostCountAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('AGWUnhealthyHostCountEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('AGWUnhealthyHostCountAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('AGWUnhealthyHostCountPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AGWUnhealthyHostCountWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('AGWUnhealthyHostCountEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('AGWUnhealthyHostCountPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('AGWUnhealthyHostCountAlertSeverity')]"
           }
         }
       },
@@ -5199,20 +5199,20 @@
         "policyDefinitionReferenceId": "ALZ_LBDataPathAvailability",
         "policyDefinitionName": "Deploy_ALB_DataPathAvailability_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('LBDataPathAvailabilityAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('LBDataPathAvailabilityEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('LBDataPathAvailabilityAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('LBDataPathAvailabilityPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('LBDataPathAvailabilityWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('LBDataPathAvailabilityEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('LBDataPathAvailabilityPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('LBDataPathAvailabilityAlertSeverity')]"
           }
         }
       },
@@ -5220,20 +5220,20 @@
         "policyDefinitionReferenceId": "ALZ_LBGlobalBackendAvailability",
         "policyDefinitionName": "Deploy_ALB_GlobalBackendAvailability_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('LBGlobalBackendAvailabilityAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('LBGlobalBackendAvailabilityEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('LBGlobalBackendAvailabilityAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('LBGlobalBackendAvailabilityPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('LBGlobalBackendAvailabilityWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('LBGlobalBackendAvailabilityEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('LBGlobalBackendAvailabilityPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('LBGlobalBackendAvailabilityAlertSeverity')]"
           }
         }
       },
@@ -5241,20 +5241,20 @@
         "policyDefinitionReferenceId": "ALZ_LBHealthProbeStatus",
         "policyDefinitionName": "Deploy_ALB_HealthProbeStatus_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('LBHealthProbeStatusAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('LBHealthProbeStatusEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('LBHealthProbeStatusAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('LBHealthProbeStatusPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('LBHealthProbeStatusWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('LBHealthProbeStatusEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('LBHealthProbeStatusPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('LBHealthProbeStatusAlertSeverity')]"
           }
         }
       },
@@ -5262,20 +5262,20 @@
         "policyDefinitionReferenceId": "ALZ_LBUsedSNATPorts",
         "policyDefinitionName": "Deploy_ALB_UsedSNATPorts_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('LBUsedSNATPortsAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('LBUsedSNATPortsEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('LBUsedSNATPortsAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('LBUsedSNATPortsPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('LBUsedSNATPortsWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('LBUsedSNATPortsEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('LBUsedSNATPortsPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('LBUsedSNATPortsAlertSeverity')]"
           }
         }
       },
@@ -5283,20 +5283,20 @@
         "policyDefinitionReferenceId": "ALZ_CDNPOriginHealthPercentage",
         "policyDefinitionName": "Deploy_FrontDoorCDN_OriginHealthPercentage_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('CDNPOriginHealthPercentageAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('CDNPOriginHealthPercentageEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('CDNPOriginHealthPercentageAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('CDNPOriginHealthPercentagePolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('CDNPOriginHealthPercentageWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('CDNPOriginHealthPercentageEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('CDNPOriginHealthPercentagePolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('CDNPOriginHealthPercentageAlertSeverity')]"
           }
         }
       },
@@ -5304,20 +5304,20 @@
         "policyDefinitionReferenceId": "ALZ_CDNPOriginLatency",
         "policyDefinitionName": "Deploy_FrontDoorCDN_OriginLatency_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('CDNPOriginLatencyAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('CDNPOriginLatencyEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('CDNPOriginLatencyAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('CDNPOriginLatencyPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('CDNPOriginLatencyWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('CDNPOriginLatencyEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('CDNPOriginLatencyPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('CDNPOriginLatencyAlertSeverity')]"
           }
         }
       },
@@ -5325,20 +5325,20 @@
         "policyDefinitionReferenceId": "ALZ_CDNPPercentage4XX",
         "policyDefinitionName": "Deploy_FrontdoorCDN_Percentage4XX_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('CDNPPercentage4XXAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('CDNPPercentage4XXEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('CDNPPercentage4XXAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('CDNPPercentage4XXPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('CDNPPercentage4XXWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('CDNPPercentage4XXEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('CDNPPercentage4XXPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('CDNPPercentage4XXAlertSeverity')]"
           }
         }
       },
@@ -5346,20 +5346,20 @@
         "policyDefinitionReferenceId": "ALZ_CDNPPercentage5XX",
         "policyDefinitionName": "Deploy_FrontdoorCDN_Percentage5XX_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('CDNPPercentage5XXAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('CDNPPercentage5XXEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('CDNPPercentage5XXAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('CDNPPercentage5XXPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('CDNPPercentage5XXWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('CDNPPercentage5XXEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('CDNPPercentage5XXPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('CDNPPercentage5XXAlertSeverity')]"
           }
         }
       },
@@ -5367,20 +5367,20 @@
         "policyDefinitionReferenceId": "ALZ_TMEndpointHealth",
         "policyDefinitionName": "Deploy_TM_EndpointHealth_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('TMEndpointHealthAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('TMEndpointHealthEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('TMEndpointHealthAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('TMEndpointHealthPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('TMEndpointHealthWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('TMEndpointHealthEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('TMEndpointHealthPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('TMEndpointHealthAlertSeverity')]"
           }
         }
       },
@@ -5388,20 +5388,20 @@
         "policyDefinitionReferenceId": "ALZ_WSFCPUPercentage",
         "policyDefinitionName": "Deploy_WSF_CPUPercentage_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('WSFCPUPercentageAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('WSFCPUPercentageEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('WSFCPUPercentageAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('WSFCPUPercentagePolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('WSFCPUPercentageWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('WSFCPUPercentageEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('WSFCPUPercentagePolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('WSFCPUPercentageAlertSeverity')]"
           }
         }
       },
@@ -5409,20 +5409,20 @@
         "policyDefinitionReferenceId": "ALZ_WSFMemoryPercentage",
         "policyDefinitionName": "Deploy_WSF_MemoryPercentage_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('WSFMemoryPercentageAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('WSFMemoryPercentageEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('WSFMemoryPercentageAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('WSFMemoryPercentagePolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('WSFMemoryPercentageWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('WSFMemoryPercentageEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('WSFMemoryPercentagePolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('WSFMemoryPercentageAlertSeverity')]"
           }
         }
       },
@@ -5430,20 +5430,20 @@
         "policyDefinitionReferenceId": "ALZ_WSFDiskQueueLength",
         "policyDefinitionName": "Deploy_WSF_DiskQueueLength_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('WSFDiskQueueLengthAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('WSFDiskQueueLengthEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('WSFDiskQueueLengthAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('WSFDiskQueueLengthPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('WSFDiskQueueLengthWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('WSFDiskQueueLengthEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('WSFDiskQueueLengthPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('WSFDiskQueueLengthAlertSeverity')]"
           }
         }
       },
@@ -5451,20 +5451,20 @@
         "policyDefinitionReferenceId": "ALZ_WSFHttpQueueLength",
         "policyDefinitionName": "Deploy_WSF_HttpQueueLength_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('WSFHttpQueueLengthAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('WSFHttpQueueLengthEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('WSFHttpQueueLengthAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('WSFHttpQueueLengthPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('WSFHttpQueueLengthWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('WSFHttpQueueLengthEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('WSFHttpQueueLengthPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('WSFHttpQueueLengthAlertSeverity')]"
           }
         }
       },
@@ -5472,20 +5472,20 @@
         "policyDefinitionReferenceId": "ALZ_FDBackendHealth",
         "policyDefinitionName": "Deploy_FD_BackendHealth_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('FDBackendHealthAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('FDBackendHealthEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('FDBackendHealthAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('FDBackendHealthPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('FDBackendHealthWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('FDBackendHealthEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('FDBackendHealthPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('FDBackendHealthAlertSeverity')]"
           }
         }
       },
@@ -5493,20 +5493,20 @@
         "policyDefinitionReferenceId": "ALZ_FDBackendRequestLatency",
         "policyDefinitionName": "Deploy_FD_BackendRequestLatency_Alert",
         "parameters": {
-          "severity": {
-            "value": "[parameters('FDBackendRequestLatencyAlertSeverity')]"
+          "evaluationFrequency": {
+            "value": "[parameters('FDBackendRequestLatencyEvaluationFrequency')]"
           },
           "enabled": {
             "value": "[parameters('FDBackendRequestLatencyAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('FDBackendRequestLatencyPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('FDBackendRequestLatencyWindowSize')]"
           },
-          "evaluationFrequency": {
-            "value": "[parameters('FDBackendRequestLatencyEvaluationFrequency')]"
+          "effect": {
+            "value": "[parameters('FDBackendRequestLatencyPolicyEffect')]"
+          },
+          "severity": {
+            "value": "[parameters('FDBackendRequestLatencyAlertSeverity')]"
           }
         }
       }

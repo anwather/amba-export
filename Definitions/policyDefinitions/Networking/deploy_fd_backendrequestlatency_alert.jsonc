@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy Frontdoor Backend Request Latency Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Networking",
-      "version": "1.0.1",
-      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Networking",
+      "version": "1.0.1"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -87,6 +87,14 @@
         },
         "type": "String"
       },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -98,22 +106,14 @@
           "displayName": "Effect"
         },
         "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/frontdoors",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/frontdoors"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -125,29 +125,29 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "existenceCondition": {
-            "allOf": [
-              {
-                "equals": "Microsoft.Network/frontdoors",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
-              },
-              {
-                "equals": "BackendRequestLatency",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
-              },
-              {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/frontdoors/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
-              },
-              {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
-              }
-            ]
-          },
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/frontdoors"
+              },
+              {
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "BackendRequestLatency"
+              },
+              {
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/frontdoors/', field('fullName'))]"
+              },
+              {
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
+              }
+            ]
+          },
           "deployment": {
             "properties": {
               "parameters": {
@@ -173,6 +173,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -214,6 +215,7 @@
                       "description": "Metric Alert for Frontdoor BackendRequestLatency",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -231,23 +233,22 @@
                           "value": "[parameters('severity')]"
                         }
                       },
-                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
-                            "operator": "GreaterThan",
+                            "metricNamespace": "Microsoft.Network/frontdoors",
+                            "criterionType": "DynamicThresholdCriterion",
+                            "name": "ServiceApiResult",
+                            "metricName": "BackendRequestLatency",
+                            "alertSensitivity": "Medium",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "metricNamespace": "Microsoft.Network/frontdoors",
-                            "name": "ServiceApiResult",
-                            "criterionType": "DynamicThresholdCriterion",
-                            "metricName": "BackendRequestLatency",
-                            "alertSensitivity": "Medium"
+                            "operator": "GreaterThan"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
@@ -265,8 +266,7 @@
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

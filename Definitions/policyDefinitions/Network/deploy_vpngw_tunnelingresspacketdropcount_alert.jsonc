@@ -6,10 +6,10 @@
     "description": "Policy to audit/deploy VPN Gateway Ingress Packet Drop Count Alert",
     "mode": "All",
     "metadata": {
+      "_deployed_by_amba": "True",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Network",
       "version": "1.0.1",
-      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
@@ -42,18 +42,6 @@
         },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "type": "String"
-      },
       "windowSize": {
         "allowedValues": [
           "PT1M",
@@ -72,6 +60,18 @@
         },
         "type": "String"
       },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
       "severity": {
         "allowedValues": [
           "0",
@@ -87,6 +87,14 @@
         },
         "type": "String"
       },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -95,14 +103,6 @@
         "defaultValue": "deployIfNotExists",
         "metadata": {
           "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
         "type": "String"
@@ -160,11 +160,11 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
@@ -188,10 +188,10 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "windowSize": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "enabled": {
                     "type": "String"
                   },
                   "severity": {
@@ -206,12 +206,14 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for VPN Gateway tunnel TunnelIngressPacketDropCount",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -219,32 +221,31 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
-                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
+                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
-                            "name": "TunnelIngressPacketDropCount",
-                            "metricNamespace": "microsoft.network/vpngateways",
+                            "operator": "GreaterThan",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
+                            "name": "TunnelIngressPacketDropCount",
+                            "metricNamespace": "microsoft.network/vpngateways",
                             "criterionType": "DynamicThresholdCriterion",
-                            "operator": "GreaterThan",
                             "metricName": "TunnelIngressPacketDropCount",
                             "alertSensitivity": "Medium"
                           }
@@ -263,7 +264,6 @@
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
