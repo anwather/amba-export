@@ -6,10 +6,10 @@
     "description": "Policy to audit/deploy Azure Load Balancer Health Probe Status Alert",
     "mode": "All",
     "metadata": {
+      "_deployed_by_amba": "True",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "Category": "Networking",
-      "version": "1.0.1",
-      "_deployed_by_amba": "True"
+      "version": "1.0.1"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -84,6 +84,14 @@
         },
         "type": "String"
       },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "threshold": {
         "defaultValue": "90",
         "metadata": {
@@ -103,22 +111,14 @@
           "displayName": "Effect"
         },
         "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/loadBalancers",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/loadBalancers"
           },
           {
             "field": "Microsoft.Network/loadBalancers/sku.name",
@@ -128,8 +128,8 @@
             ]
           },
           {
-            "equals": "Regional",
-            "field": "Microsoft.Network/loadBalancers/sku.tier"
+            "field": "Microsoft.Network/loadBalancers/sku.tier",
+            "equals": "Regional"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -141,29 +141,29 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "existenceCondition": {
-            "allOf": [
-              {
-                "equals": "Microsoft.Network/loadBalancers",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
-              },
-              {
-                "equals": "DipAvailability",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
-              },
-              {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
-              },
-              {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
-              }
-            ]
-          },
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.Network/loadBalancers"
+              },
+              {
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "DipAvailability"
+              },
+              {
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', field('fullName'))]"
+              },
+              {
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
+              }
+            ]
+          },
           "deployment": {
             "properties": {
               "parameters": {
@@ -185,13 +185,14 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
                 "resourceName": {
                   "value": "[field('name')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -216,14 +217,14 @@
                   "severity": {
                     "type": "String"
                   },
-                  "threshold": {
-                    "type": "String"
-                  },
                   "resourceName": {
                     "metadata": {
                       "description": "Name of the resource",
                       "displayName": "resourceName"
                     },
+                    "type": "String"
+                  },
+                  "threshold": {
                     "type": "String"
                   }
                 },
@@ -236,6 +237,7 @@
                       "description": "Metric Alert for ALB Health Probe Status",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -256,7 +258,6 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
-                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -264,11 +265,11 @@
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "operator": "LessThan",
                             "metricNamespace": "Microsoft.Network/loadBalancers",
-                            "name": "DipAvailability",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "DipAvailability"
+                            "name": "DipAvailability",
+                            "metricName": "DipAvailability",
+                            "operator": "LessThan"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -286,8 +287,7 @@
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

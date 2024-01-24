@@ -6,15 +6,23 @@
     "description": "Policy to audit/update Recovery Vault Backup Health Alerting to Azure monitor alerts",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Site Recovery",
-      "version": "1.0.0",
-      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Site Recovery",
+      "version": "1.0.0"
     },
     "parameters": {
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "modify",
@@ -27,22 +35,14 @@
           "displayName": "Effect"
         },
         "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.RecoveryServices/Vaults",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.RecoveryServices/Vaults"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",

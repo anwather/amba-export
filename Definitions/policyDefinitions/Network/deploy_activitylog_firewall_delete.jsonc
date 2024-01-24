@@ -6,13 +6,13 @@
     "description": "Policy to Deploy Activity Log Azure Firewall Delete Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Network",
-      "version": "1.0.2",
-      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Network",
+      "version": "1.0.2"
     },
     "parameters": {
       "enabled": {
@@ -24,6 +24,14 @@
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Alert State"
+        },
+        "type": "String"
+      },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring on resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -53,22 +61,14 @@
           "displayName": "Resource Group Tags"
         },
         "type": "Object"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring on resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/azureFirewalls",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/azureFirewalls"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -80,11 +80,14 @@
         "effect": "deployIfNotExists",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
+                "field": "Microsoft.Insights/ActivityLogAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               },
               {
                 "equals": 2,
@@ -95,24 +98,24 @@
                       {
                         "allOf": [
                           {
-                            "equals": "category",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field",
+                            "equals": "category"
                           },
                           {
-                            "equals": "Administrative",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals",
+                            "equals": "Administrative"
                           }
                         ]
                       },
                       {
                         "allOf": [
                           {
-                            "equals": "operationName",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field",
+                            "equals": "operationName"
                           },
                           {
-                            "equals": "Microsoft.Network/azureFirewalls/delete",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals",
+                            "equals": "Microsoft.Network/azureFirewalls/delete"
                           }
                         ]
                       }
@@ -122,10 +125,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
-          "name": "ActivityAzureFirewallDelete",
           "deployment": {
             "properties": {
               "parameters": {
@@ -142,6 +141,7 @@
                   "value": "[parameters('alertResourceGroupTags')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "enabled": {
@@ -179,6 +179,7 @@
                           "value": "[parameters('alertResourceGroupName')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
@@ -207,12 +208,12 @@
                               "condition": {
                                 "allOf": [
                                   {
-                                    "equals": "Administrative",
-                                    "field": "category"
+                                    "field": "category",
+                                    "equals": "Administrative"
                                   },
                                   {
-                                    "equals": "Microsoft.Network/azurefirewalls/delete",
-                                    "field": "operationName"
+                                    "field": "operationName",
+                                    "equals": "Microsoft.Network/azurefirewalls/delete"
                                   },
                                   {
                                     "field": "status",
@@ -232,8 +233,7 @@
                           }
                         ],
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
                     "apiVersion": "2019-10-01",
                     "name": "ActivityAzureFirewallDelete",
@@ -243,14 +243,14 @@
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "name": "ActivityAzureFirewallDelete",
+          "existenceScope": "resourceGroup",
           "deploymentScope": "subscription",
-          "existenceScope": "resourceGroup"
+          "resourceGroupName": "[parameters('alertResourceGroupName')]"
         }
       }
     }

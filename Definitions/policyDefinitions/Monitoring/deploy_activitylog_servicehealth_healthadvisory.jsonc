@@ -6,10 +6,10 @@
     "description": "Policy to Deploy Service Health Advisory Alert",
     "mode": "All",
     "metadata": {
+      "_deployed_by_amba": "True",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Monitoring",
       "version": "1.1.1",
-      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ]
@@ -53,6 +53,14 @@
         },
         "type": "Object"
       },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring  Subscription level alerts. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -61,14 +69,6 @@
         "defaultValue": "disabled",
         "metadata": {
           "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring  Subscription level alerts. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
         "type": "String"
@@ -182,6 +182,9 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {
+                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
+                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -218,6 +221,7 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
+                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -266,6 +270,7 @@
                             "type": "Microsoft.Insights/actionGroups",
                             "properties": {
                               "enabled": true,
+                              "groupShortName": "AmbaActionGr",
                               "copy": [
                                 {
                                   "name": "emailReceivers",
@@ -277,8 +282,7 @@
                                     "emailAddress": "[trim(variables('varALZMonitorActionGroupEmail')[copyIndex('emailReceivers')])]"
                                   }
                                 }
-                              ],
-                              "groupShortName": "AmbaActionGr"
+                              ]
                             },
                             "apiVersion": "2022-06-01",
                             "location": "Global",
@@ -288,7 +292,6 @@
                             }
                           }
                         ],
-                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -300,9 +303,6 @@
                     ]
                   }
                 ],
-                "variables": {
-                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
-                },
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
               },
               "mode": "incremental"
