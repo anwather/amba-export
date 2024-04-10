@@ -6,13 +6,13 @@
     "description": "Policy to Deploy Service Health Advisory Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Monitoring",
-      "version": "1.1.1",
-      "_deployed_by_amba": "True",
+      "version": "1.1.2",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "enabled": {
@@ -68,16 +68,16 @@
       "monitorDisable": {
         "defaultValue": "MonitorDisable",
         "metadata": {
-          "description": "Tag name to disable monitoring  Subscription level alerts. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
+          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
+          "displayName": "Monitoring disabled"
         },
         "type": "String"
       },
       "alzMonitorActionGroupEmail": {
         "defaultValue": "action@mail.com",
         "metadata": {
-          "description": "Email address to send alerts to",
-          "displayName": "Action Group Email"
+          "description": "Email addresses to send alerts to",
+          "displayName": "Action Group Email Addresses"
         },
         "type": "String"
       }
@@ -104,6 +104,10 @@
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
+              },
+              {
+                "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
+                "contains": "ag-AMBA-SH-"
               },
               {
                 "equals": 2,
@@ -182,6 +186,7 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -218,6 +223,7 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
+                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -247,7 +253,7 @@
                               "actions": {
                                 "actionGroups": [
                                   {
-                                    "actionGroupId": "[concat(subscription().Id, '/resourceGroups/', parameters('alertResourceGroupName'), '/providers/Microsoft.Insights/actionGroups/AmbaActionGr')]"
+                                    "actionGroupId": "[concat(subscription().Id, '/resourceGroups/', parameters('alertResourceGroupName'), '/providers/microsoft.insights/actionGroups/', 'ag-AMBA-SH-', subscription().displayName, '-001')]"
                                   }
                                 ]
                               }
@@ -257,52 +263,20 @@
                             "name": "ServiceHealthAdvisoryEvent",
                             "tags": {
                               "_deployed_by_amba": true
-                            },
-                            "dependsOn": [
-                              "[concat(subscription().Id, '/resourceGroups/', parameters('alertResourceGroupName'), '/providers/Microsoft.Insights/actionGroups/AmbaActionGr')]"
-                            ]
-                          },
-                          {
-                            "type": "Microsoft.Insights/actionGroups",
-                            "properties": {
-                              "enabled": true,
-                              "copy": [
-                                {
-                                  "name": "emailReceivers",
-                                  "mode": "serial",
-                                  "count": "[length(variables('varALZMonitorActionGroupEmail'))]",
-                                  "input": {
-                                    "name": "[concat('AlzMail-', indexOf(variables('varALZMonitorActionGroupEmail'), variables('varALZMonitorActionGroupEmail')[copyIndex('emailReceivers')]))]",
-                                    "useCommonSchema": true,
-                                    "emailAddress": "[trim(variables('varALZMonitorActionGroupEmail')[copyIndex('emailReceivers')])]"
-                                  }
-                                }
-                              ],
-                              "groupShortName": "AmbaActionGr"
-                            },
-                            "apiVersion": "2022-06-01",
-                            "location": "Global",
-                            "name": "AmbaActionGr",
-                            "tags": {
-                              "_deployed_by_amba": true
                             }
                           }
                         ],
-                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ALZ-SvcHealth-Health",
+                    "name": "ServiceHealthHealth",
                     "dependsOn": [
-                      "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
+                      "[resourceId('Microsoft.Resources/resourceGroups', parameters('alertResourceGroupName'))]"
                     ]
                   }
                 ],
-                "variables": {
-                  "varALZMonitorActionGroupEmail": "[array(split(parameters('ALZMonitorActionGroupEmail'),','))]"
-                },
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
               },
               "mode": "incremental"
@@ -311,7 +285,7 @@
           },
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deploymentScope": "subscription",
-          "existenceScope": "resourcegroup"
+          "existenceScope": "resourceGroup"
         }
       }
     }

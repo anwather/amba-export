@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_AlertProcessing_Rule",
+  "name": "Deploy_ServiceHealth_ActionGroups",
   "properties": {
-    "displayName": "Deploy AMBA Notification Assets",
-    "description": "Policy to deploy Action Group and Alert Processing Rule for all AMBA alerts",
+    "displayName": "Deploy Service Health Action Group",
+    "description": "Policy to deploy action group for Service Health alerts",
     "mode": "All",
     "metadata": {
       "category": "Monitoring",
@@ -18,7 +18,7 @@
       "monitorDisable": {
         "defaultValue": "MonitorDisable",
         "metadata": {
-          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
+          "description": "Tag name to disable monitoring  Subscription level alerts. Set to true if monitoring should be disabled",
           "displayName": "Monitoring disabled"
         },
         "type": "String"
@@ -76,8 +76,8 @@
       "alzEventHubResourceId": {
         "defaultValue": "",
         "metadata": {
-          "description": "Event Hub resource id for action group to send alerts to a subscription level",
-          "displayName": "Event Hub"
+          "description": "Event Hub resource id for action group to send alerts to",
+          "displayName": "Event Hub resource id"
         },
         "type": "String"
       },
@@ -130,12 +130,12 @@
       "then": {
         "effect": "deployIfNotExists",
         "details": {
-          "type": "Microsoft.AlertsManagement/actionRules",
+          "type": "Microsoft.Insights/actionGroups",
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "AMBA Notification Assets - Alert Processing Rule for Subscription",
-                "field": "Microsoft.AlertsManagement/actionRules/description"
+                "equals": "SH-ActGrp",
+                "field": "Microsoft.Insights/actionGroups/groupShortName"
               }
             ]
           },
@@ -299,41 +299,14 @@
                               "webhookReceivers": "[if(empty(parameters('ALZWebhookServiceUri')), null(), variables('varWebhookReceivers'))]",
                               "armRoleReceivers": "[if(empty(parameters('ALZArmRoleId')), null(), variables('varArmRoleReceivers'))]",
                               "emailReceivers": "[if(empty(parameters('ALZMonitorActionGroupEmail')), null(), variables('varEmailReceivers'))]",
-                              "groupShortName": "ActGrp"
+                              "groupShortName": "SH-ActGrp"
                             },
                             "apiVersion": "2023-01-01",
                             "location": "Global",
-                            "name": "[concat('ag-AMBA-', subscription().displayName, '-001')]",
+                            "name": "[concat('ag-AMBA-SH-', subscription().displayName, '-001')]",
                             "tags": {
                               "_deployed_by_amba": true
                             }
-                          },
-                          {
-                            "type": "Microsoft.AlertsManagement/actionRules",
-                            "properties": {
-                              "description": "AMBA Notification Assets - Alert Processing Rule for Subscription",
-                              "enabled": true,
-                              "scopes": [
-                                "[subscription().Id]"
-                              ],
-                              "actions": [
-                                {
-                                  "actionType": "AddActionGroups",
-                                  "actiongroupIds": [
-                                    "[concat(subscription().Id, '/resourceGroups/', parameters('ALZMonitorResourceGroupName'), '/providers/microsoft.insights/actionGroups/', 'ag-AMBA-', subscription().displayName, '-001')]"
-                                  ]
-                                }
-                              ]
-                            },
-                            "apiVersion": "2021-08-08",
-                            "location": "Global",
-                            "name": "[concat('apr-AMBA-',subscription().displayName, '-001')]",
-                            "tags": {
-                              "_deployed_by_amba": true
-                            },
-                            "dependsOn": [
-                              "[concat('ag-AMBA-', subscription().displayName, '-001')]"
-                            ]
                           }
                         ],
                         "variables": {},
@@ -342,7 +315,7 @@
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ActionGroupDeployment",
+                    "name": "SH-ActionGroupDeployment",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('ALZMonitorResourceGroupName'))]"
                     ]
