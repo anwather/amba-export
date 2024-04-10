@@ -7,58 +7,58 @@
     "mode": "All",
     "metadata": {
       "category": "Monitoring",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "version": "1.0.3",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "_deployed_by_amba": "True"
+      ]
     },
     "parameters": {
       "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "alertResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
         "metadata": {
           "description": "Resource group the alert is placed in",
           "displayName": "Resource Group Name"
         },
+        "defaultValue": "rg-amba-monitoring-001",
         "type": "String"
       },
       "alertResourceGroupLocation": {
-        "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
           "displayName": "Resource Group Location"
         },
+        "defaultValue": "centralus",
         "type": "String"
       },
       "alertResourceGroupTags": {
-        "defaultValue": {
-          "_deployed_by_amba": true
-        },
         "metadata": {
           "description": "Tags on the Resource group the alert is placed in",
           "displayName": "Resource Group Tags"
         },
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
         "type": "Object"
       },
       "monitorDisable": {
-        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring on resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -79,6 +79,7 @@
         "effect": "deployIfNotExists",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "name": "ActivityLAWorkspaceDelete",
           "existenceCondition": {
             "allOf": [
               {
@@ -124,7 +125,7 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "name": "ActivityLAWorkspaceDelete",
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deployment": {
             "properties": {
               "parameters": {
@@ -160,14 +161,15 @@
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "apiVersion": "2021-04-01",
-                    "location": "[parameters('alertResourceGroupLocation')]",
                     "name": "[parameters('alertResourceGroupName')]",
+                    "location": "[parameters('alertResourceGroupLocation')]",
+                    "apiVersion": "2021-04-01",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
                     "resourceGroup": "[parameters('alertResourceGroupName')]",
                     "type": "Microsoft.Resources/deployments",
+                    "name": "ActivityLAWorkspaceDelete",
                     "properties": {
                       "parameters": {
                         "enabled": {
@@ -190,6 +192,7 @@
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
+                            "name": "ActivityLAWorkspaceDelete",
                             "properties": {
                               "description": "Activity Log LA Workspace Delete",
                               "parameters": {
@@ -220,9 +223,8 @@
                                 ]
                               }
                             },
-                            "apiVersion": "2020-10-01",
                             "location": "global",
-                            "name": "ActivityLAWorkspaceDelete",
+                            "apiVersion": "2020-10-01",
                             "tags": {
                               "_deployed_by_amba": true
                             }
@@ -234,7 +236,6 @@
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ActivityLAWorkspaceDelete",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
@@ -247,7 +248,6 @@
             },
             "location": "australiaeast"
           },
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deploymentScope": "subscription",
           "existenceScope": "resourcegroup"
         }
