@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy Vnet Gateway Egress Packet Drop Count Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Network",
-      "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -27,30 +27,6 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
-        },
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
         },
         "type": "String"
       },
@@ -72,6 +48,18 @@
         },
         "type": "String"
       },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
       "severity": {
         "allowedValues": [
           "0",
@@ -84,6 +72,18 @@
         "metadata": {
           "description": "Severity of the Alert",
           "displayName": "Severity"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -146,6 +146,42 @@
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "GreaterThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
+              },
+              {
+                "equals": "Medium",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
+              },
+              {
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.minFailingPeriodsToAlert"
+              },
+              {
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.numberOfEvaluationPeriods"
               }
             ]
           },
@@ -161,17 +197,17 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -189,16 +225,16 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "enabled": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "severity": {
                     "type": "String"
                   },
-                  "severity": {
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -210,6 +246,7 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -220,23 +257,23 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
-                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
+                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
@@ -247,8 +284,8 @@
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
-                            "criterionType": "DynamicThresholdCriterion",
                             "operator": "GreaterThan",
+                            "criterionType": "DynamicThresholdCriterion",
                             "metricName": "TunnelEgressPacketDropCount",
                             "alertSensitivity": "Medium"
                           }
@@ -267,7 +304,6 @@
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

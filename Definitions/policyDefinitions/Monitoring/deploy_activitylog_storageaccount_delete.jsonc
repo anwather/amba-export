@@ -1,13 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_activitylog_LAWorkspace_KeyRegen",
+  "name": "Deploy_activitylog_StorageAccount_Delete",
   "properties": {
-    "displayName": "Deploy Activity Log LA Workspace Regenerate Key Alert",
-    "description": "Policy to Deploy Activity Log LA Workspace Regenerate Key Alert",
+    "displayName": "Deploy Activity Log Storage Account Delete Alert",
+    "description": "Policy to Deploy Activity Log Storage Account Delete Alert",
     "mode": "All",
     "metadata": {
       "category": "Monitoring",
-      "version": "1.0.2",
+      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
@@ -45,8 +45,7 @@
       },
       "alertResourceGroupTags": {
         "defaultValue": {
-          "_deployed_by_amba": true,
-          "environment": "test"
+          "_deployed_by_amba": true
         },
         "metadata": {
           "description": "Tags on the Resource group the alert is placed in",
@@ -58,6 +57,18 @@
         "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring on resource. Set to true if monitoring should be disabled",
+          "displayName": "Monitoring disabled"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
           "displayName": "Effect"
         },
         "type": "String"
@@ -67,7 +78,7 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.OperationalInsights/workspaces",
+            "equals": "Microsoft.Storage/storageAccounts",
             "field": "type"
           },
           {
@@ -77,7 +88,7 @@
         ]
       },
       "then": {
-        "effect": "deployIfNotExists",
+        "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
           "existenceCondition": {
@@ -111,7 +122,7 @@
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "equals": "Microsoft.OperationalInsights/workspaces/regeneratesharedkey/action",
+                            "equals": "Microsoft.Storage/storageAccounts/delete",
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
@@ -125,7 +136,7 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "name": "ActivityLAWorkspaceRegenKey",
+          "name": "Activity Log Storage Account Delete",
           "deployment": {
             "properties": {
               "parameters": {
@@ -192,7 +203,7 @@
                           {
                             "type": "microsoft.insights/activityLogAlerts",
                             "properties": {
-                              "description": "Activity Log LA Workspace Regenerate Key",
+                              "description": "Activity Log Storage Account Delete",
                               "parameters": {
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
@@ -209,7 +220,7 @@
                                     "field": "category"
                                   },
                                   {
-                                    "equals": "Microsoft.OperationalInsights/workspaces/regeneratesharedkey/action",
+                                    "equals": "Microsoft.Storage/storageAccounts/delete",
                                     "field": "operationName"
                                   },
                                   {
@@ -223,7 +234,7 @@
                             },
                             "apiVersion": "2020-10-01",
                             "location": "global",
-                            "name": "ActivityLAWorkspaceRegenKey",
+                            "name": "Activity Log Storage Account Delete",
                             "tags": {
                               "_deployed_by_amba": true
                             }
@@ -235,7 +246,7 @@
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ActivityLAWorkspaceRegenKey",
+                    "name": "ActivitySADelete",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
@@ -250,7 +261,7 @@
           },
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deploymentScope": "subscription",
-          "existenceScope": "resourceGroup"
+          "existenceScope": "resourcegroup"
         }
       }
     }

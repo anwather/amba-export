@@ -6,9 +6,9 @@
     "description": "Policy to audit/deploy Azure Load Balancer Data Path Availability Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "Category": "Networking",
-      "version": "1.0.1",
+      "version": "1.1.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "_deployed_by_amba": "True"
     },
     "parameters": {
@@ -39,18 +39,6 @@
         },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "type": "String"
-      },
       "windowSize": {
         "allowedValues": [
           "PT1M",
@@ -66,6 +54,18 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
+        },
+        "type": "String"
+      },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
         "type": "String"
       },
@@ -92,6 +92,14 @@
         },
         "type": "String"
       },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -100,14 +108,6 @@
         "defaultValue": "deployIfNotExists",
         "metadata": {
           "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
         "type": "String"
@@ -154,6 +154,34 @@
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "LessThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator"
+              },
+              {
+                "equals": "[parameters('threshold')]",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold"
               }
             ]
           },
@@ -172,11 +200,11 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
@@ -203,10 +231,10 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "windowSize": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "enabled": {
                     "type": "String"
                   },
                   "severity": {
@@ -230,6 +258,7 @@
                     "properties": {
                       "description": "Metric Alert for ALB Data Path Availability",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -237,11 +266,11 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
@@ -250,19 +279,18 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
-                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
+                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
+                            "operator": "LessThan",
                             "name": "VipAvailability",
                             "metricNamespace": "Microsoft.Network/loadBalancers",
                             "criterionType": "StaticThresholdCriterion",
-                            "operator": "LessThan",
                             "metricName": "VipAvailability"
                           }
                         ],

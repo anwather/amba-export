@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VPN Gateway Ingress Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Network",
-      "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -27,18 +27,6 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
-        },
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -84,6 +72,18 @@
         "metadata": {
           "description": "Severity of the Alert",
           "displayName": "Severity"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -150,6 +150,34 @@
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "LessThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].operator"
+              },
+              {
+                "equals": "[parameters('threshold')]",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].threshold"
               }
             ]
           },
@@ -165,9 +193,6 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -176,6 +201,9 @@
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
@@ -196,9 +224,6 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
                   "windowSize": {
                     "type": "String"
                   },
@@ -206,6 +231,9 @@
                     "type": "String"
                   },
                   "severity": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "threshold": {
@@ -227,13 +255,9 @@
                     "properties": {
                       "description": "Metric Alert for VPN Gateway tunnel ingress bytes",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
@@ -244,6 +268,9 @@
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
+                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
                         }
@@ -251,14 +278,15 @@
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "operator": "LessThan",
-                            "metricNamespace": "microsoft.network/vpngateways",
                             "name": "tunnelingressbytes",
+                            "metricNamespace": "microsoft.network/vpngateways",
+                            "operator": "LessThan",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "tunnelingressbytes"
                           }

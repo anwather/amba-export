@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM data Disk Space Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Compute",
-      "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -133,18 +133,6 @@
         },
         "type": "Object"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "operator": {
         "allowedValues": [
           "Equals",
@@ -156,6 +144,18 @@
         "defaultValue": "LessThan",
         "metadata": {
           "displayName": "Operator"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -232,6 +232,46 @@
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/scheduledqueryrules/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/scheduledqueryrules/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/scheduledqueryrules/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/scheduledqueryrules/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/scheduledqueryrules/autoMitigate"
+              },
+              {
+                "equals": "[parameters('threshold')]",
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].threshold"
+              },
+              {
+                "equals": "[parameters('operator')]",
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].operator"
+              },
+              {
+                "equals": "[parameters('timeAggregation')]",
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "[parameters('evaluationPeriods')]",
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.numberOfEvaluationPeriods"
+              },
+              {
+                "equals": "[parameters('failingPeriods')]",
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.minFailingPeriodsToAlert"
+              },
+              {
+                "equals": "InsightsMetrics| where Origin == \"vm.azm.ms\"| where Namespace == \"LogicalDisk\" and Name == \"FreeSpacePercentage\"| extend Disk=tostring(todynamic(Tags)[\"vm.azm.ms/mountId\"])|where Disk !in ('C:','/')| summarize AggregatedValue = avg(Val) by bin(TimeGenerated, 15m), Computer, _ResourceId, Disk",
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].query"
               }
             ]
           },
@@ -342,7 +382,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -379,7 +418,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
@@ -481,6 +519,7 @@
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -492,6 +531,7 @@
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

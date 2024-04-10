@@ -6,13 +6,13 @@
     "description": "Policy to Deploy Resource Health Unhealthy Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Monitoring",
-      "version": "1.0.2",
-      "_deployed_by_amba": "True",
+      "version": "1.0.3",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "enabled": {
@@ -45,14 +45,21 @@
       },
       "alertResourceGroupTags": {
         "defaultValue": {
-          "_deployed_by_amba": true,
-          "environment": "test"
+          "_deployed_by_amba": true
         },
         "metadata": {
           "description": "Tags on the Resource group the alert is placed in",
           "displayName": "Resource Group Tags"
         },
         "type": "Object"
+      },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
+          "displayName": "Monitoring disabled"
+        },
+        "type": "String"
       },
       "effect": {
         "allowedValues": [
@@ -62,14 +69,6 @@
         "defaultValue": "disabled",
         "metadata": {
           "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring on subscription level alerts. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
         "type": "String"
@@ -97,6 +96,10 @@
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
+              },
+              {
+                "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
+                "contains": "ag-AMBA-SH-"
               },
               {
                 "equals": 1,
@@ -157,7 +160,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -188,7 +190,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -234,6 +235,14 @@
                                     ]
                                   }
                                 ]
+                              },
+                              "actions": {
+                                "actionGroups": [
+                                  {
+                                    "actionGroupId": "[concat(subscription().Id, '/resourceGroups/', parameters('alertResourceGroupName'), '/providers/microsoft.insights/actionGroups/', 'ag-AMBA-SH-', subscription().displayName, '-001')]",
+                                    "webhookProperties": {}
+                                  }
+                                ]
                               }
                             },
                             "apiVersion": "2020-10-01",
@@ -244,6 +253,7 @@
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -251,10 +261,11 @@
                     "apiVersion": "2019-10-01",
                     "name": "ResourceHealtAlert",
                     "dependsOn": [
-                      "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
+                      "[resourceId('Microsoft.Resources/resourceGroups', parameters('alertResourceGroupName'))]"
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
               },
               "mode": "incremental"

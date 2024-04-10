@@ -6,9 +6,9 @@
     "description": "Policy to audit/deploy Azure Application Gateway ResponseStatus Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "Category": "Networking",
-      "version": "1.0.1",
+      "version": "1.1.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "_deployed_by_amba": "True"
     },
     "parameters": {
@@ -84,6 +84,14 @@
         },
         "type": "String"
       },
+      "monitorDisable": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "effect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -92,14 +100,6 @@
         "defaultValue": "deployIfNotExists",
         "metadata": {
           "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
-      "monitorDisable": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
         "type": "String"
@@ -152,6 +152,42 @@
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Total",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "GreaterThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
+              },
+              {
+                "equals": "Medium",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
+              },
+              {
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.minFailingPeriodsToAlert"
+              },
+              {
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.numberOfEvaluationPeriods"
               }
             ]
           },
@@ -222,7 +258,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -258,12 +293,12 @@
                           {
                             "timeAggregation": "Total",
                             "operator": "GreaterThan",
+                            "name": "ResponseStatus",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
                             "metricNamespace": "Microsoft.Network/applicationgateways",
-                            "name": "ResponseStatus",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "ResponseStatus",
                             "alertSensitivity": "[parameters('alertSensitivity')]",
@@ -293,6 +328,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

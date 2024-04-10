@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy App Service Plan Http Queue Length Alert",
     "mode": "All",
     "metadata": {
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Web Services",
-      "version": "1.0.1",
-      "_deployed_by_amba": "True",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -27,18 +27,6 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
-        },
-        "type": "String"
-      },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -84,6 +72,18 @@
         "metadata": {
           "description": "Severity of the Alert",
           "displayName": "Severity"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -142,6 +142,42 @@
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "GreaterThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
+              },
+              {
+                "equals": "Medium",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
+              },
+              {
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.minFailingPeriodsToAlert"
+              },
+              {
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.numberOfEvaluationPeriods"
               }
             ]
           },
@@ -157,9 +193,6 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -168,6 +201,9 @@
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -185,9 +221,6 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
                   "windowSize": {
                     "type": "String"
                   },
@@ -195,6 +228,9 @@
                     "type": "String"
                   },
                   "severity": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -213,13 +249,9 @@
                     "properties": {
                       "description": "Metric Alert for App Service Plan Http Queue Length",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
@@ -229,22 +261,26 @@
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         }
                       },
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
-                            "operator": "GreaterThan",
+                            "name": "ServiceApiResult",
+                            "metricNamespace": "Microsoft.Web/serverfarms",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "metricNamespace": "Microsoft.Web/serverfarms",
-                            "name": "ServiceApiResult",
+                            "operator": "GreaterThan",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "HttpQueueLength",
                             "alertSensitivity": "Medium"
