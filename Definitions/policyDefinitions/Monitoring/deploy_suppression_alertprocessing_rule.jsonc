@@ -6,9 +6,9 @@
     "description": "Policy to deploy empty and disabled suppression Alert Processing Rule for all AMBA alerts",
     "mode": "All",
     "metadata": {
-      "category": "Monitoring",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "version": "1.0.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Monitoring",
       "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
@@ -16,36 +16,36 @@
     },
     "parameters": {
       "monitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
           "displayName": "Monitoring disabled"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "alzMonitorResourceGroupLocation": {
+        "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
           "displayName": "Resource Group Location"
         },
-        "defaultValue": "centralus",
         "type": "String"
       },
       "alzMonitorResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
         "metadata": {
           "description": "Resource group the alert is placed in",
           "displayName": "Resource Group Name"
         },
-        "defaultValue": "rg-amba-monitoring-001",
         "type": "String"
       },
       "alzMonitorResourceGroupTags": {
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
         "metadata": {
           "description": "Tags on the Resource group the alert is placed in",
           "displayName": "Resource Group Tags"
-        },
-        "defaultValue": {
-          "_deployed_by_amba": true
         },
         "type": "Object"
       }
@@ -67,6 +67,9 @@
         "effect": "deployIfNotExists",
         "details": {
           "type": "Microsoft.AlertsManagement/actionRules",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -75,10 +78,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
-          "resourceGroupName": "[parameters('ALZMonitorResourceGroupName')]",
           "deployment": {
             "properties": {
               "parameters": {
@@ -108,15 +107,14 @@
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "name": "[parameters('ALZMonitorResourceGroupName')]",
-                    "location": "[parameters('ALZMonitorResourceGroupLocation')]",
                     "apiVersion": "2021-04-01",
+                    "location": "[parameters('ALZMonitorResourceGroupLocation')]",
+                    "name": "[parameters('ALZMonitorResourceGroupName')]",
                     "tags": "[parameters('ALZMonitorResourceGroupTags')]"
                   },
                   {
                     "resourceGroup": "[parameters('ALZMonitorResourceGroupName')]",
                     "type": "Microsoft.Resources/deployments",
-                    "name": "SuppressionRuleDeployment",
                     "properties": {
                       "parameters": {
                         "ALZMonitorResourceGroupName": {
@@ -133,7 +131,6 @@
                         "resources": [
                           {
                             "type": "Microsoft.AlertsManagement/actionRules",
-                            "name": "[concat('apr-AMBA-',subscription().displayName, '-002')]",
                             "properties": {
                               "description": "AMBA Notification Assets - Suppression Alert Processing Rule for maintenance period for Subscription",
                               "enabled": false,
@@ -146,8 +143,9 @@
                                 }
                               ]
                             },
-                            "location": "Global",
                             "apiVersion": "2021-08-08",
+                            "location": "Global",
+                            "name": "[concat('apr-AMBA-',subscription().displayName, '-002')]",
                             "tags": {
                               "_deployed_by_amba": true
                             },
@@ -160,6 +158,7 @@
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
+                    "name": "SuppressionRuleDeployment",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('ALZMonitorResourceGroupName'))]"
                     ]
@@ -172,6 +171,7 @@
             },
             "location": "australiaeast"
           },
+          "resourceGroupName": "[parameters('ALZMonitorResourceGroupName')]",
           "deploymentScope": "subscription",
           "existenceScope": "resourceGroup"
         }
