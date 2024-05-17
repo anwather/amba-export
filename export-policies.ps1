@@ -18,7 +18,7 @@ $gs = @"
                 "strategy": "full",
                 "keepDfcSecurityAssignments": false
             },
-            "managedIdentityLocation": $Location
+            "managedIdentityLocation": "$Location"
         }
     ]
 }
@@ -32,14 +32,14 @@ Copy-Item ./tmp/patterns/alz/scripts/Start-AMBACleanup.ps1 ./assets/Start-AMBACl
 
 $pseudoRootManagementGroup = "amba"
 
-#Deploy AMBA 
-# New-AzManagementGroupDeployment -ManagementGroupId $pseudoRootManagementGroup `
-#     -Location $location `
-#     -TemplateUri "https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts/main/patterns/alz/alzArm.json" `
-#     -TemplateParameterFile ".\assets\alzArm.param.json" `
-#     -Verbose
+Deploy AMBA 
+New-AzManagementGroupDeployment -ManagementGroupId $pseudoRootManagementGroup `
+    -Location $location `
+    -TemplateUri "https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts/main/patterns/alz/alzArm.json" `
+    -TemplateParameterFile ".\assets\alzArm.param.json" `
+    -Verbose
 
-# Start-Sleep -Seconds 180
+Start-Sleep -Seconds 180
 
 Remove-Item -Path tmp -Recurse -Force
 
