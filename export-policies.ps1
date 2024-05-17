@@ -24,26 +24,26 @@ $gs = @"
 }
 "@
 
-$gs | Out-File ./Definitions/global-settings.jsonc
+$gs | Out-File ./Definitions/global-settings.jsonc -Verbose
 
 git clone https://github.com/Azure/azure-monitor-baseline-alerts.git tmp
 
-Copy-Item ./tmp/patterns/alz/scripts/Start-AMBACleanup.ps1 ./assets/Start-AMBACleanup.ps1
+Copy-Item ./tmp/patterns/alz/scripts/Start-AMBACleanup.ps1 ./assets/Start-AMBACleanup.ps1 -Verbose
 
 $pseudoRootManagementGroup = "amba"
 
 #Deploy AMBA 
-New-AzManagementGroupDeployment -ManagementGroupId $pseudoRootManagementGroup `
-    -Location $location `
-    -TemplateUri "https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts/main/patterns/alz/alzArm.json" `
-    -TemplateParameterFile ".\assets\alzArm.param.json" `
-    -Verbose
+# New-AzManagementGroupDeployment -ManagementGroupId $pseudoRootManagementGroup `
+#     -Location $location `
+#     -TemplateUri "https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts/main/patterns/alz/alzArm.json" `
+#     -TemplateParameterFile ".\assets\alzArm.param.json" `
+#     -Verbose
 
-Start-Sleep -Seconds 180
+# Start-Sleep -Seconds 180
 
 Remove-Item -Path tmp -Recurse -Force
 
-Export-AzPolicyResources -DefinitionsRootFolder ./Definitions -OutputFolder ./Output
+Export-AzPolicyResources -DefinitionsRootFolder ./Definitions -OutputFolder ./Output -Verbose
 
 Copy-Item ./Output/export/Definitions/policyDefinitions ./Definitions -Force -Recurse
 Copy-Item ./Output/export/Definitions/policySetDefinitions ./Definitions -Force -Recurse
