@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy Frontdoor Backend Request Latency Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.1.0",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Networking",
       "_deployed_by_amba": "True",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "category": "Networking",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
@@ -125,9 +125,6 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -184,6 +181,9 @@
               }
             ]
           },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -209,6 +209,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -242,6 +243,7 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -274,13 +276,13 @@
                           {
                             "timeAggregation": "Average",
                             "name": "ServiceApiResult",
-                            "operator": "GreaterThan",
                             "metricNamespace": "Microsoft.Network/frontdoors",
+                            "operator": "GreaterThan",
+                            "criterionType": "DynamicThresholdCriterion",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "criterionType": "DynamicThresholdCriterion",
                             "metricName": "BackendRequestLatency",
                             "alertSensitivity": "Medium"
                           }
@@ -299,10 +301,8 @@
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

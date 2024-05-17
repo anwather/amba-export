@@ -6,13 +6,13 @@
     "description": "Policy to Deploy Service Health Incident Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.2.0",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Monitoring",
       "_deployed_by_amba": "True",
+      "version": "1.2.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "category": "Monitoring",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "enabled": {
@@ -107,9 +107,6 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -121,8 +118,8 @@
                   {
                     "allOf": [
                       {
-                        "value": "[empty(parameters('BYOActionGroup'))]",
-                        "equals": true
+                        "equals": true,
+                        "value": "[empty(parameters('BYOActionGroup'))]"
                       },
                       {
                         "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
@@ -133,8 +130,8 @@
                   {
                     "allOf": [
                       {
-                        "value": "[empty(parameters('BYOActionGroup'))]",
-                        "equals": false
+                        "equals": false,
+                        "value": "[empty(parameters('BYOActionGroup'))]"
                       },
                       {
                         "equals": 1,
@@ -190,6 +187,9 @@
               }
             ]
           },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -212,6 +212,7 @@
                   "value": "[parameters('BYOActionGroup')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "enabled": {
@@ -234,6 +235,19 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {
+                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
+                  "copy": [
+                    {
+                      "name": "varActionGroupIds",
+                      "mode": "serial",
+                      "count": "[length(variables('varBYOActionGroups'))]",
+                      "input": {
+                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
+                      }
+                    }
+                  ]
+                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -260,6 +274,7 @@
                           "value": "[parameters('BYOActionGroup')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
@@ -276,6 +291,7 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
+                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -356,10 +372,8 @@
                             "condition": "[not(empty(parameters('BYOActionGroup')))]"
                           }
                         ],
-                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
                     "apiVersion": "2019-10-01",
                     "name": "ServiceHealthIncident",
@@ -368,22 +382,8 @@
                     ]
                   }
                 ],
-                "variables": {
-                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
-                  "copy": [
-                    {
-                      "name": "varActionGroupIds",
-                      "mode": "serial",
-                      "count": "[length(variables('varBYOActionGroups'))]",
-                      "input": {
-                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
-                      }
-                    }
-                  ]
-                },
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },
