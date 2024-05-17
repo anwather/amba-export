@@ -32,7 +32,7 @@ Copy-Item ./tmp/patterns/alz/scripts/Start-AMBACleanup.ps1 ./assets/Start-AMBACl
 
 $pseudoRootManagementGroup = "amba"
 
-Deploy AMBA 
+# Deploy AMBA 
 New-AzManagementGroupDeployment -ManagementGroupId $pseudoRootManagementGroup `
     -Location $location `
     -TemplateUri "https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts/main/patterns/alz/alzArm.json" `
@@ -53,9 +53,9 @@ Remove-Item -Path Output -Recurse -Force
 
 Remove-Item -Path ./Definitions/global-settings.jsonc -Force
 
-## Remove managed identity parts
+# Remove managed identity parts
 
-## Fix missing displaynames in the policy set definitions
+# Fix missing displaynames in the policy set definitions
 
 ./assets/Start-AMBACleanup.ps1 -pseudoRootManagementGroup $pseudoRootManagementGroup -Force
 
