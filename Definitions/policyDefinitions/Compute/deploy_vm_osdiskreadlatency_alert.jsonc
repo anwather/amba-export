@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VM OSDiskreadLatency Alert",
     "mode": "All",
     "metadata": {
-      "category": "Compute",
       "version": "1.1.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Compute",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "_deployed_by_amba": "True"
+      ]
     },
     "parameters": {
       "evaluationFrequency": {
@@ -26,6 +26,18 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -81,6 +93,14 @@
         },
         "type": "String"
       },
+      "threshold": {
+        "defaultValue": "30",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "type": "String"
+      },
       "alertResourceGroupLocation": {
         "defaultValue": "centralus",
         "metadata": {
@@ -89,23 +109,17 @@
         },
         "type": "String"
       },
-      "autoMitigate": {
+      "timeAggregation": {
         "allowedValues": [
-          "true",
-          "false"
+          "Average",
+          "Count",
+          "Maximum",
+          "Minimum",
+          "Total"
         ],
-        "defaultValue": "true",
+        "defaultValue": "Average",
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "30",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+          "displayName": "TimeAggregation"
         },
         "type": "String"
       },
@@ -131,28 +145,6 @@
         },
         "type": "String"
       },
-      "timeAggregation": {
-        "allowedValues": [
-          "Average",
-          "Count",
-          "Maximum",
-          "Minimum",
-          "Total"
-        ],
-        "defaultValue": "Average",
-        "metadata": {
-          "displayName": "TimeAggregation"
-        },
-        "type": "String"
-      },
-      "failingPeriods": {
-        "defaultValue": "1",
-        "metadata": {
-          "description": "Number of failing periods before alert is fired",
-          "displayName": "Failing Periods"
-        },
-        "type": "String"
-      },
       "operator": {
         "allowedValues": [
           "Equals",
@@ -167,21 +159,11 @@
         },
         "type": "String"
       },
-      "computersToInclude": {
-        "defaultValue": [
-          "*"
-        ],
-        "metadata": {
-          "description": "Array of Computer to be monitored",
-          "displayName": "Disks to be included to be monitored"
-        },
-        "type": "array"
-      },
-      "evaluationPeriods": {
+      "failingPeriods": {
         "defaultValue": "1",
         "metadata": {
-          "description": "The number of aggregated lookback points.",
-          "displayName": "Evaluation Periods"
+          "description": "Number of failing periods before alert is fired",
+          "displayName": "Failing Periods"
         },
         "type": "String"
       },
@@ -193,16 +175,13 @@
         },
         "type": "String"
       },
-      "disksToInclude": {
-        "defaultValue": [
-          "C:",
-          "/"
-        ],
+      "evaluationPeriods": {
+        "defaultValue": "1",
         "metadata": {
-          "description": "Array of disk to be monitored for disk both windows and linux",
-          "displayName": "Disks to be included to be monitored"
+          "description": "The number of aggregated lookback points.",
+          "displayName": "Evaluation Periods"
         },
-        "type": "array"
+        "type": "String"
       },
       "autoResolve": {
         "allowedValues": [
@@ -215,6 +194,27 @@
           "displayName": "Auto Resolve"
         },
         "type": "String"
+      },
+      "computersToInclude": {
+        "defaultValue": [
+          "*"
+        ],
+        "metadata": {
+          "description": "Array of Computer to be monitored",
+          "displayName": "Disks to be included to be monitored"
+        },
+        "type": "array"
+      },
+      "disksToInclude": {
+        "defaultValue": [
+          "C:",
+          "/"
+        ],
+        "metadata": {
+          "description": "Array of disk to be monitored for disk both windows and linux",
+          "displayName": "Disks to be included to be monitored"
+        },
+        "type": "array"
       }
     },
     "policyRule": {
@@ -230,6 +230,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/scheduledQueryRules",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -286,14 +289,14 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
@@ -307,46 +310,46 @@
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
-                },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
-                "alertResourceGroupTags": {
-                  "value": "[parameters('alertResourceGroupTags')]"
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "timeAggregation": {
                   "value": "[parameters('timeAggregation')]"
                 },
-                "failingPeriods": {
-                  "value": "[parameters('failingPeriods')]"
+                "alertResourceGroupTags": {
+                  "value": "[parameters('alertResourceGroupTags')]"
                 },
                 "operator": {
                   "value": "[parameters('operator')]"
                 },
-                "computersToInclude": {
-                  "value": "[parameters('computersToInclude')]"
-                },
-                "evaluationPeriods": {
-                  "value": "[parameters('evaluationPeriods')]"
+                "failingPeriods": {
+                  "value": "[parameters('failingPeriods')]"
                 },
                 "autoResolveTime": {
                   "value": "[parameters('autoResolveTime')]"
                 },
-                "disksToInclude": {
-                  "value": "[parameters('disksToInclude')]"
+                "evaluationPeriods": {
+                  "value": "[parameters('evaluationPeriods')]"
                 },
                 "autoResolve": {
                   "value": "[parameters('autoResolve')]"
+                },
+                "computersToInclude": {
+                  "value": "[parameters('computersToInclude')]"
+                },
+                "disksToInclude": {
+                  "value": "[parameters('disksToInclude')]"
                 }
               },
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "windowSize": {
@@ -361,45 +364,41 @@
                   "alertResourceGroupName": {
                     "type": "string"
                   },
+                  "threshold": {
+                    "type": "String"
+                  },
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
-                  "threshold": {
+                  "timeAggregation": {
                     "type": "String"
                   },
                   "alertResourceGroupTags": {
                     "type": "object"
                   },
-                  "timeAggregation": {
+                  "operator": {
                     "type": "String"
                   },
                   "failingPeriods": {
                     "type": "String"
                   },
-                  "operator": {
+                  "autoResolveTime": {
+                    "type": "String"
+                  },
+                  "evaluationPeriods": {
+                    "type": "String"
+                  },
+                  "autoResolve": {
                     "type": "String"
                   },
                   "computersToInclude": {
                     "type": "array"
                   },
-                  "evaluationPeriods": {
-                    "type": "String"
-                  },
-                  "autoResolveTime": {
-                    "type": "String"
-                  },
                   "disksToInclude": {
                     "type": "array"
-                  },
-                  "autoResolve": {
-                    "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -436,7 +435,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
@@ -444,9 +442,13 @@
                               "description": "Log Alert for Virtual Machine OSDiskreadLatency",
                               "displayName": "[concat(subscription().displayName, '-VMLowOSDiskreadLatencyAlert')]",
                               "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                              "autoMitigate": "[parameters('autoMitigate')]",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
+                                },
+                                "autoMitigate": {
+                                  "value": "[parameters('autoMitigate')]"
                                 },
                                 "windowSize": {
                                   "value": "[parameters('windowSize')]"
@@ -460,49 +462,44 @@
                                 "alertResourceGroupName": {
                                   "value": "[parameters('alertResourceGroupName')]"
                                 },
-                                "alertResourceGroupLocation": {
-                                  "value": "[parameters('alertResourceGroupName')]"
-                                },
-                                "autoMitigate": {
-                                  "value": "[parameters('autoMitigate')]"
-                                },
                                 "threshold": {
                                   "value": "[parameters('threshold')]"
+                                },
+                                "alertResourceGroupLocation": {
+                                  "value": "[parameters('alertResourceGroupName')]"
                                 },
                                 "failingPeriods": {
                                   "value": "[parameters('failingPeriods')]"
                                 },
-                                "computersToInclude": {
-                                  "value": "[parameters('computersToInclude')]"
+                                "autoResolveTime": {
+                                  "value": "[parameters('autoResolveTime')]"
                                 },
                                 "evaluationPeriods": {
                                   "value": "[parameters('evaluationPeriods')]"
                                 },
-                                "autoResolveTime": {
-                                  "value": "[parameters('autoResolveTime')]"
+                                "autoResolve": {
+                                  "value": "[parameters('autoResolve')]"
+                                },
+                                "computersToInclude": {
+                                  "value": "[parameters('computersToInclude')]"
                                 },
                                 "disksToInclude": {
                                   "value": "[parameters('disksToInclude')]"
-                                },
-                                "autoResolve": {
-                                  "value": "[parameters('autoResolve')]"
                                 }
                               },
                               "windowSize": "[parameters('windowSize')]",
                               "enabled": "[parameters('enabled')]",
                               "severity": "[parameters('severity')]",
-                              "autoMitigate": "[parameters('autoMitigate')]",
                               "criteria": {
                                 "allOf": [
                                   {
                                     "threshold": "[parameters('threshold')]",
                                     "timeAggregation": "[parameters('timeAggregation')]",
+                                    "operator": "[parameters('operator')]",
                                     "failingPeriods": {
                                       "numberOfEvaluationPeriods": "[parameters('evaluationPeriods')]",
                                       "minFailingPeriodsToAlert": "[parameters('failingPeriods')]"
                                     },
-                                    "operator": "[parameters('operator')]",
-                                    "query": "InsightsMetrics| where Origin == \"vm.azm.ms\"| where Namespace == \"LogicalDisk\" and Name == \"ReadLatencyMs\"| extend Disk=tostring(todynamic(Tags)[\"vm.azm.ms/mountId\"])| summarize AggregatedValue = avg(Val) by bin(TimeGenerated, 15m), Computer, _ResourceId, Disk",
                                     "metricMeasureColumn": "AggregatedValue",
                                     "resourceIdColumn": "_ResourceId",
                                     "dimensions": [
@@ -516,20 +513,21 @@
                                         "operator": "Include",
                                         "values": "[parameters('disksToInclude')]"
                                       }
-                                    ]
+                                    ],
+                                    "query": "InsightsMetrics| where Origin == \"vm.azm.ms\"| where Namespace == \"LogicalDisk\" and Name == \"ReadLatencyMs\"| extend Disk=tostring(todynamic(Tags)[\"vm.azm.ms/mountId\"])| summarize AggregatedValue = avg(Val) by bin(TimeGenerated, 15m), Computer, _ResourceId, Disk"
                                   }
                                 ]
                               },
                               "scopes": [
                                 "[subscription().Id]"
                               ],
+                              "ruleResolveConfiguration": {
+                                "timeToResolve": "[parameters('autoResolveTime')]",
+                                "autoResolved": "[parameters('autoResolve')]"
+                              },
                               "targetResourceTypes": [
                                 "Microsoft.Compute/virtualMachines"
-                              ],
-                              "ruleResolveConfiguration": {
-                                "autoResolved": "[parameters('autoResolve')]",
-                                "timeToResolve": "[parameters('autoResolveTime')]"
-                              }
+                              ]
                             },
                             "apiVersion": "2022-08-01-preview",
                             "location": "[parameters('alertResourceGroupLocation')]",
@@ -539,6 +537,7 @@
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -550,6 +549,7 @@
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

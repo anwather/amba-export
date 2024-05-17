@@ -6,13 +6,13 @@
     "description": "Policy to Deploy Resource Health Unhealthy Alert",
     "mode": "All",
     "metadata": {
+      "version": "1.1.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Monitoring",
-      "version": "1.0.3",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "_deployed_by_amba": "True"
+      ]
     },
     "parameters": {
       "enabled": {
@@ -72,6 +72,14 @@
           "displayName": "Effect"
         },
         "type": "String"
+      },
+      "byoActionGroup": {
+        "defaultValue": "",
+        "metadata": {
+          "description": "The Resource ID of an existing Action Group already deployed by the customer in his environment",
+          "displayName": "Customer defined Action Group Resource ID"
+        },
+        "type": "String"
       }
     },
     "policyRule": {
@@ -91,6 +99,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -98,8 +109,42 @@
                 "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
               },
               {
-                "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
-                "contains": "ag-AMBA-SH-"
+                "anyOf": [
+                  {
+                    "allOf": [
+                      {
+                        "value": "[empty(parameters('BYOActionGroup'))]",
+                        "equals": true
+                      },
+                      {
+                        "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
+                        "contains": "ag-AMBA-SH-"
+                      }
+                    ]
+                  },
+                  {
+                    "allOf": [
+                      {
+                        "value": "[empty(parameters('BYOActionGroup'))]",
+                        "equals": false
+                      },
+                      {
+                        "equals": 1,
+                        "count": {
+                          "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*]",
+                          "where": {
+                            "anyOf": [
+                              {
+                                "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
+                                "contains": "[split(trim(parameters('BYOActionGroup')),',')[0]]"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
               },
               {
                 "equals": 1,
@@ -125,9 +170,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -142,6 +184,9 @@
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
+                },
+                "BYOActionGroup": {
+                  "value": "[parameters('BYOActionGroup')]"
                 }
               },
               "template": {
@@ -157,6 +202,9 @@
                   },
                   "alertResourceGroupTags": {
                     "type": "object"
+                  },
+                  "BYOActionGroup": {
+                    "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
@@ -178,6 +226,9 @@
                         },
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
+                        },
+                        "BYOActionGroup": {
+                          "value": "[parameters('BYOActionGroup')]"
                         }
                       },
                       "template": {
@@ -187,6 +238,9 @@
                           },
                           "alertResourceGroupName": {
                             "type": "string"
+                          },
+                          "BYOActionGroup": {
+                            "type": "String"
                           }
                         },
                         "contentVersion": "1.0.0.0",
@@ -250,7 +304,65 @@
                             "name": "ResourceHealthUnhealthyAlert",
                             "tags": {
                               "_deployed_by_amba": true
-                            }
+                            },
+                            "condition": "[empty(parameters('BYOActionGroup'))]"
+                          },
+                          {
+                            "type": "microsoft.insights/activityLogAlerts",
+                            "properties": {
+                              "description": "Resource Health Unhealthy Alert",
+                              "parameters": {
+                                "enabled": {
+                                  "value": "[parameters('enabled')]"
+                                }
+                              },
+                              "enabled": "[parameters('enabled')]",
+                              "scopes": [
+                                "[subscription().id]"
+                              ],
+                              "condition": {
+                                "allOf": [
+                                  {
+                                    "equals": "ResourceHealth",
+                                    "field": "category"
+                                  },
+                                  {
+                                    "anyOf": [
+                                      {
+                                        "equals": "PlatformInitiated",
+                                        "field": "properties.cause"
+                                      },
+                                      {
+                                        "equals": "UserInitiated",
+                                        "field": "properties.cause"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "anyOf": [
+                                      {
+                                        "equals": "Degraded",
+                                        "field": "properties.currentHealthStatus"
+                                      },
+                                      {
+                                        "equals": "Unavailable",
+                                        "field": "properties.currentHealthStatus"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              "actions": {
+                                "actionGroups": "[variables('varActionGroupIds')]"
+                              }
+                            },
+                            "apiVersion": "2020-10-01",
+                            "location": "global",
+                            "name": "ResourceHealthUnhealthyAlert",
+                            "tags": {
+                              "_deployed_by_amba": true
+                            },
+                            "condition": "[not(empty(parameters('BYOActionGroup')))]"
                           }
                         ],
                         "variables": {},
@@ -265,7 +377,19 @@
                     ]
                   }
                 ],
-                "variables": {},
+                "variables": {
+                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
+                  "copy": [
+                    {
+                      "name": "varActionGroupIds",
+                      "mode": "serial",
+                      "count": "[length(variables('varBYOActionGroups'))]",
+                      "input": {
+                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
+                      }
+                    }
+                  ]
+                },
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
               },
               "mode": "incremental"

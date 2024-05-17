@@ -6,9 +6,9 @@
     "description": "Policy to audit/deploy Azure Application Gateway FailedRequests Alert",
     "mode": "All",
     "metadata": {
-      "Category": "Networking",
       "version": "1.1.0",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "Category": "Networking",
       "_deployed_by_amba": "True"
     },
     "parameters": {
@@ -122,6 +122,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -178,9 +181,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -270,13 +270,13 @@
                         "allOf": [
                           {
                             "timeAggregation": "Total",
-                            "operator": "GreaterThan",
                             "name": "FailedRequests",
+                            "operator": "GreaterThan",
+                            "metricNamespace": "Microsoft.Network/applicationgateways",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "metricNamespace": "Microsoft.Network/applicationgateways",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "FailedRequests",
                             "alertSensitivity": "Medium"

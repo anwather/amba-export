@@ -6,13 +6,13 @@
     "description": "Policy to deploy action group for Service Health alerts",
     "mode": "All",
     "metadata": {
+      "version": "1.2.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "category": "Monitoring",
-      "version": "1.1.0",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "_deployed_by_amba": "True"
+      ]
     },
     "parameters": {
       "monitorDisable": {
@@ -36,6 +36,14 @@
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
           "displayName": "Resource Group Location"
+        },
+        "type": "String"
+      },
+      "byoActionGroup": {
+        "defaultValue": "",
+        "metadata": {
+          "description": "The Resource ID of an existing Action Group already deployed by the customer in his environment",
+          "displayName": "Customer defined Action Group Resource ID"
         },
         "type": "String"
       },
@@ -65,11 +73,27 @@
         },
         "type": "String"
       },
+      "byoAlertProcessingRule": {
+        "defaultValue": "",
+        "metadata": {
+          "description": "The Resource ID of an existing Alert Processing Rule already deployed by the customer in his environment",
+          "displayName": "Customer defined Alert Processing Rule Resource ID"
+        },
+        "type": "String"
+      },
       "alzLogicappResourceId": {
         "defaultValue": "",
         "metadata": {
           "description": "Logic App Resource Id for Action Group to send alerts to",
           "displayName": "Logic App Resource Id"
+        },
+        "type": "String"
+      },
+      "alzFunctionTriggerUrl": {
+        "defaultValue": "",
+        "metadata": {
+          "description": "URL that triggers the Function",
+          "displayName": "Function Trigger URL"
         },
         "type": "String"
       },
@@ -86,14 +110,6 @@
         "metadata": {
           "description": "Function Resource Id for Action Group to send alerts to",
           "displayName": "Function Resource Id"
-        },
-        "type": "String"
-      },
-      "alzFunctionTriggerUrl": {
-        "defaultValue": "",
-        "metadata": {
-          "description": "URL that triggers the Function",
-          "displayName": "Function Trigger URL"
         },
         "type": "String"
       },
@@ -124,6 +140,10 @@
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
             "notEquals": "true"
+          },
+          {
+            "value": "[empty(parameters('BYOActionGroup'))]",
+            "equals": "true"
           }
         ]
       },
@@ -131,28 +151,38 @@
         "effect": "deployIfNotExists",
         "details": {
           "type": "Microsoft.Insights/actionGroups",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
+              {
+                "value": "[empty(parameters('BYOActionGroup'))]",
+                "equals": true
+              },
               {
                 "equals": "SH-ActGrp",
                 "field": "Microsoft.Insights/actionGroups/groupShortName"
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
                 "ALZMonitorActionGroupEmail": {
                   "value": "[parameters('ALZMonitorActionGroupEmail')]"
                 },
+                "BYOActionGroup": {
+                  "value": "[parameters('BYOActionGroup')]"
+                },
                 "ALZMonitorResourceGroupName": {
                   "value": "[parameters('ALZMonitorResourceGroupName')]"
                 },
                 "ALZMonitorResourceGroupLocation": {
                   "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+                },
+                "BYOAlertProcessingRule": {
+                  "value": "[parameters('BYOAlertProcessingRule')]"
                 },
                 "ALZLogicappCallbackUrl": {
                   "value": "[parameters('ALZLogicappCallbackUrl')]"
@@ -163,11 +193,11 @@
                 "ALZFunctionResourceId": {
                   "value": "[parameters('ALZFunctionResourceId')]"
                 },
-                "ALZEventHubResourceId": {
-                  "value": "[parameters('ALZEventHubResourceId')]"
-                },
                 "ALZFunctionTriggerUrl": {
                   "value": "[parameters('ALZFunctionTriggerUrl')]"
+                },
+                "ALZEventHubResourceId": {
+                  "value": "[parameters('ALZEventHubResourceId')]"
                 },
                 "ALZWebhookServiceUri": {
                   "value": "[parameters('ALZWebhookServiceUri')]"
@@ -184,11 +214,17 @@
                   "ALZMonitorActionGroupEmail": {
                     "type": "string"
                   },
+                  "BYOActionGroup": {
+                    "type": "String"
+                  },
                   "ALZMonitorResourceGroupName": {
                     "type": "string"
                   },
                   "ALZMonitorResourceGroupLocation": {
                     "type": "string"
+                  },
+                  "BYOAlertProcessingRule": {
+                    "type": "String"
                   },
                   "ALZLogicappCallbackUrl": {
                     "type": "String"
@@ -199,11 +235,11 @@
                   "ALZFunctionResourceId": {
                     "type": "string"
                   },
-                  "ALZEventHubResourceId": {
-                    "type": "string"
-                  },
                   "ALZFunctionTriggerUrl": {
                     "type": "String"
+                  },
+                  "ALZEventHubResourceId": {
+                    "type": "string"
                   },
                   "ALZWebhookServiceUri": {
                     "type": "string"
@@ -232,8 +268,14 @@
                         "ALZMonitorActionGroupEmail": {
                           "value": "[parameters('ALZMonitorActionGroupEmail')]"
                         },
+                        "BYOActionGroup": {
+                          "value": "[parameters('BYOActionGroup')]"
+                        },
                         "ALZMonitorResourceGroupName": {
                           "value": "[parameters('ALZMonitorResourceGroupName')]"
+                        },
+                        "BYOAlertProcessingRule": {
+                          "value": "[parameters('BYOAlertProcessingRule')]"
                         },
                         "ALZLogicappCallbackUrl": {
                           "value": "[parameters('ALZLogicappCallbackUrl')]"
@@ -244,11 +286,11 @@
                         "ALZFunctionResourceId": {
                           "value": "[parameters('ALZFunctionResourceId')]"
                         },
-                        "ALZEventHubResourceId": {
-                          "value": "[parameters('ALZEventHubResourceId')]"
-                        },
                         "ALZFunctionTriggerUrl": {
                           "value": "[parameters('ALZFunctionTriggerUrl')]"
+                        },
+                        "ALZEventHubResourceId": {
+                          "value": "[parameters('ALZEventHubResourceId')]"
                         },
                         "ALZWebhookServiceUri": {
                           "value": "[parameters('ALZWebhookServiceUri')]"
@@ -262,8 +304,14 @@
                           "ALZMonitorActionGroupEmail": {
                             "type": "string"
                           },
+                          "BYOActionGroup": {
+                            "type": "string"
+                          },
                           "ALZMonitorResourceGroupName": {
                             "type": "string"
+                          },
+                          "BYOAlertProcessingRule": {
+                            "type": "String"
                           },
                           "ALZLogicappCallbackUrl": {
                             "type": "string"
@@ -274,10 +322,10 @@
                           "ALZFunctionResourceId": {
                             "type": "string"
                           },
-                          "ALZEventHubResourceId": {
+                          "ALZFunctionTriggerUrl": {
                             "type": "string"
                           },
-                          "ALZFunctionTriggerUrl": {
+                          "ALZEventHubResourceId": {
                             "type": "string"
                           },
                           "ALZWebhookServiceUri": {
@@ -298,15 +346,16 @@
                               "eventHubReceivers": "[if(empty(parameters('ALZEventHubResourceId')), null(), variables('varEventHubReceivers'))]",
                               "webhookReceivers": "[if(empty(parameters('ALZWebhookServiceUri')), null(), variables('varWebhookReceivers'))]",
                               "armRoleReceivers": "[if(empty(parameters('ALZArmRoleId')), null(), variables('varArmRoleReceivers'))]",
-                              "emailReceivers": "[if(empty(parameters('ALZMonitorActionGroupEmail')), null(), variables('varEmailReceivers'))]",
-                              "groupShortName": "SH-ActGrp"
+                              "groupShortName": "SH-ActGrp",
+                              "emailReceivers": "[if(empty(parameters('ALZMonitorActionGroupEmail')), null(), variables('varEmailReceivers'))]"
                             },
                             "apiVersion": "2023-01-01",
                             "location": "Global",
                             "name": "[concat('ag-AMBA-SH-', subscription().displayName, '-001')]",
                             "tags": {
                               "_deployed_by_amba": true
-                            }
+                            },
+                            "condition": "[empty(parameters('BYOActionGroup'))]"
                           }
                         ],
                         "variables": {},
@@ -333,16 +382,6 @@
                     }
                   ],
                   "varALZEventHubResourceId": "[array(split(parameters('ALZEventHubResourceId'),','))]",
-                  "varALZWebhookServiceUri": "[array(split(parameters('ALZWebhookServiceUri'),','))]",
-                  "varLogicAppReceivers": [
-                    {
-                      "resourceId": "[if(empty(parameters('ALZLogicappResourceId')), null(), trim(parameters('ALZLogicappResourceId')))]",
-                      "name": "AlzLA-0",
-                      "useCommonSchema": true,
-                      "callbackUrl": "[if(empty(parameters('ALZLogicappCallbackUrl')), null(), trim(parameters('ALZLogicappCallbackUrl')))]"
-                    }
-                  ],
-                  "varALZArmRoleId": "[array(split(parameters('ALZArmRoleId'),','))]",
                   "copy": [
                     {
                       "name": "varEmailReceivers",
@@ -386,12 +425,22 @@
                         "useCommonAlertSchema": true,
                         "tenantId": "null()",
                         "identifierUri": "null()",
-                        "useAadAuth": "false",
                         "serviceUri": "[trim(variables('varALZWebhookServiceUri')[copyIndex('varWebhookReceivers')])]",
+                        "useAadAuth": "false",
                         "objectId": "null()"
                       }
                     }
-                  ]
+                  ],
+                  "varALZWebhookServiceUri": "[array(split(parameters('ALZWebhookServiceUri'),','))]",
+                  "varLogicAppReceivers": [
+                    {
+                      "resourceId": "[if(empty(parameters('ALZLogicappResourceId')), null(), trim(parameters('ALZLogicappResourceId')))]",
+                      "name": "AlzLA-0",
+                      "useCommonSchema": true,
+                      "callbackUrl": "[if(empty(parameters('ALZLogicappCallbackUrl')), null(), trim(parameters('ALZLogicappCallbackUrl')))]"
+                    }
+                  ],
+                  "varALZArmRoleId": "[array(split(parameters('ALZArmRoleId'),','))]"
                 },
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
