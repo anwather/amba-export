@@ -18,9 +18,7 @@ $gs = @"
                 "strategy": "full",
                 "keepDfcSecurityAssignments": false
             },
-            "managedIdentityLocation": {
-                "*": "$Location"
-            }
+            "managedIdentityLocation": $Location
         }
     ]
 }
