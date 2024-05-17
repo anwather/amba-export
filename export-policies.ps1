@@ -24,8 +24,6 @@ $gs = @"
 }
 "@
 
-New-EPACDefinitionFolder -DefinitionsRootFolder Definitions
-
 $gs | Out-File ./Definitions/global-settings.jsonc
 
 git clone https://github.com/Azure/azure-monitor-baseline-alerts.git tmp
