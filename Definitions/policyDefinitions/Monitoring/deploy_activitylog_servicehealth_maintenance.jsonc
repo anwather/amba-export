@@ -7,86 +7,86 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.2.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.2.0",
       "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "enabled": {
+      "alertResourceGroupLocation": {
+        "defaultValue": "centralus",
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Location of the Resource group the alert is placed in",
+          "displayName": "Resource Group Location"
         },
+        "type": "String"
+      },
+      "enabled": {
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "type": "String"
       },
       "alertResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
         "metadata": {
           "description": "Resource group the alert is placed in",
           "displayName": "Resource Group Name"
         },
-        "defaultValue": "rg-amba-monitoring-001",
-        "type": "String"
-      },
-      "alertResourceGroupLocation": {
-        "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
-        },
-        "defaultValue": "centralus",
         "type": "String"
       },
       "alertResourceGroupTags": {
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
         "metadata": {
           "description": "Tags on the Resource group the alert is placed in",
           "displayName": "Resource Group Tags"
         },
-        "defaultValue": {
-          "_deployed_by_amba": true
-        },
         "type": "Object"
       },
       "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
         "defaultValue": "disabled",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "type": "String"
       },
       "monitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
           "displayName": "Monitoring disabled"
         },
-        "defaultValue": "MonitorDisable",
-        "type": "String"
-      },
-      "byoActionGroup": {
-        "metadata": {
-          "description": "The Resource ID of an existing Action Group already deployed by the customer in his environment",
-          "displayName": "Customer defined Action Group Resource ID"
-        },
-        "defaultValue": "",
         "type": "String"
       },
       "alzMonitorActionGroupEmail": {
+        "defaultValue": "",
         "metadata": {
           "description": "Email addresses to send alerts to",
           "displayName": "Action Group Email Addresses"
         },
+        "type": "String"
+      },
+      "byoActionGroup": {
         "defaultValue": "",
+        "metadata": {
+          "description": "The Resource ID of an existing Action Group already deployed by the customer in his environment",
+          "displayName": "Customer defined Action Group Resource ID"
+        },
         "type": "String"
       }
     },
@@ -107,9 +107,6 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -190,17 +187,20 @@
               }
             ]
           },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "deployment": {
             "properties": {
               "parameters": {
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
+                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
-                },
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
@@ -214,13 +214,13 @@
               },
               "template": {
                 "parameters": {
+                  "alertResourceGroupLocation": {
+                    "type": "string"
+                  },
                   "enabled": {
                     "type": "string"
                   },
                   "alertResourceGroupName": {
-                    "type": "string"
-                  },
-                  "alertResourceGroupLocation": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
@@ -234,6 +234,19 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {
+                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
+                  "copy": [
+                    {
+                      "name": "varActionGroupIds",
+                      "mode": "serial",
+                      "count": "[length(variables('varBYOActionGroups'))]",
+                      "input": {
+                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
+                      }
+                    }
+                  ]
+                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -276,6 +289,7 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
+                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -356,7 +370,6 @@
                             "condition": "[not(empty(parameters('BYOActionGroup')))]"
                           }
                         ],
-                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -368,19 +381,6 @@
                     ]
                   }
                 ],
-                "variables": {
-                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
-                  "copy": [
-                    {
-                      "name": "varActionGroupIds",
-                      "mode": "serial",
-                      "count": "[length(variables('varBYOActionGroups'))]",
-                      "input": {
-                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
-                      }
-                    }
-                  ]
-                },
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
               },
               "mode": "incremental"
