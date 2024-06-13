@@ -5,16 +5,24 @@
     "displayName": "Deploy Azure Monitor Baseline Alerts for Management",
     "description": "Initiative to deploy AMBA alerts relevant to the ALZ Management management group",
     "metadata": {
+      "_deployed_by_amba": true,
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "_deployed_by_amba": true,
       "version": "1.0.3",
       "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "alzMonitorResourceGroupLocation": {
+      "ALZMonitorResourceGroupName": {
+        "defaultValue": "ALZ-Monitoring-RG",
+        "metadata": {
+          "description": "Name of the resource group to deploy the ALZ monitoring resources to",
+          "displayName": "ALZ Monitoring Resource Group Name"
+        },
+        "type": "String"
+      },
+      "ALZMonitorResourceGroupLocation": {
         "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the resource group",
@@ -22,7 +30,7 @@
         },
         "type": "String"
       },
-      "alzMonitorResourceGroupTags": {
+      "ALZMonitorResourceGroupTags": {
         "defaultValue": {
           "_deployed_by_alz_monitor": true
         },
@@ -32,15 +40,7 @@
         },
         "type": "Object"
       },
-      "alzMonitorResourceGroupName": {
-        "defaultValue": "ALZ-Monitoring-RG",
-        "metadata": {
-          "description": "Name of the resource group to deploy the ALZ monitoring resources to",
-          "displayName": "ALZ Monitoring Resource Group Name"
-        },
-        "type": "String"
-      },
-      "storageAccountAvailabilityAlertSeverity": {
+      "StorageAccountAvailabilityAlertSeverity": {
         "allowedValues": [
           "0",
           "1",
@@ -55,7 +55,7 @@
         },
         "type": "String"
       },
-      "storageAccountAvailabilityPolicyEffect": {
+      "StorageAccountAvailabilityPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
@@ -67,15 +67,7 @@
         },
         "type": "string"
       },
-      "storageAccountAvailabilityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Storage Account Availability Alert State"
-        },
-        "type": "string"
-      },
-      "storageAccountAvailabilityWindowSize": {
+      "StorageAccountAvailabilityWindowSize": {
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -93,15 +85,15 @@
         },
         "type": "string"
       },
-      "storageAccountAvailabilityThreshold": {
-        "defaultValue": "90",
+      "StorageAccountAvailabilityAlertState": {
+        "defaultValue": "true",
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Storage Account Availability Alert Threshold"
+          "description": "Alert state for the alert",
+          "displayName": "Storage Account Availability Alert State"
         },
         "type": "string"
       },
-      "storageAccountAvailabilityFrequency": {
+      "StorageAccountAvailabilityFrequency": {
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -116,7 +108,15 @@
         },
         "type": "string"
       },
-      "rvBackupHealthMonitorPolicyEffect": {
+      "StorageAccountAvailabilityThreshold": {
+        "defaultValue": "90",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Storage Account Availability Alert Threshold"
+        },
+        "type": "string"
+      },
+      "RVBackupHealthMonitorPolicyEffect": {
         "allowedValues": [
           "modify",
           "audit",
@@ -129,7 +129,7 @@
         },
         "type": "string"
       },
-      "storageAccountDeletePolicyEffect": {
+      "StorageAccountDeletePolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
@@ -141,7 +141,7 @@
         },
         "type": "string"
       },
-      "storageAccountDeleteAlertState": {
+      "StorageAccountDeleteAlertState": {
         "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
@@ -149,7 +149,7 @@
         },
         "type": "string"
       },
-      "aaTotalJobAlertSeverity": {
+      "AATotalJobAlertSeverity": {
         "allowedValues": [
           "0",
           "1",
@@ -164,7 +164,7 @@
         },
         "type": "String"
       },
-      "aaTotalJobAlertWindowSize": {
+      "AATotalJobAlertWindowSize": {
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -182,7 +182,7 @@
         },
         "type": "string"
       },
-      "aaTotalJobAlertEvaluationFrequency": {
+      "AATotalJobAlertEvaluationFrequency": {
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -197,7 +197,7 @@
         },
         "type": "string"
       },
-      "aaTotalJobAlertPolicyEffect": {
+      "AATotalJobAlertPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
@@ -209,7 +209,7 @@
         },
         "type": "string"
       },
-      "aaTotalJobAlertAlertState": {
+      "AATotalJobAlertAlertState": {
         "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
@@ -217,7 +217,7 @@
         },
         "type": "string"
       },
-      "aaTotalJobAlertThreshold": {
+      "AATotalJobAlertThreshold": {
         "defaultValue": "20",
         "metadata": {
           "description": "Threshold for the alert",
@@ -247,11 +247,11 @@
         "policyDefinitionReferenceId": "ALZ_activityLAWDelete",
         "policyDefinitionName": "Deploy_activitylog_LAWorkspace_Delete",
         "parameters": {
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
           "enabled": {
             "value": "[parameters('activityLAWDeleteAlertState')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
@@ -265,11 +265,11 @@
         "policyDefinitionReferenceId": "ALZ_activityLAWKeyRegen",
         "policyDefinitionName": "Deploy_activitylog_LAWorkspace_KeyRegen",
         "parameters": {
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
           "enabled": {
             "value": "[parameters('activityLAWKeyRegenAlertState')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
@@ -295,11 +295,11 @@
           "severity": {
             "value": "[parameters('AATotalJobAlertSeverity')]"
           },
-          "effect": {
-            "value": "[parameters('AATotalJobAlertPolicyEffect')]"
-          },
           "threshold": {
             "value": "[parameters('AATotalJobAlertThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('AATotalJobAlertPolicyEffect')]"
           }
         }
       },
@@ -328,11 +328,11 @@
           "severity": {
             "value": "[parameters('StorageAccountAvailabilityAlertSeverity')]"
           },
-          "effect": {
-            "value": "[parameters('StorageAccountAvailabilityPolicyEffect')]"
-          },
           "threshold": {
             "value": "[parameters('StorageAccountAvailabilityThreshold')]"
+          },
+          "effect": {
+            "value": "[parameters('StorageAccountAvailabilityPolicyEffect')]"
           }
         }
       },
@@ -340,11 +340,11 @@
         "policyDefinitionReferenceId": "ALZ_activitySADelete",
         "policyDefinitionName": "Deploy_activitylog_StorageAccount_Delete",
         "parameters": {
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
           "enabled": {
             "value": "[parameters('StorageAccountDeleteAlertState')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
