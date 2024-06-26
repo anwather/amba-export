@@ -11,11 +11,27 @@
         "AzureCloud"
       ],
       "version": "1.2.0",
-      "category": "Key Vault",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Key Vault"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "String"
+      },
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,25 +40,25 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
-      "autoMitigate": {
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -54,25 +70,25 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
-      "enabled": {
+      "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -81,30 +97,14 @@
           "4"
         ],
         "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "type": "String"
       },
       "MonitorDisable": {
-        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
           "displayName": "Monitoring disabled"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -193,14 +193,14 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
@@ -221,13 +221,13 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "enabled": {
                     "type": "String"
                   },
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "severity": {
@@ -242,34 +242,36 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for KeyVault Requests",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "enabled": "[parameters('enabled')]",
+                      "windowSize": "[parameters('windowSize')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
@@ -278,8 +280,8 @@
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
-                            "operator": "GreaterThan",
                             "name": "ServiceApiResult",
+                            "operator": "GreaterThan",
                             "metricNamespace": "microsoft.keyvault/vaults",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "ServiceApiResult",
@@ -287,10 +289,7 @@
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "apiVersion": "2018-03-01",
                     "location": "global",
@@ -300,6 +299,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
