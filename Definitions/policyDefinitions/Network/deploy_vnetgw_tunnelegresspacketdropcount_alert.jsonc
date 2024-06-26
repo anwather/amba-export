@@ -6,16 +6,32 @@
     "description": "Policy to audit/deploy Vnet Gateway Egress Packet Drop Count Alert",
     "mode": "All",
     "metadata": {
+      "category": "Network",
+      "version": "1.2.0",
       "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "version": "1.2.0",
-      "category": "Network",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      ]
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,25 +40,25 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
       "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -54,25 +70,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -81,30 +85,26 @@
           "4"
         ],
         "defaultValue": "3",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "type": "String"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
+      "enabled": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "MonitorDisable": {
-        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
           "displayName": "Monitoring disabled"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -129,6 +129,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -185,9 +188,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -203,16 +203,17 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -231,10 +232,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "severity": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -245,6 +246,7 @@
                     "type": "String"
                   }
                 },
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 "contentVersion": "1.0.0.0",
                 "variables": {},
                 "resources": [
@@ -252,7 +254,6 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Vnet Gateway tunnel TunnelEgressPacketDropCount",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -263,50 +264,49 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
-                            "timeAggregation": "Average",
+                            "name": "TunnelEgressPacketDropCount",
+                            "alertSensitivity": "Medium",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
-                            "operator": "GreaterThan",
-                            "name": "TunnelEgressPacketDropCount",
                             "metricNamespace": "microsoft.network/virtualNetworkGateways",
-                            "criterionType": "DynamicThresholdCriterion",
                             "metricName": "TunnelEgressPacketDropCount",
-                            "alertSensitivity": "Medium"
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "DynamicThresholdCriterion"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
+                    "name": "[concat(parameters('resourceName'), '-TunnelEgressPacketDropCountAlert')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-TunnelEgressPacketDropCountAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
-                ],
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+                ]
+              }
             }
           }
         }

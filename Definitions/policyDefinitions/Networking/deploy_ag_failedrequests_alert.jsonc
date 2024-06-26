@@ -6,24 +6,12 @@
     "description": "Policy to audit/deploy Azure Application Gateway FailedRequests Alert",
     "mode": "All",
     "metadata": {
+      "_deployed_by_amba": "True",
       "version": "1.1.1",
       "category": "Networking",
-      "_deployed_by_amba": "True",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -67,6 +55,18 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "severity": {
@@ -122,9 +122,6 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -181,6 +178,9 @@
               }
             ]
           },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -239,13 +239,12 @@
                     "type": "String"
                   }
                 },
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
+                      "description": "Metric Alert for App Gateway FailedRequests",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -263,42 +262,43 @@
                           "value": "[parameters('enabled')]"
                         }
                       },
-                      "description": "Metric Alert for App Gateway FailedRequests",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ],
                       "criteria": {
                         "allOf": [
                           {
-                            "name": "FailedRequests",
+                            "timeAggregation": "Total",
                             "metricNamespace": "Microsoft.Network/applicationgateways",
                             "metricName": "FailedRequests",
+                            "criterionType": "DynamicThresholdCriterion",
                             "operator": "GreaterThan",
+                            "name": "FailedRequests",
                             "alertSensitivity": "Medium",
                             "failingPeriods": {
-                              "minFailingPeriodsToAlert": 2,
-                              "numberOfEvaluationPeriods": 2
-                            },
-                            "timeAggregation": "Total",
-                            "criterionType": "DynamicThresholdCriterion"
+                              "numberOfEvaluationPeriods": 2,
+                              "minFailingPeriodsToAlert": 2
+                            }
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-                      }
+                      },
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ]
                     },
+                    "location": "global",
                     "name": "[concat(parameters('resourceName'), '-agFailedRequests')]",
                     "apiVersion": "2018-03-01",
-                    "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
-                ]
+                ],
+                "variables": {},
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               }
             }
           }

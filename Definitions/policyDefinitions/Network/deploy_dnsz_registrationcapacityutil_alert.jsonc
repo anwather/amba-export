@@ -6,16 +6,32 @@
     "description": "Policy to audit/deploy Private DNS Zone Registration Capacity Utilization Alert",
     "mode": "All",
     "metadata": {
+      "category": "Network",
       "_deployed_by_amba": "True",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.1.0",
-      "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,25 +40,25 @@
           "PT1H"
         ],
         "defaultValue": "PT1H",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
       "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -54,25 +70,21 @@
           "P1D"
         ],
         "defaultValue": "PT1H",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "threshold": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
+        "defaultValue": "80",
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -81,38 +93,26 @@
           "4"
         ],
         "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "type": "String"
       },
-      "threshold": {
-        "defaultValue": "80",
+      "enabled": {
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
-        "type": "String"
-      },
-      "effect": {
         "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
+          "true",
+          "false"
         ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
+        "defaultValue": "true",
         "type": "String"
       },
       "MonitorDisable": {
-        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -133,6 +133,132 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "deployment": {
+            "properties": {
+              "parameters": {
+                "resourceId": {
+                  "value": "[field('id')]"
+                },
+                "evaluationFrequency": {
+                  "value": "[parameters('evaluationFrequency')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
+                "resourceName": {
+                  "value": "[field('name')]"
+                }
+              },
+              "mode": "incremental",
+              "template": {
+                "parameters": {
+                  "resourceId": {
+                    "metadata": {
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
+                      "displayName": "resourceId"
+                    },
+                    "type": "String"
+                  },
+                  "evaluationFrequency": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
+                  "windowSize": {
+                    "type": "String"
+                  },
+                  "threshold": {
+                    "type": "String"
+                  },
+                  "severity": {
+                    "type": "String"
+                  },
+                  "enabled": {
+                    "type": "String"
+                  },
+                  "resourceName": {
+                    "metadata": {
+                      "description": "Name of the resource",
+                      "displayName": "resourceName"
+                    },
+                    "type": "String"
+                  }
+                },
+                "contentVersion": "1.0.0.0",
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                "variables": {},
+                "resources": [
+                  {
+                    "type": "Microsoft.Insights/metricAlerts",
+                    "properties": {
+                      "description": "Metric Alert for Private DNS Zone Registration Capacity Utilization",
+                      "parameters": {
+                        "evaluationFrequency": {
+                          "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
+                        },
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
+                        },
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        }
+                      },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "windowSize": "[parameters('windowSize')]",
+                      "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
+                      "criteria": {
+                        "allOf": [
+                          {
+                            "threshold": "[parameters('threshold')]",
+                            "name": "VirtualNetworkWithRegistrationCapacityUtilization",
+                            "metricNamespace": "Microsoft.Network/privateDnsZones",
+                            "metricName": "VirtualNetworkWithRegistrationCapacityUtilization",
+                            "operator": "GreaterThanOrEqual",
+                            "timeAggregation": "Maximum",
+                            "criterionType": "StaticThresholdCriterion"
+                          }
+                        ],
+                        "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                      }
+                    },
+                    "name": "[concat(parameters('resourceName'), '-RequestsAlert')]",
+                    "apiVersion": "2018-03-01",
+                    "location": "global",
+                    "tags": {
+                      "_deployed_by_amba": true
+                    }
+                  }
+                ]
+              }
+            }
+          },
           "existenceCondition": {
             "allOf": [
               {
@@ -183,133 +309,7 @@
           },
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
-          "deployment": {
-            "properties": {
-              "parameters": {
-                "resourceId": {
-                  "value": "[field('id')]"
-                },
-                "evaluationFrequency": {
-                  "value": "[parameters('evaluationFrequency')]"
-                },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
-                "resourceName": {
-                  "value": "[field('name')]"
-                }
-              },
-              "template": {
-                "parameters": {
-                  "resourceId": {
-                    "metadata": {
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
-                      "displayName": "resourceId"
-                    },
-                    "type": "String"
-                  },
-                  "evaluationFrequency": {
-                    "type": "String"
-                  },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
-                  "windowSize": {
-                    "type": "String"
-                  },
-                  "enabled": {
-                    "type": "String"
-                  },
-                  "severity": {
-                    "type": "String"
-                  },
-                  "threshold": {
-                    "type": "String"
-                  },
-                  "resourceName": {
-                    "metadata": {
-                      "description": "Name of the resource",
-                      "displayName": "resourceName"
-                    },
-                    "type": "String"
-                  }
-                },
-                "contentVersion": "1.0.0.0",
-                "variables": {},
-                "resources": [
-                  {
-                    "type": "Microsoft.Insights/metricAlerts",
-                    "properties": {
-                      "description": "Metric Alert for Private DNS Zone Registration Capacity Utilization",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "parameters": {
-                        "evaluationFrequency": {
-                          "value": "[parameters('evaluationFrequency')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
-                        }
-                      },
-                      "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
-                      "severity": "[parameters('severity')]",
-                      "criteria": {
-                        "allOf": [
-                          {
-                            "threshold": "[parameters('threshold')]",
-                            "timeAggregation": "Maximum",
-                            "operator": "GreaterThanOrEqual",
-                            "name": "VirtualNetworkWithRegistrationCapacityUtilization",
-                            "metricNamespace": "Microsoft.Network/privateDnsZones",
-                            "criterionType": "StaticThresholdCriterion",
-                            "metricName": "VirtualNetworkWithRegistrationCapacityUtilization"
-                          }
-                        ],
-                        "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
-                    },
-                    "apiVersion": "2018-03-01",
-                    "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-RequestsAlert')]",
-                    "tags": {
-                      "_deployed_by_amba": true
-                    }
-                  }
-                ],
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
-            }
-          }
+          ]
         }
       }
     }

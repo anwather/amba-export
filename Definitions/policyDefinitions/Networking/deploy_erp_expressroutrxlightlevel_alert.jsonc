@@ -1,16 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_FrontDoorCDN_Percentage4XX_Alert",
+  "name": "Deploy_ERP_ExpressRoutRxLightLevel_Alert",
   "properties": {
-    "displayName": "Deploy FrontDoor CDN Profile Percentage4XX Alert",
-    "description": "Policy to audit/deploy FrontDoor CDN Profile Percentage4XX Alert",
+    "displayName": "Deploy ER Direct ExpressRoute RxLightLevel High Alert",
+    "description": "Policy to audit/deploy ER Direct RxLightLevel High Alert",
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "alzCloudEnvironments": [
-        "AzureCloud"
-      ],
-      "version": "1.1.1",
+      "version": "1.2.0",
       "category": "Networking",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -60,16 +57,16 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "enabled": {
+      "effect": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
+        "defaultValue": "disabled",
         "type": "String"
       },
       "severity": {
@@ -84,19 +81,27 @@
           "3",
           "4"
         ],
-        "defaultValue": "2",
+        "defaultValue": "1",
         "type": "String"
       },
-      "effect": {
+      "enabled": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
         "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
+          "true",
+          "false"
         ],
-        "defaultValue": "deployIfNotExists",
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "threshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "defaultValue": "0",
         "type": "String"
       },
       "MonitorDisable": {
@@ -112,7 +117,7 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Cdn/profiles",
+            "equals": "Microsoft.Network/expressRoutePorts",
             "field": "type"
           },
           {
@@ -128,15 +133,19 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.Cdn/profiles",
+                "equals": "Microsoft.Network/expressRoutePorts",
                 "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "equals": "Percentage4XX",
+                "equals": "RxLightLevel",
                 "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Cdn/profiles/', field('fullName'))]",
+                "equals": "GreaterThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator"
+              },
+              {
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/expressRoutePorts/', field('fullName'))]",
                 "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
@@ -161,23 +170,15 @@
               },
               {
                 "equals": "Average",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
               },
               {
                 "equals": "GreaterThan",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator"
               },
               {
-                "equals": "Medium",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
-              },
-              {
-                "equals": 2,
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.minFailingPeriodsToAlert"
-              },
-              {
-                "equals": 2,
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.numberOfEvaluationPeriods"
+                "equals": "[parameters('threshold')]",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold"
               }
             ]
           },
@@ -199,16 +200,20 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "resourceName": {
                   "value": "[field('name')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -227,10 +232,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "severity": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -239,15 +244,17 @@
                       "displayName": "resourceName"
                     },
                     "type": "String"
+                  },
+                  "threshold": {
+                    "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
-                      "description": "Metric Alert for Frontdoor CDN Origin Latency",
+                      "description": "Metric Alert for ER Direct Connection RxLightLevelHigh",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -258,51 +265,50 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
+                        "severity": {
+                          "value": "[parameters('severity')]"
+                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
+                            "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "failingPeriods": {
-                              "numberOfEvaluationPeriods": 2,
-                              "minFailingPeriodsToAlert": 2
-                            },
+                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
+                            "metricName": "RxLightLevel",
+                            "criterionType": "StaticThresholdCriterion",
                             "operator": "GreaterThan",
-                            "name": "ServiceApiResult",
-                            "metricNamespace": "Microsoft.Cdn/profiles",
-                            "criterionType": "DynamicThresholdCriterion",
-                            "alertSensitivity": "Medium",
-                            "metricName": "Percentage4XX"
+                            "name": "RxLightLevel"
                           }
                         ],
-                        "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                        "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
                       },
                       "scopes": [
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-Percentage4XXAlert')]",
+                    "name": "[concat(parameters('resourceName'), '-DirectERRxLightLevelHighAlert')]",
+                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }
