@@ -7,11 +7,11 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.1.0",
-      "category": "Network",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.1.0",
+      "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
@@ -60,33 +60,6 @@
         "defaultValue": "PT1H",
         "type": "String"
       },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
-      "severity": {
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "type": "String"
-      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
@@ -105,6 +78,33 @@
           "displayName": "Threshold"
         },
         "defaultValue": "80",
+        "type": "String"
+      },
+      "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "MonitorDisable": {
@@ -199,20 +199,19 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
+                "severity": {
+                  "value": "[parameters('severity')]"
+                },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -231,13 +230,13 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "severity": {
-                    "type": "String"
-                  },
                   "enabled": {
                     "type": "String"
                   },
                   "threshold": {
+                    "type": "String"
+                  },
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -264,31 +263,31 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "metricNamespace": "Microsoft.Network/privateDnsZones",
                             "timeAggregation": "Maximum",
+                            "operator": "GreaterThanOrEqual",
                             "name": "RecordSetCapacityUtilization",
+                            "metricNamespace": "Microsoft.Network/privateDnsZones",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "RecordSetCapacityUtilization",
-                            "operator": "GreaterThanOrEqual"
+                            "metricName": "RecordSetCapacityUtilization"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -297,9 +296,9 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "name": "[concat(parameters('resourceName'), '-RecordSet_Capacity_Utilization')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-RecordSet_Capacity_Utilization')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -307,7 +306,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

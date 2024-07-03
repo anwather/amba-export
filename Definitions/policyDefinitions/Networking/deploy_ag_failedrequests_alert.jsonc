@@ -57,16 +57,16 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
+      "enabled": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
         "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
+          "true",
+          "false"
         ],
-        "defaultValue": "deployIfNotExists",
+        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
@@ -84,16 +84,16 @@
         "defaultValue": "2",
         "type": "String"
       },
-      "enabled": {
+      "effect": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "MonitorDisable": {
@@ -196,17 +196,16 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -225,10 +224,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -255,32 +254,32 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Total",
-                            "metricNamespace": "Microsoft.Network/applicationgateways",
-                            "metricName": "FailedRequests",
-                            "criterionType": "DynamicThresholdCriterion",
-                            "operator": "GreaterThan",
-                            "name": "FailedRequests",
-                            "alertSensitivity": "Medium",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
-                            }
+                            },
+                            "operator": "GreaterThan",
+                            "name": "FailedRequests",
+                            "metricNamespace": "Microsoft.Network/applicationgateways",
+                            "criterionType": "DynamicThresholdCriterion",
+                            "metricName": "FailedRequests",
+                            "alertSensitivity": "Medium"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
@@ -289,9 +288,9 @@
                         "[parameters('resourceId')]"
                       ]
                     },
+                    "apiVersion": "2018-03-01",
                     "location": "global",
                     "name": "[concat(parameters('resourceName'), '-agFailedRequests')]",
-                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -299,7 +298,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }
