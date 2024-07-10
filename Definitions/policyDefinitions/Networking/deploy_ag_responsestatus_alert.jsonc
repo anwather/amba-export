@@ -7,7 +7,7 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "category": "Networking",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -57,18 +57,6 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
@@ -96,6 +84,26 @@
         "defaultValue": "2",
         "type": "String"
       },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
+      "MonitorDisable": {
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
       "alertSensitivity": {
         "metadata": {
           "description": "Alert Sensitivity for the alert",
@@ -107,14 +115,6 @@
           "High"
         ],
         "defaultValue": "Medium",
-        "type": "String"
-      },
-      "MonitorDisable": {
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -178,7 +178,7 @@
                 "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
               },
               {
-                "equals": "Medium",
+                "equals": "[parameters('alertSensitivity')]",
                 "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
               },
               {
@@ -292,20 +292,20 @@
                         "allOf": [
                           {
                             "timeAggregation": "Total",
-                            "operator": "GreaterThan",
-                            "name": "ResponseStatus",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "alertSensitivity": "[parameters('alertSensitivity')]",
+                            "name": "ResponseStatus",
+                            "operator": "GreaterThan",
                             "metricNamespace": "Microsoft.Network/applicationgateways",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "ResponseStatus",
+                            "alertSensitivity": "[parameters('alertSensitivity')]",
                             "dimensions": [
                               {
-                                "operator": "Include",
                                 "name": "HttpStatusGroup",
+                                "operator": "Include",
                                 "values": [
                                   "4xx",
                                   "5xx"

@@ -7,11 +7,11 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "category": "Hybrid Compute",
-      "version": "1.0.1",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.0.1",
+      "category": "Hybrid Compute",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
@@ -29,34 +29,10 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "autoMitigate": {
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
         },
         "allowedValues": [
           "true",
@@ -82,12 +58,16 @@
         "defaultValue": "PT15M",
         "type": "String"
       },
-      "threshold": {
+      "enabled": {
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
-        "defaultValue": "10",
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
@@ -105,6 +85,14 @@
         "defaultValue": "1",
         "type": "String"
       },
+      "threshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "defaultValue": "10",
+        "type": "String"
+      },
       "timeAggregation": {
         "metadata": {
           "displayName": "TimeAggregation"
@@ -117,14 +105,6 @@
           "Total"
         ],
         "defaultValue": "Average",
-        "type": "String"
-      },
-      "MonitorDisable": {
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "operator": {
@@ -141,12 +121,32 @@
         "defaultValue": "GreaterThan",
         "type": "String"
       },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "autoResolveTime": {
         "metadata": {
           "description": "Auto Resolve time for the alert in ISO 8601 format",
           "displayName": "Auto Resolve"
         },
         "defaultValue": "true",
+        "type": "String"
+      },
+      "MonitorDisable": {
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "autoResolve": {
@@ -247,17 +247,17 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "timeAggregation": {
                   "value": "[parameters('timeAggregation')]"
@@ -272,7 +272,6 @@
                   "value": "[parameters('autoResolve')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
@@ -281,16 +280,16 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "enabled": {
-                    "type": "String"
-                  },
                   "windowSize": {
                     "type": "String"
                   },
-                  "threshold": {
+                  "enabled": {
                     "type": "String"
                   },
                   "severity": {
+                    "type": "String"
+                  },
+                  "threshold": {
                     "type": "String"
                   },
                   "timeAggregation": {
@@ -321,17 +320,17 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         },
                         "autoResolveTime": {
                           "value": "[parameters('autoResolveTime')]"
@@ -342,55 +341,56 @@
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
+                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
-                      "scopes": [
-                        "[resourceGroup().Id]"
-                      ],
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "[parameters('timeAggregation')]",
+                            "failingPeriods": {
+                              "numberOfEvaluationPeriods": 1,
+                              "minFailingPeriodsToAlert": 1
+                            },
                             "operator": "[parameters('operator')]",
-                            "query": "Heartbeat| summarize TimeGenerated=max(TimeGenerated) by Computer, _ResourceId| extend Duration = datetime_diff('minute',now(),TimeGenerated)| summarize AggregatedValue = min(Duration) by Computer, bin(TimeGenerated,5m), _ResourceId",
                             "metricMeasureColumn": "AggregatedValue",
                             "resourceIdColumn": "_ResourceId",
                             "dimensions": [
                               {
-                                "name": "Computer",
                                 "operator": "Include",
+                                "name": "Computer",
                                 "values": [
                                   "*"
                                 ]
                               }
                             ],
-                            "failingPeriods": {
-                              "numberOfEvaluationPeriods": 1,
-                              "minFailingPeriodsToAlert": 1
-                            }
+                            "query": "Heartbeat| summarize TimeGenerated=max(TimeGenerated) by Computer, _ResourceId| extend Duration = datetime_diff('minute',now(),TimeGenerated)| summarize AggregatedValue = min(Duration) by Computer, bin(TimeGenerated,5m), _ResourceId"
                           }
                         ]
                       },
-                      "targetResourceTypes": [
-                        "Microsoft.HybridCompute/machines"
+                      "scopes": [
+                        "[resourceGroup().Id]"
                       ],
                       "ruleResolveConfiguration": {
-                        "autoResolved": "[parameters('autoResolve')]",
-                        "timeToResolve": "[parameters('autoResolveTime')]"
-                      }
+                        "timeToResolve": "[parameters('autoResolveTime')]",
+                        "autoResolved": "[parameters('autoResolve')]"
+                      },
+                      "targetResourceTypes": [
+                        "Microsoft.HybridCompute/machines"
+                      ]
                     },
-                    "name": "[concat(resourceGroup().name, '-HybridVMHeartBeatAlert')]",
                     "apiVersion": "2022-08-01-preview",
                     "location": "[resourceGroup().location]",
+                    "name": "[concat(resourceGroup().name, '-HybridVMHeartBeatAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }
