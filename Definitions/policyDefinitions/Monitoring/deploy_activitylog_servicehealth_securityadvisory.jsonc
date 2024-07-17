@@ -8,11 +8,11 @@
     "metadata": {
       "_deployed_by_amba": "True",
       "category": "Monitoring",
-      "version": "1.2.0",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "version": "1.2.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "effect": {
@@ -27,6 +27,14 @@
         "defaultValue": "disabled",
         "type": "String"
       },
+      "alertResourceGroupLocation": {
+        "metadata": {
+          "description": "Location of the Resource group the alert is placed in",
+          "displayName": "Resource Group Location"
+        },
+        "defaultValue": "centralus",
+        "type": "String"
+      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
@@ -39,36 +47,12 @@
         "defaultValue": "true",
         "type": "String"
       },
-      "ALZMonitorActionGroupEmail": {
-        "metadata": {
-          "description": "Email addresses to send alerts to",
-          "displayName": "Action Group Email Addresses"
-        },
-        "defaultValue": "",
-        "type": "String"
-      },
       "alertResourceGroupName": {
         "metadata": {
           "description": "Resource group the alert is placed in",
           "displayName": "Resource Group Name"
         },
         "defaultValue": "rg-amba-monitoring-001",
-        "type": "String"
-      },
-      "BYOActionGroup": {
-        "metadata": {
-          "description": "The Resource ID of an existing Action Group already deployed by the customer in his environment",
-          "displayName": "Customer defined Action Group Resource ID"
-        },
-        "defaultValue": "",
-        "type": "String"
-      },
-      "alertResourceGroupLocation": {
-        "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
-        },
-        "defaultValue": "centralus",
         "type": "String"
       },
       "alertResourceGroupTags": {
@@ -87,6 +71,22 @@
           "displayName": "Monitoring disabled"
         },
         "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
+      "ALZMonitorActionGroupEmail": {
+        "metadata": {
+          "description": "Email addresses to send alerts to",
+          "displayName": "Action Group Email Addresses"
+        },
+        "defaultValue": "",
+        "type": "String"
+      },
+      "BYOActionGroup": {
+        "metadata": {
+          "description": "The Resource ID of an existing Action Group already deployed by the customer in his environment",
+          "displayName": "Customer defined Action Group Resource ID"
+        },
+        "defaultValue": "",
         "type": "String"
       }
     },
@@ -193,61 +193,47 @@
           "deployment": {
             "properties": {
               "parameters": {
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
+                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
-                },
-                "ALZMonitorActionGroupEmail": {
-                  "value": "[parameters('ALZMonitorActionGroupEmail')]"
                 },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
-                "BYOActionGroup": {
-                  "value": "[parameters('BYOActionGroup')]"
-                },
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
-                },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
+                },
+                "ALZMonitorActionGroupEmail": {
+                  "value": "[parameters('ALZMonitorActionGroupEmail')]"
+                },
+                "BYOActionGroup": {
+                  "value": "[parameters('BYOActionGroup')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
-                  "enabled": {
+                  "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "ALZMonitorActionGroupEmail": {
+                  "enabled": {
                     "type": "string"
                   },
                   "alertResourceGroupName": {
                     "type": "string"
                   },
-                  "BYOActionGroup": {
-                    "type": "String"
-                  },
-                  "alertResourceGroupLocation": {
-                    "type": "string"
-                  },
                   "alertResourceGroupTags": {
                     "type": "object"
+                  },
+                  "ALZMonitorActionGroupEmail": {
+                    "type": "string"
+                  },
+                  "BYOActionGroup": {
+                    "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {
-                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
-                  "copy": [
-                    {
-                      "name": "varActionGroupIds",
-                      "mode": "serial",
-                      "count": "[length(variables('varBYOActionGroups'))]",
-                      "input": {
-                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
-                      }
-                    }
-                  ]
-                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -264,26 +250,25 @@
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "ALZMonitorActionGroupEmail": {
-                          "value": "[parameters('ALZMonitorActionGroupEmail')]"
-                        },
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
+                        },
+                        "ALZMonitorActionGroupEmail": {
+                          "value": "[parameters('ALZMonitorActionGroupEmail')]"
                         },
                         "BYOActionGroup": {
                           "value": "[parameters('BYOActionGroup')]"
                         }
                       },
-                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "enabled": {
                             "type": "string"
                           },
-                          "ALZMonitorActionGroupEmail": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           },
-                          "alertResourceGroupName": {
+                          "ALZMonitorActionGroupEmail": {
                             "type": "string"
                           },
                           "BYOActionGroup": {
@@ -291,7 +276,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -303,6 +287,9 @@
                                 }
                               },
                               "enabled": "[parameters('enabled')]",
+                              "scopes": [
+                                "[subscription().id]"
+                              ],
                               "condition": {
                                 "allOf": [
                                   {
@@ -315,9 +302,6 @@
                                   }
                                 ]
                               },
-                              "scopes": [
-                                "[subscription().id]"
-                              ],
                               "actions": {
                                 "actionGroups": [
                                   {
@@ -329,10 +313,10 @@
                             "apiVersion": "2020-10-01",
                             "location": "global",
                             "name": "ServiceHealthSecurityIncident",
-                            "condition": "[empty(parameters('BYOActionGroup'))]",
                             "tags": {
                               "_deployed_by_amba": true
-                            }
+                            },
+                            "condition": "[empty(parameters('BYOActionGroup'))]"
                           },
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -344,6 +328,9 @@
                                 }
                               },
                               "enabled": "[parameters('enabled')]",
+                              "scopes": [
+                                "[subscription().id]"
+                              ],
                               "condition": {
                                 "allOf": [
                                   {
@@ -356,9 +343,6 @@
                                   }
                                 ]
                               },
-                              "scopes": [
-                                "[subscription().id]"
-                              ],
                               "actions": {
                                 "actionGroups": "[variables('varActionGroupIds')]"
                               }
@@ -366,14 +350,16 @@
                             "apiVersion": "2020-10-01",
                             "location": "global",
                             "name": "ServiceHealthSecurityIncident",
-                            "condition": "[not(empty(parameters('BYOActionGroup')))]",
                             "tags": {
                               "_deployed_by_amba": true
-                            }
+                            },
+                            "condition": "[not(empty(parameters('BYOActionGroup')))]"
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      }
+                      },
+                      "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
                     "name": "ServiceSecurityIncident",
@@ -382,14 +368,28 @@
                     ]
                   }
                 ],
+                "variables": {
+                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
+                  "copy": [
+                    {
+                      "name": "varActionGroupIds",
+                      "mode": "serial",
+                      "count": "[length(variables('varBYOActionGroups'))]",
+                      "input": {
+                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
+                      }
+                    }
+                  ]
+                },
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             },
             "location": "australiaeast"
           },
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "existenceScope": "resourcegroup",
-          "deploymentScope": "subscription"
+          "deploymentScope": "subscription",
+          "existenceScope": "resourcegroup"
         }
       }
     }

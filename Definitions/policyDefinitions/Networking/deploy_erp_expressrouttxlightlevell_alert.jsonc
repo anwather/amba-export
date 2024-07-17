@@ -7,11 +7,23 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "category": "Networking",
       "version": "1.1.1",
+      "category": "Networking",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -25,18 +37,6 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
         "type": "String"
       },
       "autoMitigate": {
@@ -81,6 +81,14 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
+      "threshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "defaultValue": "0",
+        "type": "String"
+      },
       "severity": {
         "metadata": {
           "description": "Severity of the Alert",
@@ -94,14 +102,6 @@
           "4"
         ],
         "defaultValue": "1",
-        "type": "String"
-      },
-      "threshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "defaultValue": "0",
         "type": "String"
       },
       "MonitorDisable": {
@@ -203,17 +203,16 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "threshold": {
                   "value": "[parameters('threshold')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -235,10 +234,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "severity": {
+                  "threshold": {
                     "type": "String"
                   },
-                  "threshold": {
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -254,6 +253,7 @@
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
+                    "name": "[concat(parameters('resourceName'), '-DirectERTxLightLevelHighAlert')]",
                     "properties": {
                       "description": "Metric Alert for ER Direct Connection TxLightLevelHigh",
                       "parameters": {
@@ -269,11 +269,11 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
@@ -287,13 +287,13 @@
                       "criteria": {
                         "allOf": [
                           {
-                            "threshold": "[parameters('threshold')]",
                             "name": "TxLightLevel",
-                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
+                            "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
+                            "operator": "GreaterThan",
+                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "TxLightLevel",
-                            "operator": "GreaterThan"
+                            "metricName": "TxLightLevel"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -301,14 +301,14 @@
                     },
                     "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-DirectERTxLightLevelHighAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

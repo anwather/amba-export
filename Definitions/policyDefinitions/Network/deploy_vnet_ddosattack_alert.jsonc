@@ -6,31 +6,19 @@
     "description": "Policy to audit/deploy Virtual Network DDoS Attack Alert",
     "mode": "All",
     "metadata": {
-      "category": "Network",
       "_deployed_by_amba": "True",
       "version": "1.1.0",
+      "category": "Network",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "displayName": "Effect",
-          "description": "Effect of the policy"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "evaluationFrequency": {
         "metadata": {
-          "displayName": "Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
         },
         "allowedValues": [
           "PT1M",
@@ -42,10 +30,22 @@
         "defaultValue": "PT1M",
         "type": "String"
       },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "autoMitigate": {
         "metadata": {
-          "displayName": "Auto Mitigate",
-          "description": "Auto Mitigate for the alert"
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "allowedValues": [
           "true",
@@ -56,8 +56,8 @@
       },
       "windowSize": {
         "metadata": {
-          "displayName": "Window Size",
-          "description": "Window size for the alert"
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
         },
         "allowedValues": [
           "PT1M",
@@ -72,22 +72,18 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "enabled": {
+      "threshold": {
         "metadata": {
-          "displayName": "Alert State",
-          "description": "Alert state for the alert"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+        "defaultValue": "0",
         "type": "String"
       },
       "severity": {
         "metadata": {
-          "displayName": "Severity",
-          "description": "Severity of the Alert"
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
         },
         "allowedValues": [
           "0",
@@ -99,18 +95,22 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "threshold": {
+      "enabled": {
         "metadata": {
-          "displayName": "Threshold",
-          "description": "Threshold for the alert"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
-        "defaultValue": "0",
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "MonitorDisable": {
         "metadata": {
-          "displayName": "Effect",
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled"
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
         },
         "defaultValue": "MonitorDisable",
         "type": "String"
@@ -199,14 +199,14 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -217,8 +217,8 @@
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "displayName": "resourceId",
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
+                      "displayName": "resourceId"
                     },
                     "type": "String"
                   },
@@ -231,19 +231,19 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "threshold": {
                     "type": "String"
                   },
                   "severity": {
                     "type": "String"
                   },
-                  "threshold": {
+                  "enabled": {
                     "type": "String"
                   },
                   "resourceName": {
                     "metadata": {
-                      "displayName": "resourceName",
-                      "description": "Name of the resource"
+                      "description": "Name of the resource",
+                      "displayName": "resourceName"
                     },
                     "type": "String"
                   }
@@ -265,31 +265,31 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "timeAggregation": "Maximum",
-                            "operator": "GreaterThan",
-                            "name": "ifunderddosattack",
                             "metricNamespace": "Microsoft.Network/virtualNetworks",
+                            "timeAggregation": "Maximum",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "ifunderddosattack"
+                            "name": "ifunderddosattack",
+                            "metricName": "ifunderddosattack",
+                            "operator": "GreaterThan"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -298,9 +298,9 @@
                         "[parameters('resourceId')]"
                       ]
                     },
+                    "name": "[concat(parameters('resourceName'), '-DDOSAttackAlert')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-DDOSAttackAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }

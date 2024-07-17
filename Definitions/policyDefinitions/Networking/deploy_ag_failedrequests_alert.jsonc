@@ -7,11 +7,23 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "category": "Networking",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -25,6 +37,18 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "autoMitigate": {
@@ -57,18 +81,6 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "severity": {
         "metadata": {
           "description": "Severity of the Alert",
@@ -84,16 +96,17 @@
         "defaultValue": "2",
         "type": "String"
       },
-      "enabled": {
+      "alertSensitivity": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Alert Sensitivity for the alert",
+          "displayName": "Alert Sensitivity"
         },
         "allowedValues": [
-          "true",
-          "false"
+          "Low",
+          "Medium",
+          "High"
         ],
-        "defaultValue": "true",
+        "defaultValue": "Medium",
         "type": "String"
       },
       "MonitorDisable": {
@@ -165,7 +178,7 @@
                 "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
               },
               {
-                "equals": "Medium",
+                "equals": "[parameters('alertSensitivity')]",
                 "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
               },
               {
@@ -190,6 +203,9 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
@@ -199,8 +215,8 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "alertSensitivity": {
+                  "value": "[parameters('alertSensitivity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -219,6 +235,9 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "enabled": {
+                    "type": "String"
+                  },
                   "autoMitigate": {
                     "type": "String"
                   },
@@ -228,7 +247,7 @@
                   "severity": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "alertSensitivity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -249,6 +268,9 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
@@ -258,40 +280,40 @@
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
+                        "alertSensitivity": {
+                          "value": "[parameters('alertSensitivity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "enabled": "[parameters('enabled')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
-                      "enabled": "[parameters('enabled')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
-                            "timeAggregation": "Total",
-                            "metricNamespace": "Microsoft.Network/applicationgateways",
-                            "metricName": "FailedRequests",
-                            "criterionType": "DynamicThresholdCriterion",
-                            "operator": "GreaterThan",
                             "name": "FailedRequests",
-                            "alertSensitivity": "Medium",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
-                            }
+                            },
+                            "alertSensitivity": "[parameters('alertSensitivity')]",
+                            "timeAggregation": "Total",
+                            "operator": "GreaterThan",
+                            "metricNamespace": "Microsoft.Network/applicationgateways",
+                            "metricName": "FailedRequests",
+                            "criterionType": "DynamicThresholdCriterion"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
-                    "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-agFailedRequests')]",
                     "apiVersion": "2018-03-01",
+                    "name": "[concat(parameters('resourceName'), '-agFailedRequests')]",
+                    "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }

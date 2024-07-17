@@ -9,12 +9,24 @@
       "_deployed_by_amba": "True",
       "version": "1.1.0",
       "category": "Network",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      ]
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -58,18 +70,6 @@
           "P1D"
         ],
         "defaultValue": "PT1H",
-        "type": "String"
-      },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "severity": {
@@ -133,6 +133,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -181,9 +184,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -252,6 +252,7 @@
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
+                    "name": "[concat(parameters('resourceName'), '-RecordSet_Capacity_Utilization')]",
                     "properties": {
                       "description": "Metric Alert for Private DNS Zone Record Set Capacity Utilization",
                       "parameters": {
@@ -283,12 +284,12 @@
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "metricNamespace": "Microsoft.Network/privateDnsZones",
-                            "timeAggregation": "Maximum",
                             "name": "RecordSetCapacityUtilization",
+                            "timeAggregation": "Maximum",
+                            "metricNamespace": "Microsoft.Network/privateDnsZones",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "RecordSetCapacityUtilization",
-                            "operator": "GreaterThanOrEqual"
+                            "operator": "GreaterThanOrEqual",
+                            "metricName": "RecordSetCapacityUtilization"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -297,7 +298,6 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "name": "[concat(parameters('resourceName'), '-RecordSet_Capacity_Utilization')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
                     "tags": {

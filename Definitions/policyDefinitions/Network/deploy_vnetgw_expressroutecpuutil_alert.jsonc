@@ -6,15 +6,27 @@
     "description": "Policy to audit/deploy Virtual Network Gateway Express Route CPU Utilization Alert",
     "mode": "All",
     "metadata": {
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.1.0",
       "_deployed_by_amba": "True",
+      "category": "Network",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "version": "1.1.0",
-      "category": "Network",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      ]
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -28,18 +40,6 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
-        "type": "String"
-      },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "autoMitigate": {
@@ -72,6 +72,21 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
+      "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "1",
+        "type": "String"
+      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
@@ -90,21 +105,6 @@
           "displayName": "Threshold"
         },
         "defaultValue": "80",
-        "type": "String"
-      },
-      "severity": {
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "1",
         "type": "String"
       },
       "MonitorDisable": {
@@ -203,19 +203,20 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "resourceName": {
                   "value": "[field('name')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -237,14 +238,14 @@
                   "enabled": {
                     "type": "String"
                   },
-                  "threshold": {
-                    "type": "String"
-                  },
                   "resourceName": {
                     "metadata": {
                       "description": "Name of the resource",
                       "displayName": "resourceName"
                     },
+                    "type": "String"
+                  },
+                  "threshold": {
                     "type": "String"
                   }
                 },
@@ -253,6 +254,7 @@
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
+                    "name": "[concat(parameters('resourceName'), '-GatewayERCPUAlert')]",
                     "properties": {
                       "description": "Metric Alert for VNet Gateway Express Route CPU Utilization",
                       "parameters": {
@@ -265,31 +267,31 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
+                        "severity": {
+                          "value": "[parameters('severity')]"
+                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
-                        },
-                        "severity": {
-                          "value": "[parameters('severity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
-                            "threshold": "[parameters('threshold')]",
-                            "timeAggregation": "Average",
-                            "operator": "GreaterThan",
                             "name": "ExpressRouteGatewayCpuUtilization",
+                            "threshold": "[parameters('threshold')]",
                             "metricNamespace": "Microsoft.Network/virtualNetworkGateways",
+                            "timeAggregation": "Average",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "ExpressRouteGatewayCpuUtilization"
+                            "metricName": "ExpressRouteGatewayCpuUtilization",
+                            "operator": "GreaterThan"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -298,17 +300,15 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-GatewayERCPUAlert')]",
+                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }
