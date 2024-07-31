@@ -7,18 +7,30 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.1.0",
       "category": "Network",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
+          "displayName": "Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
         },
         "allowedValues": [
           "PT1M",
@@ -32,8 +44,8 @@
       },
       "autoMitigate": {
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "displayName": "Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
         },
         "allowedValues": [
           "true",
@@ -44,8 +56,8 @@
       },
       "windowSize": {
         "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
+          "displayName": "Window Size",
+          "description": "Window size for the alert"
         },
         "allowedValues": [
           "PT1M",
@@ -60,22 +72,22 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
+      "enabled": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
         },
         "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
+          "true",
+          "false"
         ],
-        "defaultValue": "deployIfNotExists",
+        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "displayName": "Severity",
+          "description": "Severity of the Alert"
         },
         "allowedValues": [
           "0",
@@ -87,22 +99,10 @@
         "defaultValue": "3",
         "type": "String"
       },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
       "MonitorDisable": {
         "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
+          "displayName": "Effect",
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled"
         },
         "defaultValue": "MonitorDisable",
         "type": "String"
@@ -199,11 +199,11 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -214,8 +214,8 @@
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
-                      "displayName": "resourceId"
+                      "displayName": "resourceId",
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
                     },
                     "type": "String"
                   },
@@ -228,21 +228,22 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
                     "metadata": {
-                      "description": "Name of the resource",
-                      "displayName": "resourceName"
+                      "displayName": "resourceName",
+                      "description": "Name of the resource"
                     },
                     "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -258,32 +259,32 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
-                            "metricNamespace": "microsoft.network/vpngateways",
                             "timeAggregation": "Average",
-                            "name": "TunnelEgressPacketDropTSMismatch",
-                            "criterionType": "DynamicThresholdCriterion",
-                            "metricName": "TunnelEgressPacketDropTSMismatch",
-                            "operator": "GreaterThan",
-                            "alertSensitivity": "Medium",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
-                            }
+                            },
+                            "operator": "GreaterThan",
+                            "name": "TunnelEgressPacketDropTSMismatch",
+                            "metricNamespace": "microsoft.network/vpngateways",
+                            "criterionType": "DynamicThresholdCriterion",
+                            "metricName": "TunnelEgressPacketDropTSMismatch",
+                            "alertSensitivity": "Medium"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
@@ -300,7 +301,6 @@
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               }
             }

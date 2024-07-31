@@ -7,11 +7,11 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "category": "Network",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.1.0",
-      "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
@@ -28,18 +28,6 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
-        "type": "String"
-      },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "autoMitigate": {
@@ -72,6 +60,21 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
+      "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "0",
+        "type": "String"
+      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
@@ -92,19 +95,16 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "severity": {
+      "effect": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "0",
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "MonitorDisable": {
@@ -199,19 +199,20 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
+                "severity": {
+                  "value": "[parameters('severity')]"
+                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -230,13 +231,13 @@
                   "windowSize": {
                     "type": "String"
                   },
+                  "severity": {
+                    "type": "String"
+                  },
                   "enabled": {
                     "type": "String"
                   },
                   "threshold": {
-                    "type": "String"
-                  },
-                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -248,7 +249,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -264,30 +264,30 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
+                        "severity": {
+                          "value": "[parameters('severity')]"
+                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
-                        },
-                        "severity": {
-                          "value": "[parameters('severity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Total",
                             "operator": "LessThan",
-                            "name": "bgppeerstatus",
                             "metricNamespace": "microsoft.network/vpngateways",
                             "criterionType": "StaticThresholdCriterion",
+                            "name": "bgppeerstatus",
                             "metricName": "bgppeerstatus"
                           }
                         ],
@@ -305,9 +305,9 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

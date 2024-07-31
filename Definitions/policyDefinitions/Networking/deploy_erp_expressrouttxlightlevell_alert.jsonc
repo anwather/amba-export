@@ -27,34 +27,10 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "String"
-      },
       "autoMitigate": {
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
         },
         "allowedValues": [
           "true",
@@ -96,12 +72,36 @@
         "defaultValue": "1",
         "type": "String"
       },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "threshold": {
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
         "defaultValue": "0",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
         "type": "String"
       },
       "MonitorDisable": {
@@ -197,14 +197,14 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
@@ -229,13 +229,13 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "enabled": {
-                    "type": "String"
-                  },
                   "windowSize": {
                     "type": "String"
                   },
                   "severity": {
+                    "type": "String"
+                  },
+                  "enabled": {
                     "type": "String"
                   },
                   "threshold": {
@@ -250,7 +250,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -263,14 +262,14 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
@@ -278,26 +277,26 @@
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ],
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "name": "TxLightLevel",
-                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
                             "timeAggregation": "Average",
+                            "operator": "GreaterThan",
+                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "TxLightLevel",
-                            "operator": "GreaterThan"
+                            "name": "TxLightLevel",
+                            "metricName": "TxLightLevel"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      }
+                      },
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ]
                     },
                     "apiVersion": "2018-03-01",
                     "location": "global",
@@ -307,6 +306,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               }
             }

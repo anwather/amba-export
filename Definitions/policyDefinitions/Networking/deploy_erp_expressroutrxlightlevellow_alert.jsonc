@@ -6,24 +6,12 @@
     "description": "Policy to audit/deploy ER Direct RxLightLevel Low Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.1.1",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "_deployed_by_amba": "True",
-      "category": "Networking"
+      "category": "Networking",
+      "version": "1.1.1",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "String"
-      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -69,14 +57,6 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "threshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "defaultValue": "-10",
-        "type": "String"
-      },
       "severity": {
         "metadata": {
           "description": "Severity of the Alert",
@@ -102,6 +82,26 @@
           "false"
         ],
         "defaultValue": "true",
+        "type": "String"
+      },
+      "threshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "defaultValue": "-10",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
         "type": "String"
       },
       "MonitorDisable": {
@@ -130,9 +130,6 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -185,6 +182,9 @@
               }
             ]
           },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -200,14 +200,14 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -232,13 +232,13 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "threshold": {
-                    "type": "String"
-                  },
                   "severity": {
                     "type": "String"
                   },
                   "enabled": {
+                    "type": "String"
+                  },
+                  "threshold": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -249,14 +249,10 @@
                     "type": "String"
                   }
                 },
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
-                    "location": "global",
                     "type": "Microsoft.Insights/metricAlerts",
-                    "name": "[concat(parameters('resourceName'), '-DirectERRxLightLevelLowAlert')]",
                     "properties": {
                       "description": "Metric Alert for ER Direct Connection RxLightLevelLow",
                       "parameters": {
@@ -269,14 +265,14 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
@@ -284,30 +280,34 @@
                       "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ],
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "name": "RxLightLevel",
-                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
-                            "metricName": "RxLightLevel",
-                            "operator": "LessThan",
                             "timeAggregation": "Average",
-                            "criterionType": "StaticThresholdCriterion"
+                            "operator": "LessThan",
+                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
+                            "criterionType": "StaticThresholdCriterion",
+                            "name": "RxLightLevel",
+                            "metricName": "RxLightLevel"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      }
+                      },
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ]
                     },
                     "apiVersion": "2018-03-01",
+                    "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-DirectERRxLightLevelLowAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
-                ]
+                ],
+                "variables": {},
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               }
             }
           }

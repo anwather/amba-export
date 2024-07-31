@@ -7,15 +7,27 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.1.1",
       "category": "Networking",
+      "version": "1.1.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
-          "displayName": "Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
         },
         "allowedValues": [
           "PT1M",
@@ -27,22 +39,34 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
+      "autoMitigate": {
         "metadata": {
-          "displayName": "Effect",
-          "description": "Effect of the policy"
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
+          "true",
+          "false"
         ],
-        "defaultValue": "disabled",
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
         "metadata": {
-          "displayName": "Window Size",
-          "description": "Window size for the alert"
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
         },
         "allowedValues": [
           "PT1M",
@@ -59,8 +83,8 @@
       },
       "severity": {
         "metadata": {
-          "displayName": "Severity",
-          "description": "Severity of the Alert"
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
         },
         "allowedValues": [
           "0",
@@ -72,42 +96,18 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "enabled": {
-        "metadata": {
-          "displayName": "Alert State",
-          "description": "Alert state for the alert"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
       "threshold": {
         "metadata": {
-          "displayName": "Threshold",
-          "description": "Threshold for the alert"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
         "defaultValue": "-10",
         "type": "String"
       },
-      "autoMitigate": {
-        "metadata": {
-          "displayName": "Auto Mitigate",
-          "description": "Auto Mitigate for the alert"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
       "MonitorDisable": {
         "metadata": {
-          "displayName": "Effect",
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled"
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
         },
         "defaultValue": "MonitorDisable",
         "type": "String"
@@ -130,6 +130,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -182,9 +185,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -194,36 +194,41 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "threshold": {
                   "value": "[parameters('threshold')]"
-                },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "displayName": "resourceId",
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
+                      "displayName": "resourceId"
                     },
                     "type": "String"
                   },
                   "evaluationFrequency": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
+                  "enabled": {
                     "type": "String"
                   },
                   "windowSize": {
@@ -232,19 +237,13 @@
                   "severity": {
                     "type": "String"
                   },
-                  "enabled": {
-                    "type": "String"
-                  },
                   "threshold": {
-                    "type": "String"
-                  },
-                  "autoMitigate": {
                     "type": "String"
                   },
                   "resourceName": {
                     "metadata": {
-                      "displayName": "resourceName",
-                      "description": "Name of the resource"
+                      "description": "Name of the resource",
+                      "displayName": "resourceName"
                     },
                     "type": "String"
                   }
@@ -260,55 +259,56 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
-                      "enabled": "[parameters('enabled')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "operator": "LessThan",
                             "name": "TxLightLevel",
+                            "operator": "LessThan",
                             "metricNamespace": "Microsoft.Network/expressRoutePorts",
-                            "metricName": "TxLightLevel",
-                            "criterionType": "StaticThresholdCriterion"
+                            "criterionType": "StaticThresholdCriterion",
+                            "metricName": "TxLightLevel"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
-                    "name": "[concat(parameters('resourceName'), '-DirectERTxLightLevelLowAlert')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-DirectERTxLightLevelLowAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

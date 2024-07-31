@@ -5,21 +5,21 @@
     "displayName": "Deploy Azure Monitor Baseline Alerts for Management",
     "description": "Initiative to deploy AMBA alerts relevant to the ALZ Management management group",
     "metadata": {
-      "version": "1.0.3",
       "category": "Monitoring",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.0.3",
+      "_deployed_by_amba": true,
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "_deployed_by_amba": true
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "ALZMonitorResourceGroupName": {
+      "ALZMonitorResourceGroupLocation": {
         "metadata": {
-          "displayName": "ALZ Monitoring Resource Group Name",
-          "description": "Name of the resource group to deploy the ALZ monitoring resources to"
+          "displayName": "ALZ Monitoring Resource Group Location",
+          "description": "Location of the resource group"
         },
-        "defaultValue": "ALZ-Monitoring-RG",
+        "defaultValue": "centralus",
         "type": "String"
       },
       "ALZMonitorResourceGroupTags": {
@@ -32,12 +32,12 @@
         },
         "type": "Object"
       },
-      "ALZMonitorResourceGroupLocation": {
+      "ALZMonitorResourceGroupName": {
         "metadata": {
-          "displayName": "ALZ Monitoring Resource Group Location",
-          "description": "Location of the resource group"
+          "displayName": "ALZ Monitoring Resource Group Name",
+          "description": "Name of the resource group to deploy the ALZ monitoring resources to"
         },
-        "defaultValue": "centralus",
+        "defaultValue": "ALZ-Monitoring-RG",
         "type": "String"
       },
       "AATotalJobAlertSeverity": {
@@ -71,6 +71,21 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "AATotalJobAlertEvaluationFrequency": {
+        "metadata": {
+          "displayName": "AA Total Job Alert Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
         "type": "string"
       },
       "AATotalJobAlertPolicyEffect": {
@@ -225,21 +240,6 @@
         },
         "defaultValue": "true",
         "type": "string"
-      },
-      "AATotalJobAlertEvaluationFrequency": {
-        "metadata": {
-          "displayName": "AA Total Job Alert Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
-        "type": "string"
       }
     },
     "policyDefinitions": [
@@ -283,14 +283,14 @@
         "policyDefinitionReferenceId": "ALZ_AATotalJob",
         "policyDefinitionName": "Deploy_AA_TotalJob_Alert",
         "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('AATotalJobAlertEvaluationFrequency')]"
+          },
           "effect": {
             "value": "[parameters('AATotalJobAlertPolicyEffect')]"
           },
           "enabled": {
             "value": "[parameters('AATotalJobAlertAlertState')]"
-          },
-          "evaluationFrequency": {
-            "value": "[parameters('AATotalJobAlertEvaluationFrequency')]"
           },
           "windowSize": {
             "value": "[parameters('AATotalJobAlertWindowSize')]"
@@ -316,14 +316,14 @@
         "policyDefinitionReferenceId": "ALZ_StorageAccountAvailability",
         "policyDefinitionName": "Deploy_StorageAccount_Availability_Alert",
         "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('StorageAccountAvailabilityFrequency')]"
+          },
           "effect": {
             "value": "[parameters('StorageAccountAvailabilityPolicyEffect')]"
           },
           "enabled": {
             "value": "[parameters('StorageAccountAvailabilityAlertState')]"
-          },
-          "evaluationFrequency": {
-            "value": "[parameters('StorageAccountAvailabilityFrequency')]"
           },
           "windowSize": {
             "value": "[parameters('StorageAccountAvailabilityWindowSize')]"
@@ -343,14 +343,14 @@
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "effect": {
-            "value": "[parameters('StorageAccountDeletePolicyEffect')]"
-          },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('StorageAccountDeletePolicyEffect')]"
           },
           "enabled": {
             "value": "[parameters('StorageAccountDeleteAlertState')]"

@@ -7,11 +7,11 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "category": "Network",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
       "version": "1.2.0",
+      "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
@@ -60,6 +60,18 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "severity": {
         "metadata": {
           "description": "Severity of the Alert",
@@ -73,18 +85,6 @@
           "4"
         ],
         "defaultValue": "3",
-        "type": "String"
-      },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
         "type": "String"
       },
       "effect": {
@@ -203,11 +203,11 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -231,10 +231,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -246,6 +246,7 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -261,30 +262,30 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
+                            "metricNamespace": "microsoft.network/virtualNetworkGateways",
+                            "operator": "GreaterThan",
+                            "criterionType": "DynamicThresholdCriterion",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
-                            "operator": "GreaterThan",
                             "name": "TunnelIngressPacketDropTSMismatch",
-                            "metricNamespace": "microsoft.network/virtualNetworkGateways",
-                            "criterionType": "DynamicThresholdCriterion",
                             "metricName": "TunnelIngressPacketDropTSMismatch",
                             "alertSensitivity": "Medium"
                           }
@@ -296,14 +297,13 @@
                       ]
                     },
                     "apiVersion": "2018-03-01",
-                    "name": "[concat(parameters('resourceName'), '-TunnelIngressPacketDropTSMismatchAlert')]",
                     "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-TunnelIngressPacketDropTSMismatchAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

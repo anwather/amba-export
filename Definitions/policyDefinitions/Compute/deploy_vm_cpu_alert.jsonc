@@ -15,10 +15,22 @@
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
+          "displayName": "Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
         },
         "allowedValues": [
           "PT5M",
@@ -29,38 +41,38 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "alertResourceGroupLocation": {
         "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
+          "displayName": "Resource Group Location",
+          "description": "Location of the Resource group the alert is placed in"
         },
         "defaultValue": "centralus",
         "type": "String"
       },
       "alertResourceGroupName": {
         "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
+          "displayName": "Resource Group Name",
+          "description": "Resource group the alert is placed in"
         },
         "defaultValue": "AlzMonitoring-rg",
         "type": "String"
       },
       "autoMitigate": {
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "displayName": "Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
         },
         "allowedValues": [
           "true",
@@ -71,8 +83,8 @@
       },
       "windowSize": {
         "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
+          "displayName": "Window Size",
+          "description": "Window size for the alert"
         },
         "allowedValues": [
           "PT5M",
@@ -86,30 +98,20 @@
         "defaultValue": "PT15M",
         "type": "String"
       },
-      "enabled": {
+      "alertResourceGroupTags": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "displayName": "Resource Group Tags",
+          "description": "Tags on the Resource group the alert is placed in"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
-      "threshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+        "defaultValue": {
+          "environment": "test"
         },
-        "defaultValue": "85",
-        "type": "String"
+        "type": "Object"
       },
       "severity": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "displayName": "Severity",
+          "description": "Severity of the Alert"
         },
         "allowedValues": [
           "0",
@@ -121,15 +123,21 @@
         "defaultValue": "2",
         "type": "String"
       },
-      "alertResourceGroupTags": {
+      "threshold": {
         "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
+          "displayName": "Threshold",
+          "description": "Threshold for the alert"
         },
-        "defaultValue": {
-          "environment": "test"
+        "defaultValue": "85",
+        "type": "String"
+      },
+      "failingPeriods": {
+        "metadata": {
+          "displayName": "Failing Periods",
+          "description": "Number of failing periods before alert is fired"
         },
-        "type": "Object"
+        "defaultValue": "1",
+        "type": "String"
       },
       "timeAggregation": {
         "metadata": {
@@ -145,12 +153,12 @@
         "defaultValue": "Average",
         "type": "String"
       },
-      "failingPeriods": {
+      "autoResolveTime": {
         "metadata": {
-          "description": "Number of failing periods before alert is fired",
-          "displayName": "Failing Periods"
+          "displayName": "Auto Resolve",
+          "description": "Auto Resolve time for the alert in ISO 8601 format"
         },
-        "defaultValue": "1",
+        "defaultValue": "true",
         "type": "String"
       },
       "operator": {
@@ -167,18 +175,10 @@
         "defaultValue": "GreaterThan",
         "type": "String"
       },
-      "autoResolveTime": {
-        "metadata": {
-          "description": "Auto Resolve time for the alert in ISO 8601 format",
-          "displayName": "Auto Resolve"
-        },
-        "defaultValue": "true",
-        "type": "String"
-      },
       "autoResolve": {
         "metadata": {
-          "description": "Auto Resolve for the alert",
-          "displayName": "Auto Resolve"
+          "displayName": "Auto Resolve",
+          "description": "Auto Resolve for the alert"
         },
         "allowedValues": [
           "true",
@@ -260,7 +260,6 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deployment": {
             "properties": {
               "parameters": {
@@ -276,32 +275,32 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
-                "severity": {
-                  "value": "[parameters('severity')]"
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
                 },
-                "timeAggregation": {
-                  "value": "[parameters('timeAggregation')]"
+                "severity": {
+                  "value": "[parameters('severity')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
                 },
-                "operator": {
-                  "value": "[parameters('operator')]"
+                "timeAggregation": {
+                  "value": "[parameters('timeAggregation')]"
                 },
                 "autoResolveTime": {
                   "value": "[parameters('autoResolveTime')]"
+                },
+                "operator": {
+                  "value": "[parameters('operator')]"
                 },
                 "autoResolve": {
                   "value": "[parameters('autoResolve')]"
@@ -321,31 +320,31 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "windowSize": {
-                    "type": "String"
-                  },
                   "enabled": {
                     "type": "String"
                   },
-                  "threshold": {
-                    "type": "String"
-                  },
-                  "severity": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "alertResourceGroupTags": {
                     "type": "object"
                   },
-                  "timeAggregation": {
+                  "severity": {
+                    "type": "String"
+                  },
+                  "threshold": {
                     "type": "String"
                   },
                   "failingPeriods": {
                     "type": "String"
                   },
-                  "operator": {
+                  "timeAggregation": {
                     "type": "String"
                   },
                   "autoResolveTime": {
+                    "type": "String"
+                  },
+                  "operator": {
                     "type": "String"
                   },
                   "autoResolve": {
@@ -353,7 +352,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -390,13 +388,12 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
                             "properties": {
-                              "description": "Log Alert for Virtual Machine CPU",
                               "displayName": "[concat(subscription().displayName, '-VMHighCPUAlert')]",
+                              "description": "Log Alert for Virtual Machine CPU",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
@@ -410,17 +407,17 @@
                                 "autoMitigate": {
                                   "value": "[parameters('autoMitigate')]"
                                 },
-                                "windowSize": {
-                                  "value": "[parameters('windowSize')]"
-                                },
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
                                 },
-                                "threshold": {
-                                  "value": "[parameters('threshold')]"
+                                "windowSize": {
+                                  "value": "[parameters('windowSize')]"
                                 },
                                 "severity": {
                                   "value": "[parameters('severity')]"
+                                },
+                                "threshold": {
+                                  "value": "[parameters('threshold')]"
                                 },
                                 "failingPeriods": {
                                   "value": "[parameters('failingPeriods')]"
@@ -434,8 +431,8 @@
                               },
                               "evaluationFrequency": "[parameters('evaluationFrequency')]",
                               "autoMitigate": "[parameters('autoMitigate')]",
-                              "windowSize": "[parameters('windowSize')]",
                               "enabled": "[parameters('enabled')]",
+                              "windowSize": "[parameters('windowSize')]",
                               "severity": "[parameters('severity')]",
                               "ruleResolveConfiguration": {
                                 "timeToResolve": "[parameters('autoResolveTime')]",
@@ -445,11 +442,11 @@
                                 "allOf": [
                                   {
                                     "threshold": "[parameters('threshold')]",
-                                    "timeAggregation": "[parameters('timeAggregation')]",
                                     "failingPeriods": {
                                       "numberOfEvaluationPeriods": "1",
                                       "minFailingPeriodsToAlert": "[parameters('failingPeriods')]"
                                     },
+                                    "timeAggregation": "[parameters('timeAggregation')]",
                                     "operator": "[parameters('operator')]",
                                     "metricMeasureColumn": "AggregatedValue",
                                     "resourceIdColumn": "_ResourceId",
@@ -466,11 +463,11 @@
                                   }
                                 ]
                               },
-                              "scopes": [
-                                "[subscription().Id]"
-                              ],
                               "targetResourceTypes": [
                                 "Microsoft.Compute/virtualMachines"
+                              ],
+                              "scopes": [
+                                "[subscription().Id]"
                               ]
                             },
                             "apiVersion": "2022-08-01-preview",
@@ -481,6 +478,7 @@
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -492,12 +490,14 @@
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
             },
             "location": "australiaeast"
           },
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deploymentScope": "subscription",
           "existenceScope": "resourcegroup"
         }

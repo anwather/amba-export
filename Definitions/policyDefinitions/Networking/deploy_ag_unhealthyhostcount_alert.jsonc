@@ -12,6 +12,18 @@
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -39,6 +51,18 @@
         "defaultValue": "true",
         "type": "String"
       },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "windowSize": {
         "metadata": {
           "description": "Window size for the alert",
@@ -57,18 +81,6 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "severity": {
         "metadata": {
           "description": "Severity of the Alert",
@@ -82,18 +94,6 @@
           "4"
         ],
         "defaultValue": "2",
-        "type": "String"
-      },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
         "type": "String"
       },
       "threshold": {
@@ -130,6 +130,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -178,9 +181,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -193,14 +193,14 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
@@ -225,13 +225,13 @@
                   "autoMitigate": {
                     "type": "String"
                   },
+                  "enabled": {
+                    "type": "String"
+                  },
                   "windowSize": {
                     "type": "String"
                   },
                   "severity": {
-                    "type": "String"
-                  },
-                  "enabled": {
                     "type": "String"
                   },
                   "threshold": {
@@ -246,6 +246,7 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -258,14 +259,14 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
-                        },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
@@ -273,36 +274,35 @@
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
+                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
-                      "enabled": "[parameters('enabled')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "metricNamespace": "Microsoft.Network/applicationgateways",
-                            "timeAggregation": "Average",
                             "name": "CpuUtilization",
+                            "timeAggregation": "Average",
+                            "operator": "GreaterThan",
+                            "metricNamespace": "Microsoft.Network/applicationgateways",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "UnhealthyHostCount",
-                            "operator": "GreaterThan"
+                            "metricName": "UnhealthyHostCount"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
-                    "name": "[concat(parameters('resourceName'), '-agUnhealthyHostCount')]",
                     "apiVersion": "2018-03-01",
+                    "name": "[concat(parameters('resourceName'), '-agUnhealthyHostCount')]",
                     "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               }
             }

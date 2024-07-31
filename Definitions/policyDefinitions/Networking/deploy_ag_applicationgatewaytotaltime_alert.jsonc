@@ -7,11 +7,23 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.2.1",
       "category": "Networking",
+      "version": "1.3.0",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -57,18 +69,6 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
       "severity": {
         "metadata": {
           "description": "Severity of the Alert",
@@ -84,24 +84,16 @@
         "defaultValue": "2",
         "type": "String"
       },
-      "effect": {
+      "enabled": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
         "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
+          "true",
+          "false"
         ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
-      "MonitorDisable": {
-        "metadata": {
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
-          "displayName": "Effect"
-        },
-        "defaultValue": "MonitorDisable",
+        "defaultValue": "true",
         "type": "String"
       },
       "alertSensitivity": {
@@ -115,6 +107,14 @@
           "High"
         ],
         "defaultValue": "Medium",
+        "type": "String"
+      },
+      "MonitorDisable": {
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -185,7 +185,7 @@
                 "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
               },
               {
-                "equals": "Medium",
+                "equals": "[parameters('alertSensitivity')]",
                 "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
               },
               {
@@ -216,17 +216,17 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "resourceName": {
-                  "value": "[field('name')]"
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "alertSensitivity": {
                   "value": "[parameters('alertSensitivity')]"
+                },
+                "resourceName": {
+                  "value": "[field('name')]"
                 }
               },
               "template": {
@@ -247,10 +247,13 @@
                   "windowSize": {
                     "type": "String"
                   },
+                  "severity": {
+                    "type": "String"
+                  },
                   "enabled": {
                     "type": "String"
                   },
-                  "severity": {
+                  "alertSensitivity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -258,9 +261,6 @@
                       "description": "Name of the resource",
                       "displayName": "resourceName"
                     },
-                    "type": "String"
-                  },
-                  "alertSensitivity": {
                     "type": "String"
                   }
                 },
@@ -281,11 +281,11 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "alertSensitivity": {
                           "value": "[parameters('alertSensitivity')]"
@@ -294,8 +294,8 @@
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
@@ -304,11 +304,11 @@
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
+                            "alertSensitivity": "[parameters('alertSensitivity')]",
                             "operator": "GreaterThan",
                             "name": "ApplicationGatewayTotalTime",
                             "metricNamespace": "Microsoft.Network/applicationgateways",
                             "criterionType": "DynamicThresholdCriterion",
-                            "alertSensitivity": "[parameters('alertSensitivity')]",
                             "metricName": "ApplicationGatewayTotalTime"
                           }
                         ],

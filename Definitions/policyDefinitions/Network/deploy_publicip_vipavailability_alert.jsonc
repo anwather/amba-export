@@ -7,26 +7,14 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "category": "Network",
-      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.1.0",
+      "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -72,12 +60,16 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "threshold": {
+      "enabled": {
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
-        "defaultValue": "90",
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
@@ -95,16 +87,24 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "enabled": {
+      "threshold": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "defaultValue": "90",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "MonitorDisable": {
@@ -137,9 +137,6 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -188,6 +185,9 @@
               }
             ]
           },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -203,20 +203,19 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -235,13 +234,13 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "threshold": {
+                  "enabled": {
                     "type": "String"
                   },
                   "severity": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "threshold": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -269,49 +268,50 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ],
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "name": "VipAvailability",
-                            "metricNamespace": "Microsoft.Network/publicIPAddresses",
-                            "metricName": "VipAvailability",
-                            "operator": "LessThan",
                             "timeAggregation": "Average",
-                            "criterionType": "StaticThresholdCriterion"
+                            "metricNamespace": "Microsoft.Network/publicIPAddresses",
+                            "operator": "LessThan",
+                            "criterionType": "StaticThresholdCriterion",
+                            "name": "VipAvailability",
+                            "metricName": "VipAvailability"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      }
+                      },
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ]
                     },
-                    "name": "[concat(parameters('resourceName'), '-VIPAvailabityAlert')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-VIPAvailabityAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

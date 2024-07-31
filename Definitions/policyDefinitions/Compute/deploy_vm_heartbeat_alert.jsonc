@@ -7,11 +7,11 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "category": "Compute",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
       "version": "1.2.0",
-      "category": "Compute",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
@@ -27,18 +27,6 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "alertResourceGroupLocation": {
@@ -69,6 +57,18 @@
         "defaultValue": "true",
         "type": "String"
       },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "windowSize": {
         "metadata": {
           "description": "Window size for the alert",
@@ -86,16 +86,16 @@
         "defaultValue": "PT15M",
         "type": "String"
       },
-      "enabled": {
+      "effect": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "threshold": {
@@ -153,20 +153,6 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "operator": {
-        "metadata": {
-          "displayName": "Operator"
-        },
-        "allowedValues": [
-          "Equals",
-          "GreaterThan",
-          "GreaterThanOrEqual",
-          "LessThan",
-          "LessThanOrEqual"
-        ],
-        "defaultValue": "GreaterThan",
-        "type": "String"
-      },
       "autoResolveTime": {
         "metadata": {
           "description": "Auto Resolve time for the alert in ISO 8601 format",
@@ -181,6 +167,20 @@
           "displayName": "Evaluation Periods"
         },
         "defaultValue": "1",
+        "type": "String"
+      },
+      "operator": {
+        "metadata": {
+          "displayName": "Operator"
+        },
+        "allowedValues": [
+          "Equals",
+          "GreaterThan",
+          "GreaterThanOrEqual",
+          "LessThan",
+          "LessThanOrEqual"
+        ],
+        "defaultValue": "GreaterThan",
         "type": "String"
       },
       "autoResolve": {
@@ -268,7 +268,6 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deployment": {
             "properties": {
               "parameters": {
@@ -284,11 +283,11 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
@@ -305,14 +304,14 @@
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
                 },
-                "operator": {
-                  "value": "[parameters('operator')]"
-                },
                 "autoResolveTime": {
                   "value": "[parameters('autoResolveTime')]"
                 },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
+                },
+                "operator": {
+                  "value": "[parameters('operator')]"
                 },
                 "autoResolve": {
                   "value": "[parameters('autoResolve')]"
@@ -332,10 +331,10 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "enabled": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "threshold": {
@@ -353,13 +352,13 @@
                   "failingPeriods": {
                     "type": "String"
                   },
-                  "operator": {
-                    "type": "String"
-                  },
                   "autoResolveTime": {
                     "type": "String"
                   },
                   "evaluationPeriods": {
+                    "type": "String"
+                  },
+                  "operator": {
                     "type": "String"
                   },
                   "autoResolve": {
@@ -367,7 +366,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -404,7 +402,6 @@
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
@@ -424,11 +421,11 @@
                                 "autoMitigate": {
                                   "value": "[parameters('autoMitigate')]"
                                 },
-                                "windowSize": {
-                                  "value": "[parameters('windowSize')]"
-                                },
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
+                                },
+                                "windowSize": {
+                                  "value": "[parameters('windowSize')]"
                                 },
                                 "threshold": {
                                   "value": "[parameters('threshold')]"
@@ -451,13 +448,16 @@
                               },
                               "evaluationFrequency": "[parameters('evaluationFrequency')]",
                               "autoMitigate": "[parameters('autoMitigate')]",
-                              "windowSize": "[parameters('windowSize')]",
                               "enabled": "[parameters('enabled')]",
+                              "windowSize": "[parameters('windowSize')]",
                               "severity": "[parameters('severity')]",
                               "ruleResolveConfiguration": {
                                 "timeToResolve": "[parameters('autoResolveTime')]",
                                 "autoResolved": "[parameters('autoResolve')]"
                               },
+                              "scopes": [
+                                "[subscription().Id]"
+                              ],
                               "criteria": {
                                 "allOf": [
                                   {
@@ -483,9 +483,6 @@
                                   }
                                 ]
                               },
-                              "scopes": [
-                                "[subscription().Id]"
-                              ],
                               "targetResourceTypes": [
                                 "Microsoft.Compute/virtualMachines"
                               ]
@@ -498,6 +495,7 @@
                             }
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -509,12 +507,14 @@
                     ]
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
             },
             "location": "australiaeast"
           },
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deploymentScope": "subscription",
           "existenceScope": "resourcegroup"
         }
