@@ -13,10 +13,6 @@
     },
     "parameters": {
       "evaluationFrequency": {
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -25,25 +21,25 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "type": "String"
       },
       "autoMitigate": {
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "type": "String"
       },
       "windowSize": {
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -55,25 +51,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "enabled": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "allowedValues": [
           "0",
           "1",
@@ -82,34 +66,50 @@
           "4"
         ],
         "defaultValue": "2",
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "type": "String"
+      },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "type": "String"
       },
       "threshold": {
+        "defaultValue": "90",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
-        "defaultValue": "90",
         "type": "String"
       },
       "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
         "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "type": "String"
       },
       "MonitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -207,11 +207,11 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
@@ -220,6 +220,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -238,10 +239,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "severity": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
                     "type": "String"
                   },
                   "threshold": {
@@ -256,12 +257,12 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for ALB Health Probe Status",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -272,29 +273,28 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
                         }
                       },
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
                             "operator": "LessThan",
-                            "name": "DipAvailability",
                             "metricNamespace": "Microsoft.Network/loadBalancers",
+                            "name": "DipAvailability",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "DipAvailability"
                           }
@@ -306,16 +306,16 @@
                       ]
                     },
                     "apiVersion": "2018-03-01",
-                    "location": "global",
                     "name": "[concat(parameters('resourceName'), '-ALBHealthProbeStatus')]",
+                    "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

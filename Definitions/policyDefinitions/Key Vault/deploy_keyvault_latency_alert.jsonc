@@ -7,19 +7,15 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "category": "Key Vault",
       "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "category": "Key Vault",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -28,49 +24,25 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "effect": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
         },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
         "type": "String"
       },
       "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -82,21 +54,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "threshold": {
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
         },
-        "defaultValue": "1000",
         "type": "String"
       },
       "severity": {
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "allowedValues": [
           "0",
           "1",
@@ -105,14 +69,50 @@
           "4"
         ],
         "defaultValue": "3",
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "type": "String"
+      },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
+      "threshold": {
+        "defaultValue": "1000",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "type": "String"
       },
       "MonitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -196,17 +196,17 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -228,16 +228,16 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "enabled": {
-                    "type": "String"
-                  },
                   "windowSize": {
                     "type": "String"
                   },
-                  "threshold": {
+                  "severity": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
+                    "type": "String"
+                  },
+                  "threshold": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -249,12 +249,12 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for KeyVault Latency",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -262,50 +262,50 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         }
                       },
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "enabled": "[parameters('enabled')]",
                       "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ],
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "name": "ServiceApiLatency",
                             "timeAggregation": "Average",
                             "operator": "GreaterThan",
                             "metricNamespace": "microsoft.keyvault/vaults",
+                            "name": "ServiceApiLatency",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "ServiceApiLatency"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      }
+                      },
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ]
                     },
-                    "name": "[concat(parameters('resourceName'), '-LatencyAlert')]",
                     "apiVersion": "2018-03-01",
+                    "name": "[concat(parameters('resourceName'), '-LatencyAlert')]",
                     "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               }
             }

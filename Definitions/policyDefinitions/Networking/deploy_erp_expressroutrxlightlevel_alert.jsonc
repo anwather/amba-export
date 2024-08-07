@@ -13,10 +13,6 @@
     },
     "parameters": {
       "evaluationFrequency": {
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -25,25 +21,25 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "type": "String"
       },
       "autoMitigate": {
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "type": "String"
       },
       "windowSize": {
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -55,25 +51,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "effect": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
         },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
         "type": "String"
       },
       "severity": {
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "allowedValues": [
           "0",
           "1",
@@ -82,34 +66,50 @@
           "4"
         ],
         "defaultValue": "1",
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "type": "String"
       },
       "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "type": "String"
       },
       "threshold": {
+        "defaultValue": "0",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
-        "defaultValue": "0",
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "type": "String"
       },
       "MonitorDisable": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
           "displayName": "Effect"
         },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -206,11 +206,11 @@
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "resourceName": {
-                  "value": "[field('name')]"
-                },
                 "threshold": {
                   "value": "[parameters('threshold')]"
+                },
+                "resourceName": {
+                  "value": "[field('name')]"
                 }
               },
               "mode": "incremental",
@@ -238,14 +238,14 @@
                   "enabled": {
                     "type": "String"
                   },
+                  "threshold": {
+                    "type": "String"
+                  },
                   "resourceName": {
                     "metadata": {
                       "description": "Name of the resource",
                       "displayName": "resourceName"
                     },
-                    "type": "String"
-                  },
-                  "threshold": {
                     "type": "String"
                   }
                 },
@@ -255,6 +255,7 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for ER Direct Connection RxLightLevelHigh",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -275,7 +276,6 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
@@ -285,11 +285,11 @@
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
-                            "metricName": "RxLightLevel",
-                            "criterionType": "StaticThresholdCriterion",
                             "operator": "GreaterThan",
-                            "name": "RxLightLevel"
+                            "metricNamespace": "Microsoft.Network/expressRoutePorts",
+                            "name": "RxLightLevel",
+                            "criterionType": "StaticThresholdCriterion",
+                            "metricName": "RxLightLevel"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -298,9 +298,9 @@
                         "[parameters('resourceId')]"
                       ]
                     },
-                    "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-DirectERRxLightLevelHighAlert')]",
                     "apiVersion": "2018-03-01",
+                    "name": "[concat(parameters('resourceName'), '-DirectERRxLightLevelHighAlert')]",
+                    "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }

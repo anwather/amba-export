@@ -6,32 +6,16 @@
     "description": "Policy to audit/deploy FrontDoor CDN Profile Origin Latency Alert",
     "mode": "All",
     "metadata": {
-      "category": "Networking",
       "_deployed_by_amba": "True",
       "version": "1.1.1",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "category": "Networking",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "displayName": "Effect",
-          "description": "Effect of the policy"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "String"
-      },
       "evaluationFrequency": {
-        "metadata": {
-          "displayName": "Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -40,25 +24,25 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "type": "String"
       },
       "autoMitigate": {
-        "metadata": {
-          "displayName": "Auto Mitigate",
-          "description": "Auto Mitigate for the alert"
-        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "type": "String"
       },
       "windowSize": {
-        "metadata": {
-          "displayName": "Window Size",
-          "description": "Window size for the alert"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -70,25 +54,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "enabled": {
         "metadata": {
-          "displayName": "Alert State",
-          "description": "Alert state for the alert"
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
-        "metadata": {
-          "displayName": "Severity",
-          "description": "Severity of the Alert"
-        },
         "allowedValues": [
           "0",
           "1",
@@ -97,14 +69,42 @@
           "4"
         ],
         "defaultValue": "2",
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "type": "String"
+      },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "type": "String"
       },
       "MonitorDisable": {
-        "metadata": {
-          "displayName": "Effect",
-          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled"
-        },
         "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring resource. Set to true if monitoring should be disabled",
+          "displayName": "Effect"
+        },
         "type": "String"
       }
     },
@@ -199,11 +199,11 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -214,8 +214,8 @@
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "displayName": "resourceId",
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
+                      "displayName": "resourceId"
                     },
                     "type": "String"
                   },
@@ -228,27 +228,27 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "severity": {
                     "type": "String"
                   },
-                  "severity": {
+                  "enabled": {
                     "type": "String"
                   },
                   "resourceName": {
                     "metadata": {
-                      "displayName": "resourceName",
-                      "description": "Name of the resource"
+                      "description": "Name of the resource",
+                      "displayName": "resourceName"
                     },
                     "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Frontdoor CDN Origin Latency",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -259,32 +259,31 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         }
                       },
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
+                            "operator": "GreaterThan",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
-                            "operator": "GreaterThan",
-                            "name": "ServiceApiResult",
                             "metricNamespace": "Microsoft.Cdn/profiles",
+                            "name": "ServiceApiResult",
                             "criterionType": "DynamicThresholdCriterion",
-                            "metricName": "OriginLatency",
-                            "alertSensitivity": "Medium"
+                            "alertSensitivity": "Medium",
+                            "metricName": "OriginLatency"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
@@ -294,13 +293,14 @@
                       ]
                     },
                     "apiVersion": "2018-03-01",
-                    "location": "global",
                     "name": "[concat(parameters('resourceName'), '-OriginLatencyAlert')]",
+                    "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               }
             }
