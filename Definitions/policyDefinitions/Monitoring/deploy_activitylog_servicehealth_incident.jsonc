@@ -15,6 +15,18 @@
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "String"
+      },
       "alertResourceGroupLocation": {
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
@@ -53,18 +65,6 @@
         },
         "type": "Object"
       },
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "String"
-      },
       "MonitorDisable": {
         "metadata": {
           "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
@@ -73,18 +73,18 @@
         "defaultValue": "MonitorDisable",
         "type": "String"
       },
-      "ALZMonitorActionGroupEmail": {
-        "metadata": {
-          "description": "Email addresses to send alerts to",
-          "displayName": "Action Group Email Addresses"
-        },
-        "defaultValue": "",
-        "type": "String"
-      },
       "BYOActionGroup": {
         "metadata": {
           "description": "The Resource ID of an existing Action Group already deployed by the customer in his environment",
           "displayName": "Customer defined Action Group Resource ID"
+        },
+        "defaultValue": "",
+        "type": "String"
+      },
+      "ALZMonitorActionGroupEmail": {
+        "metadata": {
+          "description": "Email addresses to send alerts to",
+          "displayName": "Action Group Email Addresses"
         },
         "defaultValue": "",
         "type": "String"
@@ -205,11 +205,11 @@
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
                 },
-                "ALZMonitorActionGroupEmail": {
-                  "value": "[parameters('ALZMonitorActionGroupEmail')]"
-                },
                 "BYOActionGroup": {
                   "value": "[parameters('BYOActionGroup')]"
+                },
+                "ALZMonitorActionGroupEmail": {
+                  "value": "[parameters('ALZMonitorActionGroupEmail')]"
                 }
               },
               "template": {
@@ -226,27 +226,14 @@
                   "alertResourceGroupTags": {
                     "type": "object"
                   },
-                  "ALZMonitorActionGroupEmail": {
-                    "type": "string"
-                  },
                   "BYOActionGroup": {
                     "type": "String"
+                  },
+                  "ALZMonitorActionGroupEmail": {
+                    "type": "string"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {
-                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
-                  "copy": [
-                    {
-                      "name": "varActionGroupIds",
-                      "mode": "serial",
-                      "count": "[length(variables('varBYOActionGroups'))]",
-                      "input": {
-                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
-                      }
-                    }
-                  ]
-                },
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -266,11 +253,11 @@
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "ALZMonitorActionGroupEmail": {
-                          "value": "[parameters('ALZMonitorActionGroupEmail')]"
-                        },
                         "BYOActionGroup": {
                           "value": "[parameters('BYOActionGroup')]"
+                        },
+                        "ALZMonitorActionGroupEmail": {
+                          "value": "[parameters('ALZMonitorActionGroupEmail')]"
                         }
                       },
                       "template": {
@@ -281,15 +268,14 @@
                           "enabled": {
                             "type": "string"
                           },
-                          "ALZMonitorActionGroupEmail": {
-                            "type": "string"
-                          },
                           "BYOActionGroup": {
                             "type": "String"
+                          },
+                          "ALZMonitorActionGroupEmail": {
+                            "type": "string"
                           }
                         },
                         "contentVersion": "1.0.0.0",
-                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
@@ -370,6 +356,7 @@
                             "condition": "[not(empty(parameters('BYOActionGroup')))]"
                           }
                         ],
+                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -381,6 +368,19 @@
                     ]
                   }
                 ],
+                "variables": {
+                  "varBYOActionGroups": "[split(parameters('BYOActionGroup'), ',')]",
+                  "copy": [
+                    {
+                      "name": "varActionGroupIds",
+                      "mode": "serial",
+                      "count": "[length(variables('varBYOActionGroups'))]",
+                      "input": {
+                        "actionGroupId": "[trim(variables('varBYOActionGroups')[copyIndex('varActionGroupIds')])]"
+                      }
+                    }
+                  ]
+                },
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
               },
               "mode": "incremental"

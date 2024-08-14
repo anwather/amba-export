@@ -7,10 +7,10 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "version": "1.0.2",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.0.2",
       "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -31,6 +31,17 @@
         "defaultValue": "rg-amba-monitoring-001",
         "type": "String"
       },
+      "alertResourceGroupTags": {
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "defaultValue": {
+          "_deployed_by_amba": true,
+          "environment": "test"
+        },
+        "type": "Object"
+      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
@@ -42,17 +53,6 @@
         ],
         "defaultValue": "true",
         "type": "String"
-      },
-      "alertResourceGroupTags": {
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "defaultValue": {
-          "_deployed_by_amba": true,
-          "environment": "test"
-        },
-        "type": "Object"
       },
       "MonitorDisable": {
         "metadata": {
@@ -67,8 +67,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/azureFirewalls",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.Network/azureFirewalls"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisable'), ']')]",
@@ -80,11 +80,18 @@
         "effect": "deployIfNotExists",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "name": "ActivityAzureFirewallDelete",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
+          "existenceScope": "resourceGroup",
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "deploymentScope": "subscription",
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
+                "field": "Microsoft.Insights/ActivityLogAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               },
               {
                 "equals": 2,
@@ -95,24 +102,24 @@
                       {
                         "allOf": [
                           {
-                            "equals": "category",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field",
+                            "equals": "category"
                           },
                           {
-                            "equals": "Administrative",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals",
+                            "equals": "Administrative"
                           }
                         ]
                       },
                       {
                         "allOf": [
                           {
-                            "equals": "operationName",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field",
+                            "equals": "operationName"
                           },
                           {
-                            "equals": "Microsoft.Network/azureFirewalls/delete",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals",
+                            "equals": "Microsoft.Network/azureFirewalls/delete"
                           }
                         ]
                       }
@@ -122,10 +129,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
-          "name": "ActivityAzureFirewallDelete",
           "deployment": {
             "properties": {
               "parameters": {
@@ -135,11 +138,11 @@
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 }
               },
               "template": {
@@ -150,11 +153,11 @@
                   "alertResourceGroupName": {
                     "type": "string"
                   },
-                  "enabled": {
-                    "type": "string"
-                  },
                   "alertResourceGroupTags": {
                     "type": "object"
+                  },
+                  "enabled": {
+                    "type": "string"
                   }
                 },
                 "contentVersion": "1.0.0.0",
@@ -170,6 +173,7 @@
                   {
                     "resourceGroup": "[parameters('alertResourceGroupName')]",
                     "type": "Microsoft.Resources/deployments",
+                    "apiVersion": "2019-10-01",
                     "properties": {
                       "parameters": {
                         "alertResourceGroupName": {
@@ -193,6 +197,7 @@
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
+                            "apiVersion": "2020-10-01",
                             "properties": {
                               "description": "Activity Log Firewall Delete",
                               "parameters": {
@@ -207,12 +212,12 @@
                               "condition": {
                                 "allOf": [
                                   {
-                                    "equals": "Administrative",
-                                    "field": "category"
+                                    "field": "category",
+                                    "equals": "Administrative"
                                   },
                                   {
-                                    "equals": "Microsoft.Network/azurefirewalls/delete",
-                                    "field": "operationName"
+                                    "field": "operationName",
+                                    "equals": "Microsoft.Network/azurefirewalls/delete"
                                   },
                                   {
                                     "field": "status",
@@ -223,7 +228,6 @@
                                 ]
                               }
                             },
-                            "apiVersion": "2020-10-01",
                             "location": "global",
                             "name": "ActivityAzureFirewallDelete",
                             "tags": {
@@ -235,7 +239,6 @@
                       },
                       "mode": "Incremental"
                     },
-                    "apiVersion": "2019-10-01",
                     "name": "ActivityAzureFirewallDelete",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
@@ -247,10 +250,7 @@
               "mode": "incremental"
             },
             "location": "australiaeast"
-          },
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "deploymentScope": "subscription",
-          "existenceScope": "resourceGroup"
+          }
         }
       }
     }

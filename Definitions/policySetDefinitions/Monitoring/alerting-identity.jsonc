@@ -6,14 +6,22 @@
     "description": "Initiative to deploy AMBA alerts relevant to the ALZ Identity management group",
     "metadata": {
       "_deployed_by_amba": true,
-      "version": "1.0.3",
+      "category": "Monitoring",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "category": "Monitoring"
+      "version": "1.0.3",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "ALZMonitorResourceGroupLocation": {
+        "metadata": {
+          "description": "Location of the resource group where the alerting resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Location"
+        },
+        "defaultValue": "centralus",
+        "type": "String"
+      },
       "ALZMonitorResourceGroupName": {
         "metadata": {
           "description": "Name of the resource group where the alerting resources will be deployed",
@@ -32,18 +40,25 @@
         },
         "type": "Object"
       },
-      "ALZMonitorResourceGroupLocation": {
+      "KvLatencyAvailabilityEvaluationFrequency": {
         "metadata": {
-          "description": "Location of the resource group where the alerting resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Location"
+          "description": "Evaluation frequency for the alert",
+          "displayName": "KeyVault Latency Alert Evaluation Frequency"
         },
-        "defaultValue": "centralus",
-        "type": "String"
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "type": "string"
       },
-      "KVRequestAlertSeverity": {
+      "KvLatencyAvailabilityAlertSeverity": {
         "metadata": {
           "description": "Severity of the alert",
-          "displayName": "KeyVault Request Alert Severity"
+          "displayName": "KeyVault Latency Alert Severity"
         },
         "allowedValues": [
           "0",
@@ -52,13 +67,40 @@
           "3",
           "4"
         ],
-        "defaultValue": "2",
+        "defaultValue": "3",
         "type": "String"
       },
-      "KVRequestWindowSize": {
+      "KvAvailabilityEvaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "KeyVault Availability Alert Evaluation Frequency"
+        },
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
+        "type": "string"
+      },
+      "KvLatencyAvailabilityPolicyEffect": {
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "KeyVault Latency Alert Policy Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "KvLatencyAvailabilityWindowSize": {
         "metadata": {
           "description": "Window size for the alert",
-          "displayName": "KeyVault Request Alert Window Size"
+          "displayName": "KeyVault Latency Alert Window Size"
         },
         "allowedValues": [
           "PT1M",
@@ -71,6 +113,37 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "KvLatencyAvailabilityAlertState": {
+        "metadata": {
+          "description": "State of the alert, true will enable the alert, false will disable the alert",
+          "displayName": "KeyVault Latency Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "KvLatencyAvailabilityThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "KeyVault Latency Alert Threshold"
+        },
+        "defaultValue": "1000",
+        "type": "string"
+      },
+      "KVCapacityEvaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "KeyVault Capacity Alert Evaluation Frequency"
+        },
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
         "type": "string"
       },
       "KVRequestEvaluationFrequency": {
@@ -88,26 +161,6 @@
         "defaultValue": "PT5M",
         "type": "string"
       },
-      "KVRequestPolicyEffect": {
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "KeyVault Request Alert Policy Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "string"
-      },
-      "KVRequestAlertState": {
-        "metadata": {
-          "description": "State of the alert, true will enable the alert, false will disable the alert",
-          "displayName": "KeyVault Request Alert State"
-        },
-        "defaultValue": "true",
-        "type": "string"
-      },
       "KvAvailabilityAlertSeverity": {
         "metadata": {
           "description": "Severity of the alert",
@@ -123,37 +176,12 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "KvAvailabilityWindowSize": {
+      "activityKVDeleteAlertState": {
         "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "KeyVault Availability Alert Window Size"
+          "description": "State of the alert, true will enable the alert, false will disable the alert",
+          "displayName": "Activity Log KeyVault Delete Alert State"
         },
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT1M",
-        "type": "string"
-      },
-      "KvAvailabilityEvaluationFrequency": {
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "KeyVault Availability Alert Evaluation Frequency"
-        },
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
+        "defaultValue": "true",
         "type": "string"
       },
       "KvAvailabilityPolicyEffect": {
@@ -176,33 +204,10 @@
         "defaultValue": "true",
         "type": "string"
       },
-      "KVAvailabilityThreshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "KeyVault Availability Alert Threshold"
-        },
-        "defaultValue": "20",
-        "type": "string"
-      },
-      "KvLatencyAvailabilityAlertSeverity": {
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "KeyVault Latency Alert Severity"
-        },
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "3",
-        "type": "String"
-      },
-      "KvLatencyAvailabilityWindowSize": {
+      "KvAvailabilityWindowSize": {
         "metadata": {
           "description": "Window size for the alert",
-          "displayName": "KeyVault Latency Alert Window Size"
+          "displayName": "KeyVault Availability Alert Window Size"
         },
         "allowedValues": [
           "PT1M",
@@ -214,50 +219,7 @@
           "PT12H",
           "P1D"
         ],
-        "defaultValue": "PT5M",
-        "type": "string"
-      },
-      "KvLatencyAvailabilityEvaluationFrequency": {
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "KeyVault Latency Alert Evaluation Frequency"
-        },
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "type": "string"
-      },
-      "KvLatencyAvailabilityPolicyEffect": {
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "KeyVault Latency Alert Policy Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "string"
-      },
-      "KvLatencyAvailabilityAlertState": {
-        "metadata": {
-          "description": "State of the alert, true will enable the alert, false will disable the alert",
-          "displayName": "KeyVault Latency Alert State"
-        },
-        "defaultValue": "true",
-        "type": "string"
-      },
-      "KvLatencyAvailabilityThreshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "KeyVault Latency Alert Threshold"
-        },
-        "defaultValue": "1000",
+        "defaultValue": "PT1M",
         "type": "string"
       },
       "KVCapacityAlertSeverity": {
@@ -274,6 +236,61 @@
         ],
         "defaultValue": "1",
         "type": "String"
+      },
+      "KVAvailabilityThreshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "KeyVault Availability Alert Threshold"
+        },
+        "defaultValue": "20",
+        "type": "string"
+      },
+      "KVCapacityPolicyEffect": {
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "KeyVault Capacity Alert Policy Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "KVRequestAlertSeverity": {
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "KeyVault Request Alert Severity"
+        },
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "KVRequestPolicyEffect": {
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "KeyVault Request Alert Policy Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "string"
+      },
+      "KVCapacityAlertState": {
+        "metadata": {
+          "description": "State of the alert, true will enable the alert, false will disable the alert",
+          "displayName": "KeyVault Capacity Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
       },
       "KVCapacityWindowSize": {
         "metadata": {
@@ -293,41 +310,6 @@
         "defaultValue": "PT5M",
         "type": "string"
       },
-      "KVCapacityEvaluationFrequency": {
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "KeyVault Capacity Alert Evaluation Frequency"
-        },
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
-        "type": "string"
-      },
-      "KVCapacityPolicyEffect": {
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "KeyVault Capacity Alert Policy Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "string"
-      },
-      "KVCapacityAlertState": {
-        "metadata": {
-          "description": "State of the alert, true will enable the alert, false will disable the alert",
-          "displayName": "KeyVault Capacity Alert State"
-        },
-        "defaultValue": "true",
-        "type": "string"
-      },
       "KVCapacityThreshold": {
         "metadata": {
           "description": "Threshold for the alert",
@@ -336,10 +318,28 @@
         "defaultValue": "75",
         "type": "string"
       },
-      "activityKVDeleteAlertState": {
+      "KVRequestWindowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "KeyVault Request Alert Window Size"
+        },
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "type": "string"
+      },
+      "KVRequestAlertState": {
         "metadata": {
           "description": "State of the alert, true will enable the alert, false will disable the alert",
-          "displayName": "Activity Log KeyVault Delete Alert State"
+          "displayName": "KeyVault Request Alert State"
         },
         "defaultValue": "true",
         "type": "string"
@@ -359,11 +359,11 @@
           "windowSize": {
             "value": "[parameters('KVRequestWindowSize')]"
           },
-          "enabled": {
-            "value": "[parameters('KVRequestAlertState')]"
-          },
           "severity": {
             "value": "[parameters('KVRequestAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('KVRequestAlertState')]"
           }
         }
       },
@@ -380,11 +380,11 @@
           "windowSize": {
             "value": "[parameters('KvAvailabilityWindowSize')]"
           },
-          "enabled": {
-            "value": "[parameters('KvAvailabilityAlertState')]"
-          },
           "severity": {
             "value": "[parameters('KvAvailabilityAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('KvAvailabilityAlertState')]"
           },
           "threshold": {
             "value": "[parameters('KVAvailabilityThreshold')]"
@@ -404,11 +404,11 @@
           "windowSize": {
             "value": "[parameters('KvLatencyAvailabilityWindowSize')]"
           },
-          "enabled": {
-            "value": "[parameters('KvLatencyAvailabilityAlertState')]"
-          },
           "severity": {
             "value": "[parameters('KvLatencyAvailabilityAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('KvLatencyAvailabilityAlertState')]"
           },
           "threshold": {
             "value": "[parameters('KvLatencyAvailabilityThreshold')]"
@@ -428,11 +428,11 @@
           "windowSize": {
             "value": "[parameters('KVCapacityWindowSize')]"
           },
-          "enabled": {
-            "value": "[parameters('KVCapacityAlertState')]"
-          },
           "severity": {
             "value": "[parameters('KVCapacityAlertSeverity')]"
+          },
+          "enabled": {
+            "value": "[parameters('KVCapacityAlertState')]"
           },
           "threshold": {
             "value": "[parameters('KVCapacityThreshold')]"
@@ -446,14 +446,14 @@
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "enabled": {
-            "value": "[parameters('activityKVDeleteAlertState')]"
-          },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityKVDeleteAlertState')]"
           }
         }
       }
