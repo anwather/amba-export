@@ -3,30 +3,51 @@
   "name": "Alerting-Connectivity",
   "properties": {
     "displayName": "Deploy Azure Monitor Baseline Alerts for Connectivity",
-    "description": "Initiative to deploy AMBA alerts relevant to the ALZ Connectivity management group",
+    "description": "This initiative deploys Azure Monitor Baseline Alerts to monitor Network components such as Azure Firewalls, ExpressRoute, VPN, and Private DNS Zones.",
     "metadata": {
       "_deployed_by_amba": true,
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
       "version": "1.1.1",
-      "category": "Monitoring",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Monitoring"
     },
     "parameters": {
-      "ALZMonitorResourceGroupName": {
-        "defaultValue": "ALZ-Monitoring-RG",
-        "metadata": {
-          "description": "Name of the resource group where the ALZ Monitor resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Name"
-        },
-        "type": "String"
-      },
       "ALZMonitorResourceGroupLocation": {
         "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the resource group where the ALZ Monitor resources will be deployed",
           "displayName": "ALZ Monitor Resource Group Location"
+        },
+        "type": "String"
+      },
+      "ALZMonitorDisableTagValues": {
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
+        "type": "Array"
+      },
+      "ALZMonitorDisableTagName": {
+        "defaultValue": "MonitorDisableTagName",
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "type": "String"
+      },
+      "ALZMonitorResourceGroupName": {
+        "defaultValue": "ALZ-Monitoring-RG",
+        "metadata": {
+          "description": "Name of the resource group where the ALZ Monitor resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Name"
         },
         "type": "String"
       },
@@ -153,21 +174,6 @@
         },
         "type": "string"
       },
-      "LBDatapathAvailabilityAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "0",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "LB Data path Availability Alert Severity"
-        },
-        "type": "String"
-      },
       "PIPPacketsInDDoSEvaluationFrequency": {
         "allowedValues": [
           "PT1M",
@@ -182,6 +188,21 @@
           "displayName": "PIP Packets In DDoS Evaluation Frequency"
         },
         "type": "string"
+      },
+      "LBDatapathAvailabilityAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "0",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "LB Data path Availability Alert Severity"
+        },
+        "type": "String"
       },
       "LBDatapathAvailabilityPolicyEffect": {
         "allowedValues": [
@@ -240,6 +261,36 @@
         },
         "type": "string"
       },
+      "LBHealthProbeStatusAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "LB Health Probe Status Alert Severity"
+        },
+        "type": "String"
+      },
+      "PIPDDoSAttackEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "PIP DDoS Attack Evaluation Frequency"
+        },
+        "type": "string"
+      },
       "LBDatapathAvailabilityWindowSize": {
         "allowedValues": [
           "PT1M",
@@ -266,48 +317,6 @@
         },
         "type": "string"
       },
-      "PIPDDoSAttackEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "PIP DDoS Attack Evaluation Frequency"
-        },
-        "type": "string"
-      },
-      "LBHealthProbeStatusAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "LB Health Probe Status Alert Severity"
-        },
-        "type": "String"
-      },
-      "LBHealthProbeStatusPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "LB Health Probe Status Policy Effect"
-        },
-        "type": "string"
-      },
       "PIPVIPAvailabilityAlertSeverity": {
         "allowedValues": [
           "0",
@@ -323,6 +332,18 @@
         },
         "type": "String"
       },
+      "LBHealthProbeStatusPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "LB Health Probe Status Policy Effect"
+        },
+        "type": "string"
+      },
       "PIPVIPAvailabilityPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -334,6 +355,53 @@
           "displayName": "PIP VIP Availability Policy Effect"
         },
         "type": "string"
+      },
+      "LBHealthProbeStatusAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "LB Health Probe Status Alert State"
+        },
+        "type": "string"
+      },
+      "activityNSGDeletePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Activity NSG Delete Policy Effect"
+        },
+        "type": "string"
+      },
+      "activityUDRUpdatePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Activity UDR Update Policy Effect"
+        },
+        "type": "string"
+      },
+      "PIPPacketsInDDoSAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "4",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PIP Packets In DDoS Alert Severity"
+        },
+        "type": "String"
       },
       "LBHealthProbeStatusWindowSize": {
         "allowedValues": [
@@ -353,41 +421,6 @@
         },
         "type": "string"
       },
-      "LBHealthProbeStatusAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "LB Health Probe Status Alert State"
-        },
-        "type": "string"
-      },
-      "PIPPacketsInDDoSAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "4",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "PIP Packets In DDoS Alert Severity"
-        },
-        "type": "String"
-      },
-      "PIPPacketsInDDoSPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "PIP Packets In DDoS Policy Effect"
-        },
-        "type": "string"
-      },
       "LBUsedSNATPortsAlertSeverity": {
         "allowedValues": [
           "0",
@@ -403,11 +436,15 @@
         },
         "type": "String"
       },
-      "PIPVIPAvailabilityAlertState": {
-        "defaultValue": "true",
+      "PIPPacketsInDDoSPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "PIP VIP Availability Alert State"
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "PIP Packets In DDoS Policy Effect"
         },
         "type": "string"
       },
@@ -429,6 +466,26 @@
         },
         "type": "string"
       },
+      "PIPVIPAvailabilityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PIP VIP Availability Alert State"
+        },
+        "type": "string"
+      },
+      "LBUsedSNATPortsPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "LB Used SNAT Ports Policy Effect"
+        },
+        "type": "string"
+      },
       "VNETDDOSAttackAlertSeverity": {
         "allowedValues": [
           "0",
@@ -444,19 +501,19 @@
         },
         "type": "String"
       },
-      "PIPVIPAvailabilityThreshold": {
-        "defaultValue": "1",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "PIP VIP Availability Threshold"
-        },
-        "type": "string"
-      },
       "activityUDRUpdateAlertState": {
         "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Activity UDR Update Alert State"
+        },
+        "type": "string"
+      },
+      "PIPVIPAvailabilityThreshold": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "PIP VIP Availability Threshold"
         },
         "type": "string"
       },
@@ -483,7 +540,40 @@
         },
         "type": "String"
       },
-      "LBUsedSNATPortsPolicyEffect": {
+      "PIPDDoSAttackAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "1",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "PIP DDoS Attack Alert Severity"
+        },
+        "type": "String"
+      },
+      "PIPPacketsInDDoSWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "PIP Packets In DDoS Window Size"
+        },
+        "type": "string"
+      },
+      "VNETDDOSAttackPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
@@ -491,7 +581,7 @@
         "defaultValue": "deployIfNotExists",
         "metadata": {
           "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "LB Used SNAT Ports Policy Effect"
+          "displayName": "VNET DDoS Attack Policy Effect"
         },
         "type": "string"
       },
@@ -515,56 +605,19 @@
         },
         "type": "string"
       },
-      "VNETDDOSAttackPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "VNET DDoS Attack Policy Effect"
-        },
-        "type": "string"
-      },
-      "PIPPacketsInDDoSWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "PIP Packets In DDoS Window Size"
-        },
-        "type": "string"
-      },
-      "PIPDDoSAttackAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "1",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "PIP DDoS Attack Alert Severity"
-        },
-        "type": "String"
-      },
       "PIPPacketsInDDoSThreshold": {
         "defaultValue": "40000",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "PIP Packets In DDoS Threshold"
+        },
+        "type": "string"
+      },
+      "LBUsedSNATPortsAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "LB Used SNAT Ports Alert State"
         },
         "type": "string"
       },
@@ -577,14 +630,6 @@
         "metadata": {
           "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
           "displayName": "PIP DDoS Attack Policy Effect"
-        },
-        "type": "string"
-      },
-      "LBUsedSNATPortsAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "LB Used SNAT Ports Alert State"
         },
         "type": "string"
       },
@@ -606,6 +651,14 @@
         },
         "type": "string"
       },
+      "PIPBytesInDDoSAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "PIP Bytes In DDoS Alert State"
+        },
+        "type": "string"
+      },
       "PIPBytesInDDoSWindowSize": {
         "allowedValues": [
           "PT1M",
@@ -621,14 +674,6 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "PIP Bytes In DDoS Window Size"
-        },
-        "type": "string"
-      },
-      "VNETDDOSAttackAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "VNET DDoS Attack Alert State"
         },
         "type": "string"
       },
@@ -650,11 +695,11 @@
         },
         "type": "string"
       },
-      "PIPBytesInDDoSAlertState": {
+      "VNETDDOSAttackAlertState": {
         "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
-          "displayName": "PIP Bytes In DDoS Alert State"
+          "displayName": "VNET DDoS Attack Alert State"
         },
         "type": "string"
       },
@@ -684,14 +729,6 @@
         },
         "type": "string"
       },
-      "VNETDDOSAttackThreshold": {
-        "defaultValue": "1",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "VNET DDoS Attack Threshold"
-        },
-        "type": "string"
-      },
       "PIPDDoSAttackAlertState": {
         "defaultValue": "true",
         "metadata": {
@@ -700,11 +737,340 @@
         },
         "type": "string"
       },
+      "VNETDDOSAttackThreshold": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "VNET DDoS Attack Threshold"
+        },
+        "type": "string"
+      },
       "PIPDDoSAttackThreshold": {
         "defaultValue": "0",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "PIP DDoS Attack Threshold"
+        },
+        "type": "string"
+      },
+      "ERCIRQoSDropBitsinPerSecAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Alert Severity"
+        },
+        "type": "String"
+      },
+      "ERCIRQoSDropBitsinPerSecWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Window Size"
+        },
+        "type": "string"
+      },
+      "ERCIRQoSDropBitsinPerSecEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Evaluation Frequency"
+        },
+        "type": "string"
+      },
+      "ERCIRQoSDropBitsinPerSecPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Policy Effect"
+        },
+        "type": "string"
+      },
+      "ERCIRQoSDropBitsinPerSecAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERC IRQoS Drop Bits in Per Sec Alert State"
+        },
+        "type": "string"
+      },
+      "ERCIRQoSDropBitsoutPerSecAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Alert Severity"
+        },
+        "type": "String"
+      },
+      "ERCIRQoSDropBitsoutPerSecWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Window Size"
+        },
+        "type": "string"
+      },
+      "ERCIRQoSDropBitsoutPerSecEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Evaluation Frequency"
+        },
+        "type": "string"
+      },
+      "ERCIRQoSDropBitsoutPerSecPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Policy Effect"
+        },
+        "type": "string"
+      },
+      "ERCIRQoSDropBitsoutPerSecAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "ERC IRQoS Drop Bits out Per Sec Alert State"
+        },
+        "type": "string"
+      },
+      "VPNGwBGPPeerStatusAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "3",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "VPN Gw BGP Peer Status Alert Severity"
+        },
+        "type": "String"
+      },
+      "VPNGwBGPPeerStatusWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "VPN Gw BGP Peer Status Window Size"
+        },
+        "type": "string"
+      },
+      "VPNGwBGPPeerStatusEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "VPN Gw BGP Peer Status Evaluation Frequency"
+        },
+        "type": "string"
+      },
+      "VPNGwBGPPeerStatusPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "VPN Gw BGP Peer Status Policy Effect"
+        },
+        "type": "string"
+      },
+      "VPNGwBGPPeerStatusAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "VPN Gw BGP Peer Status Alert State"
+        },
+        "type": "string"
+      },
+      "VPNGwBGPPeerStatusThreshold": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "VPN Gw BGP Peer Status Threshold"
+        },
+        "type": "string"
+      },
+      "VnetGwERCpuUtilAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "3",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw ER Cpu Util Alert Severity"
+        },
+        "type": "String"
+      },
+      "VnetGwERCpuUtilWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw ER Cpu Util Window Size"
+        },
+        "type": "string"
+      },
+      "VnetGwERCpuUtilEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Vnet Gw ER Cpu Util Evaluation Frequency"
+        },
+        "type": "string"
+      },
+      "VnetGwERCpuUtilPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Vnet Gw ER Cpu Util Policy Effect"
+        },
+        "type": "string"
+      },
+      "VnetGwERCpuUtilAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Vnet Gw ER Cpu Util Alert State"
+        },
+        "type": "string"
+      },
+      "VnetGwERCpuUtilThreshold": {
+        "defaultValue": "80",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Vnet Gw ER Cpu Util Threshold"
+        },
+        "type": "string"
+      },
+      "VnetGwTunnelBWAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "0",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "Vnet Gw Tunnel BW Alert Severity"
+        },
+        "type": "String"
+      },
+      "VnetGwTunnelBWWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Vnet Gw Tunnel BW Window Size"
         },
         "type": "string"
       },
@@ -2591,11 +2957,35 @@
         },
         "type": "string"
       },
+      "activityFWDeletePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Activity FW Delete Policy Effect"
+        },
+        "type": "string"
+      },
       "activityFWDeleteAlertState": {
         "defaultValue": "true",
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Activity FW Delete Alert State"
+        },
+        "type": "string"
+      },
+      "activityVPNGWDeletePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "Activity VPN GW Delete Policy Effect"
         },
         "type": "string"
       },
@@ -3082,327 +3472,6 @@
           "displayName": "ERP Tx Light Level Low Alert State"
         },
         "type": "string"
-      },
-      "ERCIRQoSDropBitsinPerSecAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "ERC IRQoS Drop Bits in Per Sec Alert Severity"
-        },
-        "type": "String"
-      },
-      "ERCIRQoSDropBitsinPerSecWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "ERC IRQoS Drop Bits in Per Sec Window Size"
-        },
-        "type": "string"
-      },
-      "ERCIRQoSDropBitsinPerSecEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "ERC IRQoS Drop Bits in Per Sec Evaluation Frequency"
-        },
-        "type": "string"
-      },
-      "ERCIRQoSDropBitsinPerSecPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "ERC IRQoS Drop Bits in Per Sec Policy Effect"
-        },
-        "type": "string"
-      },
-      "ERCIRQoSDropBitsinPerSecAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "ERC IRQoS Drop Bits in Per Sec Alert State"
-        },
-        "type": "string"
-      },
-      "ERCIRQoSDropBitsoutPerSecAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "ERC IRQoS Drop Bits out Per Sec Alert Severity"
-        },
-        "type": "String"
-      },
-      "ERCIRQoSDropBitsoutPerSecWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "ERC IRQoS Drop Bits out Per Sec Window Size"
-        },
-        "type": "string"
-      },
-      "ERCIRQoSDropBitsoutPerSecEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "ERC IRQoS Drop Bits out Per Sec Evaluation Frequency"
-        },
-        "type": "string"
-      },
-      "ERCIRQoSDropBitsoutPerSecPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "ERC IRQoS Drop Bits out Per Sec Policy Effect"
-        },
-        "type": "string"
-      },
-      "ERCIRQoSDropBitsoutPerSecAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "ERC IRQoS Drop Bits out Per Sec Alert State"
-        },
-        "type": "string"
-      },
-      "VPNGwBGPPeerStatusAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "3",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "VPN Gw BGP Peer Status Alert Severity"
-        },
-        "type": "String"
-      },
-      "VPNGwBGPPeerStatusWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "VPN Gw BGP Peer Status Window Size"
-        },
-        "type": "string"
-      },
-      "VPNGwBGPPeerStatusEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "VPN Gw BGP Peer Status Evaluation Frequency"
-        },
-        "type": "string"
-      },
-      "VPNGwBGPPeerStatusPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "VPN Gw BGP Peer Status Policy Effect"
-        },
-        "type": "string"
-      },
-      "VPNGwBGPPeerStatusAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "VPN Gw BGP Peer Status Alert State"
-        },
-        "type": "string"
-      },
-      "VPNGwBGPPeerStatusThreshold": {
-        "defaultValue": "1",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "VPN Gw BGP Peer Status Threshold"
-        },
-        "type": "string"
-      },
-      "VnetGwERCpuUtilAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "3",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "Vnet Gw ER Cpu Util Alert Severity"
-        },
-        "type": "String"
-      },
-      "VnetGwERCpuUtilWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Vnet Gw ER Cpu Util Window Size"
-        },
-        "type": "string"
-      },
-      "VnetGwERCpuUtilEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Vnet Gw ER Cpu Util Evaluation Frequency"
-        },
-        "type": "string"
-      },
-      "VnetGwERCpuUtilPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "Vnet Gw ER Cpu Util Policy Effect"
-        },
-        "type": "string"
-      },
-      "VnetGwERCpuUtilAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Vnet Gw ER Cpu Util Alert State"
-        },
-        "type": "string"
-      },
-      "VnetGwERCpuUtilThreshold": {
-        "defaultValue": "80",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Vnet Gw ER Cpu Util Threshold"
-        },
-        "type": "string"
-      },
-      "VnetGwTunnelBWAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "0",
-        "metadata": {
-          "description": "Severity of the alert",
-          "displayName": "Vnet Gw Tunnel BW Alert Severity"
-        },
-        "type": "String"
-      },
-      "VnetGwTunnelBWWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Vnet Gw Tunnel BW Window Size"
-        },
-        "type": "string"
       }
     },
     "policyDefinitions": [
@@ -3412,6 +3481,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('ERCIRQoSDropBitsinPerSecEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('ERCIRQoSDropBitsinPerSecWindowSize')]"
@@ -3434,6 +3509,12 @@
           "evaluationFrequency": {
             "value": "[parameters('ERCIRQoSDropBitsoutPerSecEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('ERCIRQoSDropBitsoutPerSecWindowSize')]"
           },
@@ -3454,6 +3535,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('VPNGwBGPPeerStatusEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('VPNGwBGPPeerStatusWindowSize')]"
@@ -3479,6 +3566,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwERCpuUtilEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VnetGwERCpuUtilWindowSize')]"
           },
@@ -3502,6 +3595,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelBWEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelBWWindowSize')]"
@@ -3527,6 +3626,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelEgressEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelEgressWindowSize')]"
           },
@@ -3550,6 +3655,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelIngressEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelIngressWindowSize')]"
@@ -3575,6 +3686,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWBandWidthUtilEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VPNGWBandWidthUtilWindowSize')]"
           },
@@ -3598,6 +3715,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('VPNGWEgressEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('VPNGWEgressWindowSize')]"
@@ -3623,6 +3746,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropCountFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropCountWindowSize')]"
           },
@@ -3643,6 +3772,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchWindowSize')]"
@@ -3665,17 +3800,23 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWIngressEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VPNGWIngressWindowSize')]"
           },
           "enabled": {
             "value": "[parameters('VPNGWIngressAlertState')]"
           },
-          "severity": {
-            "value": "[parameters('VPNGWIngressAlertSeverity')]"
-          },
           "autoMitigate": {
             "value": "[parameters('VPNGWIngressAutoMitigate')]"
+          },
+          "severity": {
+            "value": "[parameters('VPNGWIngressAlertSeverity')]"
           },
           "threshold": {
             "value": "[parameters('VPNGWIngressThreshold')]"
@@ -3691,6 +3832,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropCountFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropCountWindowSize')]"
@@ -3713,6 +3860,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchWindowSize')]"
           },
@@ -3733,6 +3886,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('PDNSZCapacityUtilEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('PDNSZCapacityUtilWindowSize')]"
@@ -3758,6 +3917,12 @@
           "evaluationFrequency": {
             "value": "[parameters('PDNSZQueryVolumeEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('PDNSZQueryVolumeWindowSize')]"
           },
@@ -3781,6 +3946,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('PDNSZRecordSetCapacityEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('PDNSZRecordSetCapacityWindowSize')]"
@@ -3806,6 +3977,12 @@
           "evaluationFrequency": {
             "value": "[parameters('PDNSZRegistrationCapacityUtilEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('PDNSZRegistrationCapacityUtilWindowSize')]"
           },
@@ -3829,6 +4006,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('ERGwExpressRouteBitsInEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('ERGwExpressRouteBitsInWindowSize')]"
@@ -3854,6 +4037,12 @@
           "evaluationFrequency": {
             "value": "[parameters('ERGwExpressRouteBitsOutEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('ERGwExpressRouteBitsOutWindowSize')]"
           },
@@ -3877,6 +4066,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('ERGwExpressRouteCpuUtilEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('ERGwExpressRouteCpuUtilWindowSize')]"
@@ -3902,6 +4097,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropCountEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropCountWindowSize')]"
           },
@@ -3923,6 +4124,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchWindowSize')]"
           },
@@ -3943,6 +4150,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('VnetGwExpressRouteBitsPerSecondEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('VnetGwExpressRouteBitsPerSecondWindowSize')]"
@@ -3968,6 +4181,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchWindowSize')]"
           },
@@ -3989,6 +4208,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropCountEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropCountWindowSize')]"
           },
@@ -4009,6 +4234,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('ERCIRBgpAvailabilityEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('ERCIRBgpAvailabilityWindowSize')]"
@@ -4034,6 +4265,12 @@
           "evaluationFrequency": {
             "value": "[parameters('ERCIRArpAvailabilityFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('ERCIRArpAvailabilityWindowSize')]"
           },
@@ -4057,6 +4294,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('AFWSNATPortUtilizationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('AFWSNATPortUtilizationWindowSize')]"
@@ -4082,6 +4325,12 @@
           "evaluationFrequency": {
             "value": "[parameters('PIPBytesInDDoSEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('PIPBytesInDDoSWindowSize')]"
           },
@@ -4105,6 +4354,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('PIPDDoSAttackEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('PIPDDoSAttackWindowSize')]"
@@ -4130,6 +4385,12 @@
           "evaluationFrequency": {
             "value": "[parameters('PIPPacketsInDDoSEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('PIPPacketsInDDoSWindowSize')]"
           },
@@ -4153,6 +4414,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('PIPVIPAvailabilityEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('PIPVIPAvailabilityWindowSize')]"
@@ -4178,6 +4445,12 @@
           "evaluationFrequency": {
             "value": "[parameters('VNETDDOSAttackEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('VNETDDOSAttackWindowSize')]"
           },
@@ -4202,6 +4475,12 @@
           "evaluationFrequency": {
             "value": "[parameters('FirewallHealthEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('FirewallHealthWindowSize')]"
           },
@@ -4223,14 +4502,23 @@
         "policyDefinitionReferenceId": "ALZ_activityFWDelete",
         "policyDefinitionName": "Deploy_activitylog_Firewall_Delete",
         "parameters": {
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityFWDeleteAlertState')]"
+          },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "enabled": {
-            "value": "[parameters('activityFWDeleteAlertState')]"
+          "effect": {
+            "value": "[parameters('activityFWDeletePolicyEffect')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
@@ -4241,14 +4529,23 @@
         "policyDefinitionReferenceId": "ALZ_activityNSGDelete",
         "policyDefinitionName": "Deploy_activitylog_NSG_Delete",
         "parameters": {
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityNSGDeleteAlertState')]"
+          },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "enabled": {
-            "value": "[parameters('activityNSGDeleteAlertState')]"
+          "effect": {
+            "value": "[parameters('activityNSGDeletePolicyEffect')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
@@ -4259,14 +4556,23 @@
         "policyDefinitionReferenceId": "ALZ_activityUDRUpdate",
         "policyDefinitionName": "Deploy_activitylog_RouteTable_Update",
         "parameters": {
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityUDRUpdateAlertState')]"
+          },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "enabled": {
-            "value": "[parameters('activityUDRUpdateAlertState')]"
+          "effect": {
+            "value": "[parameters('activityUDRUpdatePolicyEffect')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
@@ -4277,14 +4583,23 @@
         "policyDefinitionReferenceId": "ALZ_activityVPNGWDelete",
         "policyDefinitionName": "Deploy_activitylog_VPNGateway_Delete",
         "parameters": {
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityVPNGWDeleteAlertState')]"
+          },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "enabled": {
-            "value": "[parameters('activityVPNGWDeleteAlertState')]"
+          "effect": {
+            "value": "[parameters('activityVPNGWDeletePolicyEffect')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
@@ -4297,6 +4612,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('LBDataPathAvailabilityEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('LBDataPathAvailabilityWindowSize')]"
@@ -4319,6 +4640,12 @@
           "evaluationFrequency": {
             "value": "[parameters('LBGlobalBackendAvailabilityEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('LBGlobalBackendAvailabilityWindowSize')]"
           },
@@ -4339,6 +4666,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('LBHealthProbeStatusEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('LBHealthProbeStatusWindowSize')]"
@@ -4361,6 +4694,12 @@
           "evaluationFrequency": {
             "value": "[parameters('LBUsedSNATPortsEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('LBUsedSNATPortsWindowSize')]"
           },
@@ -4381,6 +4720,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('ERPBitsInPerSecondEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('ERPBitsInPerSecondWindowSize')]"
@@ -4403,6 +4748,12 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPBitsOutPerSecondEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('ERPBitsOutPerSecondWindowSize')]"
           },
@@ -4423,6 +4774,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('ERPLineProtocolEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('ERPLineProtocolWindowSize')]"
@@ -4445,6 +4802,12 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPRxLightLevelHighEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('ERPRxLightLevelHighWindowSize')]"
           },
@@ -4465,6 +4828,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('ERPRxLightLevelLowEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('ERPRxLightLevelLowWindowSize')]"
@@ -4487,6 +4856,12 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPTxLightLevelHighEvaluationFrequency')]"
           },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
           "windowSize": {
             "value": "[parameters('ERPTxLightLevelHighWindowSize')]"
           },
@@ -4507,6 +4882,12 @@
         "parameters": {
           "evaluationFrequency": {
             "value": "[parameters('ERPTxLightLevelLowEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
           },
           "windowSize": {
             "value": "[parameters('ERPTxLightLevelLowWindowSize')]"
