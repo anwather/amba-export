@@ -6,13 +6,13 @@
     "description": "Policy to audit/deploy VPN Gateway Bandwidth Utilization Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.1.0",
-      "_deployed_by_amba": "True",
       "category": "Network",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "_deployed_by_amba": "True",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "effect": {
@@ -72,12 +72,16 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "threshold": {
+      "enabled": {
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
-        "defaultValue": "1",
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "severity": {
@@ -95,16 +99,12 @@
         "defaultValue": "0",
         "type": "String"
       },
-      "enabled": {
+      "threshold": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+        "defaultValue": "1",
         "type": "String"
       },
       "MonitorDisable": {
@@ -199,20 +199,19 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -231,13 +230,13 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "threshold": {
+                  "enabled": {
                     "type": "String"
                   },
                   "severity": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "threshold": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -248,13 +247,10 @@
                     "type": "String"
                   }
                 },
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
-                    "name": "[concat(parameters('resourceName'), '-GatewayBandwidthAlert')]",
                     "properties": {
                       "description": "Metric Alert for VPN Gateway Bandwidth Utilization",
                       "parameters": {
@@ -267,47 +263,51 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ],
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "name": "tunnelaveragebandwidth",
-                            "metricNamespace": "microsoft.network/vpngateways",
-                            "metricName": "tunnelaveragebandwidth",
-                            "operator": "LessThan",
                             "timeAggregation": "Average",
-                            "criterionType": "StaticThresholdCriterion"
+                            "name": "tunnelaveragebandwidth",
+                            "operator": "LessThan",
+                            "metricNamespace": "microsoft.network/vpngateways",
+                            "criterionType": "StaticThresholdCriterion",
+                            "metricName": "tunnelaveragebandwidth"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      }
+                      },
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ]
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
+                    "apiVersion": "2018-03-01",
+                    "name": "[concat(parameters('resourceName'), '-GatewayBandwidthAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
-                ]
-              }
+                ],
+                "variables": {},
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
+              },
+              "mode": "incremental"
             }
           }
         }

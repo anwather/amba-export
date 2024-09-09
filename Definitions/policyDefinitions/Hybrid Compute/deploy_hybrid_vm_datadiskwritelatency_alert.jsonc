@@ -6,15 +6,27 @@
     "description": "Policy to audit/deploy VM dataDiskWriteLatency Alert",
     "mode": "All",
     "metadata": {
-      "_deployed_by_amba": "True",
       "category": "Hybrid Compute",
+      "_deployed_by_amba": "True",
+      "version": "1.0.1",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.0.1",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -58,21 +70,6 @@
         "defaultValue": "PT15M",
         "type": "String"
       },
-      "severity": {
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "type": "String"
-      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
@@ -83,14 +80,6 @@
           "false"
         ],
         "defaultValue": "true",
-        "type": "String"
-      },
-      "threshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "defaultValue": "30",
         "type": "String"
       },
       "alertResourceGroupLocation": {
@@ -109,6 +98,29 @@
         "defaultValue": "AlzMonitoring-rg",
         "type": "String"
       },
+      "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "threshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "defaultValue": "30",
+        "type": "String"
+      },
       "timeAggregation": {
         "metadata": {
           "displayName": "TimeAggregation"
@@ -123,17 +135,15 @@
         "defaultValue": "Average",
         "type": "String"
       },
-      "effect": {
+      "alertResourceGroupTags": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
         },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
+        "defaultValue": {
+          "environment": "test"
+        },
+        "type": "Object"
       },
       "failingPeriods": {
         "metadata": {
@@ -157,15 +167,13 @@
         "defaultValue": "GreaterThan",
         "type": "String"
       },
-      "computersToInclude": {
+      "autoResolveTime": {
         "metadata": {
-          "description": "Array of Computer to be monitored",
-          "displayName": "Computers to be included to be monitored"
+          "description": "Auto Resolve time for the alert in ISO 8601 format",
+          "displayName": "Auto Resolve"
         },
-        "defaultValue": [
-          "*"
-        ],
-        "type": "array"
+        "defaultValue": "true",
+        "type": "String"
       },
       "evaluationPeriods": {
         "metadata": {
@@ -173,24 +181,6 @@
           "displayName": "Evaluation Periods"
         },
         "defaultValue": "1",
-        "type": "String"
-      },
-      "alertResourceGroupTags": {
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "defaultValue": {
-          "environment": "test"
-        },
-        "type": "Object"
-      },
-      "autoResolveTime": {
-        "metadata": {
-          "description": "Auto Resolve time for the alert in ISO 8601 format",
-          "displayName": "Auto Resolve"
-        },
-        "defaultValue": "true",
         "type": "String"
       },
       "autoResolve": {
@@ -204,6 +194,16 @@
         ],
         "defaultValue": "true",
         "type": "String"
+      },
+      "computersToInclude": {
+        "metadata": {
+          "description": "Array of Computer to be monitored",
+          "displayName": "Computers to be included to be monitored"
+        },
+        "defaultValue": [
+          "*"
+        ],
+        "type": "array"
       },
       "disksToInclude": {
         "metadata": {
@@ -230,6 +230,9 @@
         "details": {
           "type": "Microsoft.Insights/scheduledQueryRules",
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -286,9 +289,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -301,14 +301,8 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
-                },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
                 },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
@@ -316,8 +310,17 @@
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
+                "severity": {
+                  "value": "[parameters('severity')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
+                },
                 "timeAggregation": {
                   "value": "[parameters('timeAggregation')]"
+                },
+                "alertResourceGroupTags": {
+                  "value": "[parameters('alertResourceGroupTags')]"
                 },
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
@@ -325,20 +328,17 @@
                 "operator": {
                   "value": "[parameters('operator')]"
                 },
-                "computersToInclude": {
-                  "value": "[parameters('computersToInclude')]"
+                "autoResolveTime": {
+                  "value": "[parameters('autoResolveTime')]"
                 },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
                 },
-                "alertResourceGroupTags": {
-                  "value": "[parameters('alertResourceGroupTags')]"
-                },
-                "autoResolveTime": {
-                  "value": "[parameters('autoResolveTime')]"
-                },
                 "autoResolve": {
                   "value": "[parameters('autoResolve')]"
+                },
+                "computersToInclude": {
+                  "value": "[parameters('computersToInclude')]"
                 },
                 "disksToInclude": {
                   "value": "[parameters('disksToInclude')]"
@@ -355,13 +355,7 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "severity": {
-                    "type": "String"
-                  },
                   "enabled": {
-                    "type": "String"
-                  },
-                  "threshold": {
                     "type": "String"
                   },
                   "alertResourceGroupLocation": {
@@ -370,8 +364,17 @@
                   "alertResourceGroupName": {
                     "type": "string"
                   },
+                  "severity": {
+                    "type": "String"
+                  },
+                  "threshold": {
+                    "type": "String"
+                  },
                   "timeAggregation": {
                     "type": "String"
+                  },
+                  "alertResourceGroupTags": {
+                    "type": "object"
                   },
                   "failingPeriods": {
                     "type": "String"
@@ -379,20 +382,17 @@
                   "operator": {
                     "type": "String"
                   },
-                  "computersToInclude": {
-                    "type": "array"
+                  "autoResolveTime": {
+                    "type": "String"
                   },
                   "evaluationPeriods": {
                     "type": "String"
                   },
-                  "alertResourceGroupTags": {
-                    "type": "object"
-                  },
-                  "autoResolveTime": {
-                    "type": "String"
-                  },
                   "autoResolve": {
                     "type": "String"
+                  },
+                  "computersToInclude": {
+                    "type": "array"
                   },
                   "disksToInclude": {
                     "type": "array"
@@ -402,9 +402,9 @@
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
+                    "location": "[parameters('alertResourceGroupLocation')]",
                     "apiVersion": "2021-04-01",
                     "name": "[parameters('alertResourceGroupName')]",
-                    "location": "[parameters('alertResourceGroupLocation')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
@@ -451,14 +451,8 @@
                                 "windowSize": {
                                   "value": "[parameters('windowSize')]"
                                 },
-                                "severity": {
-                                  "value": "[parameters('severity')]"
-                                },
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
-                                },
-                                "threshold": {
-                                  "value": "[parameters('threshold')]"
                                 },
                                 "alertResourceGroupLocation": {
                                   "value": "[parameters('alertResourceGroupLocation')]"
@@ -466,20 +460,26 @@
                                 "alertResourceGroupName": {
                                   "value": "[parameters('alertResourceGroupName')]"
                                 },
+                                "severity": {
+                                  "value": "[parameters('severity')]"
+                                },
+                                "threshold": {
+                                  "value": "[parameters('threshold')]"
+                                },
                                 "failingPeriods": {
                                   "value": "[parameters('failingPeriods')]"
-                                },
-                                "computersToInclude": {
-                                  "value": "[parameters('computersToInclude')]"
-                                },
-                                "evaluationPeriods": {
-                                  "value": "[parameters('evaluationPeriods')]"
                                 },
                                 "autoResolveTime": {
                                   "value": "[parameters('autoResolveTime')]"
                                 },
+                                "evaluationPeriods": {
+                                  "value": "[parameters('evaluationPeriods')]"
+                                },
                                 "autoResolve": {
                                   "value": "[parameters('autoResolve')]"
+                                },
+                                "computersToInclude": {
+                                  "value": "[parameters('computersToInclude')]"
                                 },
                                 "disksToInclude": {
                                   "value": "[parameters('disksToInclude')]"
@@ -488,8 +488,8 @@
                               "evaluationFrequency": "[parameters('evaluationFrequency')]",
                               "autoMitigate": "[parameters('autoMitigate')]",
                               "windowSize": "[parameters('windowSize')]",
-                              "severity": "[parameters('severity')]",
                               "enabled": "[parameters('enabled')]",
+                              "severity": "[parameters('severity')]",
                               "criteria": {
                                 "allOf": [
                                   {
@@ -504,13 +504,13 @@
                                     "resourceIdColumn": "_ResourceId",
                                     "dimensions": [
                                       {
-                                        "operator": "Include",
                                         "name": "Computer",
+                                        "operator": "Include",
                                         "values": "[parameters('computersToInclude')]"
                                       },
                                       {
-                                        "operator": "Include",
                                         "name": "Disk",
+                                        "operator": "Include",
                                         "values": "[parameters('disksToInclude')]"
                                       }
                                     ],
@@ -530,9 +530,9 @@
                                 "Microsoft.HybridCompute/machines"
                               ]
                             },
+                            "location": "[parameters('alertResourceGroupLocation')]",
                             "apiVersion": "2022-08-01-preview",
                             "name": "[concat(subscription().displayName, '-HybridVMHighdataDiskWriteLatencyAlert')]",
-                            "location": "[parameters('alertResourceGroupLocation')]",
                             "tags": {
                               "_deployed_by_amba": true
                             }
