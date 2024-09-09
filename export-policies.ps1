@@ -43,7 +43,7 @@ Start-Sleep -Seconds 180
 
 Remove-Item -Path tmp -Recurse -Force
 
-Export-AzPolicyResources -DefinitionsRootFolder ./Definitions -OutputFolder ./Output -Verbose
+Export-AzPolicyResources -DefinitionsRootFolder ./Definitions -OutputFolder ./Output
 
 Copy-Item ./Output/export/Definitions/policyDefinitions ./Definitions -Force -Recurse
 Copy-Item ./Output/export/Definitions/policySetDefinitions ./Definitions -Force -Recurse
@@ -57,7 +57,7 @@ Remove-Item -Path ./Definitions/global-settings.jsonc -Force
 
 # Fix missing displaynames in the policy set definitions
 
-./assets/Start-AMBACleanup.ps1 -pseudoRootManagementGroup $pseudoRootManagementGroup -Force
+./assets/Start-AMBACleanup.ps1 -pseudoRootManagementGroup $pseudoRootManagementGroup -Confirm:$false
 
 Remove-Item -Path ./assets/Start-AMBACleanup.ps1 -Force
 
