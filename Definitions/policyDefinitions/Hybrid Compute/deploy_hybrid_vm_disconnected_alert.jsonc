@@ -6,96 +6,108 @@
     "description": "Policy to Deploy Hybrid VM Disconnected Alert",
     "mode": "All",
     "metadata": {
-      "category": "Hybrid Compute",
       "_deployed_by_amba": "True",
-      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.3.0",
+      "category": "Hybrid Compute",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "evaluationFrequency": {
+        "allowedValues": [
+          "PT5M",
+          "PT10M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT2H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT10M",
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Evaluation Frequency"
         },
-        "allowedValues": [
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "P1D",
         "type": "String"
       },
       "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "allowedValues": [
           "PT12H",
           "P1D"
         ],
         "defaultValue": "P1D",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "type": "String"
       },
-      "enabled": {
+      "MonitorDisableTagValues": {
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
         },
+        "type": "Array"
+      },
+      "enabled": {
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "type": "String"
+      },
+      "MonitorDisableTagName": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
         "type": "String"
       },
       "alertResourceGroupLocation": {
+        "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
           "displayName": "Resource Group Location"
         },
-        "defaultValue": "eastus",
         "type": "String"
       },
       "alertResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
         "metadata": {
           "description": "Resource group the alert is placed in",
           "displayName": "Resource Group Name"
         },
-        "defaultValue": "rg-amba-monitoring-001",
         "type": "String"
       },
       "severity": {
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "allowedValues": [
           "0",
           "1",
@@ -104,100 +116,112 @@
           "4"
         ],
         "defaultValue": "1",
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "type": "String"
       },
       "threshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "defaultValue": "0",
-        "type": "String"
-      },
-      "userAssignedManagedIdentityName": {
-        "metadata": {
-          "description": "The name of the user assigned managed identity to be created for monitoring purpose.",
-          "displayName": "Name of the user assigned managed identity to be created."
-        },
-        "defaultValue": "id-AMBA-ARG-Reader-001",
-        "type": "string"
-      },
-      "timeAggregation": {
-        "metadata": {
-          "displayName": "TimeAggregation"
-        },
         "allowedValues": [
-          "Average",
-          "Maximum",
-          "Minimum",
-          "Total",
-          "Count"
+          "5m",
+          "10m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "3h",
+          "6h",
+          "12h",
+          "1d",
+          "2d",
+          "3d",
+          "7d"
         ],
-        "defaultValue": "Count",
+        "defaultValue": "10m",
+        "metadata": {
+          "description": "Threshold in timespan value for the Hybrid VM Disconnected alert",
+          "displayName": "Hybrid VM Disconnected Threshold (expressed in timespan)"
+        },
         "type": "String"
       },
       "alertResourceGroupTags": {
+        "defaultValue": {
+          "Project": "amba-monitoring"
+        },
         "metadata": {
           "description": "Tags on the Resource group the alert is placed in",
           "displayName": "Resource Group Tags"
         },
-        "defaultValue": {
-          "Project": "amba-monitoring"
-        },
         "type": "Object"
       },
+      "timeAggregation": {
+        "allowedValues": [
+          "Count"
+        ],
+        "defaultValue": "Count",
+        "metadata": {
+          "displayName": "TimeAggregation"
+        },
+        "type": "String"
+      },
       "failingPeriods": {
+        "defaultValue": "1",
         "metadata": {
           "description": "Number of failing periods before alert is fired",
           "displayName": "Failing Periods"
         },
-        "defaultValue": "1",
         "type": "String"
       },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
+      "UAMIResourceId": {
+        "defaultValue": "",
+        "metadata": {
+          "description": "The resource Id of the user assigned managed identity.",
+          "displayName": "User Assigned managed Identity resource Id."
+        },
+        "type": "string"
+      },
       "operator": {
+        "allowedValues": [
+          "GreaterThan"
+        ],
+        "defaultValue": "GreaterThan",
         "metadata": {
           "displayName": "Operator"
         },
-        "allowedValues": [
-          "Equals",
-          "GreaterThan",
-          "GreaterThanOrEqual",
-          "LessThan",
-          "LessThanOrEqual"
-        ],
-        "defaultValue": "GreaterThan",
         "type": "String"
       },
       "evaluationPeriods": {
+        "defaultValue": "1",
         "metadata": {
           "description": "The number of aggregated lookback points.",
           "displayName": "Evaluation Periods"
         },
-        "defaultValue": "1",
         "type": "String"
-      },
-      "BYOUserAssignedManagedIdentityResourceId": {
-        "metadata": {
-          "description": "The resource Id of the user assigned managed identity provided by the customer.",
-          "displayName": "Customer defined User Assigned managed Identity resource Id."
-        },
-        "defaultValue": "",
-        "type": "string"
-      },
-      "managementSubscriptionId": {
-        "metadata": {
-          "description": "The subscription ID of the management subscription where the user assigned managed identity will be created."
-        },
-        "defaultValue": "",
-        "type": "string"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "microsoft.hybridcompute/machines",
+            "equals": "Microsoft.HybridCompute/machines",
             "field": "type"
+          },
+          {
+            "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
+            "notIn": "[parameters('MonitorDisableTagValues')]"
           }
         ]
       },
@@ -205,14 +229,10 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/scheduledQueryRules",
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[concat(subscription().displayName, '-HybridVMDisconnected')]",
+                "equals": "[concat(subscription().displayName, '-HybridVMDisconnectedAlert')]",
                 "field": "Microsoft.Insights/scheduledQueryRules/displayName"
               },
               {
@@ -240,10 +260,6 @@
                 "field": "Microsoft.Insights/scheduledQueryRules/autoMitigate"
               },
               {
-                "equals": 0,
-                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].threshold"
-              },
-              {
                 "equals": "[parameters('operator')]",
                 "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].operator"
               },
@@ -260,11 +276,18 @@
                 "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.minFailingPeriodsToAlert"
               },
               {
-                "equals": "[format('arg(\"\").resources | where type == \"microsoft.hybridcompute/machines\" | where tostring(properties.status) == \"Disconnected\" | extend lastContactedDate = todatetime(properties.lastStatusChange) | where lastContactedDate <= ago({0}d) | extend status = tostring(properties.status) | project id, Computer=name, status, lastContactedDate', parameters('threshold'))]",
+                "equals": "[format('let policyThresholdString = \"{2}\"; arg(\"\").resources | where type == \"microsoft.hybridcompute/machines\" | where parse_json(tostring(tags.{0})) !in~ (\"{1}\") | where tostring(properties.status) == \"Disconnected\" | extend appliedThresholdString = iif(tags contains \"_amba-Disconnected-threshold-override_\", tostring(tags.[\"_amba-Disconnected-threshold-override_\"]), policyThresholdString) | extend appliedThreshold = totimespan(appliedThresholdString) | extend lastContactedDate = todatetime(properties.lastStatusChange) | where lastContactedDate >= ago(appliedThreshold) | extend status = tostring(properties.status) | project id, Computer=name, status, lastContactedDate', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), parameters('threshold'))]",
                 "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].query"
+              },
+              {
+                "field": "identity.userAssignedIdentities",
+                "containsKey": "[parameters('UAMIResourceId')]"
               }
             ]
           },
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -277,8 +300,14 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
+                "MonitorDisableTagValues": {
+                  "value": "[parameters('MonitorDisableTagValues')]"
+                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "MonitorDisableTagName": {
+                  "value": "[parameters('MonitorDisableTagName')]"
                 },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
@@ -292,29 +321,23 @@
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
-                "userAssignedManagedIdentityName": {
-                  "value": "[parameters('userAssignedManagedIdentityName')]"
+                "alertResourceGroupTags": {
+                  "value": "[parameters('alertResourceGroupTags')]"
                 },
                 "timeAggregation": {
                   "value": "[parameters('timeAggregation')]"
                 },
-                "alertResourceGroupTags": {
-                  "value": "[parameters('alertResourceGroupTags')]"
-                },
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
+                },
+                "UAMIResourceId": {
+                  "value": "[parameters('UAMIResourceId')]"
                 },
                 "operator": {
                   "value": "[parameters('operator')]"
                 },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
-                },
-                "BYOUserAssignedManagedIdentityResourceId": {
-                  "value": "[parameters('BYOUserAssignedManagedIdentityResourceId')]"
-                },
-                "managementSubscriptionId": {
-                  "value": "[parameters('managementSubscriptionId')]"
                 }
               },
               "template": {
@@ -328,7 +351,13 @@
                   "windowSize": {
                     "type": "String"
                   },
+                  "MonitorDisableTagValues": {
+                    "type": "Array"
+                  },
                   "enabled": {
+                    "type": "String"
+                  },
+                  "MonitorDisableTagName": {
                     "type": "String"
                   },
                   "alertResourceGroupLocation": {
@@ -343,37 +372,32 @@
                   "threshold": {
                     "type": "String"
                   },
-                  "userAssignedManagedIdentityName": {
-                    "type": "string"
+                  "alertResourceGroupTags": {
+                    "type": "object"
                   },
                   "timeAggregation": {
                     "type": "String"
                   },
-                  "alertResourceGroupTags": {
-                    "type": "object"
-                  },
                   "failingPeriods": {
                     "type": "String"
+                  },
+                  "UAMIResourceId": {
+                    "type": "string"
                   },
                   "operator": {
                     "type": "String"
                   },
                   "evaluationPeriods": {
                     "type": "String"
-                  },
-                  "BYOUserAssignedManagedIdentityResourceId": {
-                    "type": "string"
-                  },
-                  "managementSubscriptionId": {
-                    "type": "string"
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "location": "[parameters('alertResourceGroupLocation')]",
                     "apiVersion": "2021-04-01",
+                    "location": "[parameters('alertResourceGroupLocation')]",
                     "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
@@ -391,14 +415,8 @@
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
                         },
-                        "userAssignedManagedIdentityName": {
-                          "value": "[parameters('userAssignedManagedIdentityName')]"
-                        },
-                        "BYOUserAssignedManagedIdentityResourceId": {
-                          "value": "[parameters('BYOUserAssignedManagedIdentityResourceId')]"
-                        },
-                        "managementSubscriptionId": {
-                          "value": "[parameters('managementSubscriptionId')]"
+                        "UAMIResourceId": {
+                          "value": "[parameters('UAMIResourceId')]"
                         }
                       },
                       "template": {
@@ -412,23 +430,20 @@
                           "alertResourceGroupName": {
                             "type": "string"
                           },
-                          "userAssignedManagedIdentityName": {
-                            "type": "string"
-                          },
-                          "BYOUserAssignedManagedIdentityResourceId": {
-                            "type": "string"
-                          },
-                          "managementSubscriptionId": {
+                          "UAMIResourceId": {
                             "type": "string"
                           }
                         },
                         "contentVersion": "1.0.0.0",
+                        "variables": {},
                         "resources": [
                           {
                             "type": "Microsoft.Insights/scheduledQueryRules",
                             "properties": {
                               "description": "Hybrid VM in disconnected state. Not being connected, prevents extensions to be correctly managed from the portal and Azure policies to be correctly applied. Ensure that both server the specific service (Azure Hybrid Instance Metadata Service on Windows or azcmagent on Linux) are running.",
-                              "displayName": "[concat(subscription().displayName, '-HybridVMDisconnected')]",
+                              "displayName": "[concat(subscription().displayName, '-HybridVMDisconnectedAlert')]",
+                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                              "autoMitigate": "[parameters('autoMitigate')]",
                               "parameters": {
                                 "evaluationFrequency": {
                                   "value": "[parameters('evaluationFrequency')]"
@@ -439,8 +454,14 @@
                                 "windowSize": {
                                   "value": "[parameters('windowSize')]"
                                 },
+                                "MonitorDisableTagValues": {
+                                  "value": "[parameters('MonitorDisableTagValues')]"
+                                },
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
+                                },
+                                "MonitorDisableTagName": {
+                                  "value": "[parameters('MonitorDisableTagName')]"
                                 },
                                 "alertResourceGroupLocation": {
                                   "value": "[parameters('alertResourceGroupLocation')]"
@@ -454,24 +475,16 @@
                                 "threshold": {
                                   "value": "[parameters('threshold')]"
                                 },
-                                "userAssignedManagedIdentityName": {
-                                  "value": "[parameters('userAssignedManagedIdentityName')]"
-                                },
                                 "failingPeriods": {
                                   "value": "[parameters('failingPeriods')]"
                                 },
+                                "UAMIResourceId": {
+                                  "value": "[parameters('UAMIResourceId')]"
+                                },
                                 "evaluationPeriods": {
                                   "value": "[parameters('evaluationPeriods')]"
-                                },
-                                "BYOUserAssignedManagedIdentityResourceId": {
-                                  "value": "[parameters('BYOUserAssignedManagedIdentityResourceId')]"
-                                },
-                                "managementSubscriptionId": {
-                                  "value": "[parameters('managementSubscriptionId')]"
                                 }
                               },
-                              "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                              "autoMitigate": "false",
                               "windowSize": "[parameters('windowSize')]",
                               "enabled": "[parameters('enabled')]",
                               "severity": "[parameters('severity')]",
@@ -486,8 +499,16 @@
                                     },
                                     "operator": "[parameters('operator')]",
                                     "resourceIdColumn": "id",
-                                    "dimensions": [],
-                                    "query": "[format('arg(\"\").resources | where type == \"microsoft.hybridcompute/machines\" | where tostring(properties.status) == \"Disconnected\" | extend lastContactedDate = todatetime(properties.lastStatusChange) | where lastContactedDate <= ago({0}d) | extend status = tostring(properties.status) | project id, Computer=name, status, lastContactedDate', parameters('threshold'))]"
+                                    "dimensions": [
+                                      {
+                                        "operator": "Include",
+                                        "name": "Computer",
+                                        "values": [
+                                          "*"
+                                        ]
+                                      }
+                                    ],
+                                    "query": "[format('let policyThresholdString = \"{2}\"; arg(\"\").resources | where type == \"microsoft.hybridcompute/machines\" | where parse_json(tostring(tags.{0})) !in~ (\"{1}\") | where tostring(properties.status) == \"Disconnected\" | extend lastContactedDate = todatetime(properties.lastStatusChange) | where lastContactedDate <= ago(totimespan(policyThresholdString)) | extend status = tostring(properties.status) | project id, Computer=name, status, lastContactedDate', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), parameters('threshold'))]"
                                   }
                                 ]
                               },
@@ -498,21 +519,20 @@
                                 "Microsoft.HybridCompute/machines"
                               ]
                             },
-                            "location": "[parameters('alertResourceGroupLocation')]",
                             "apiVersion": "2022-08-01-preview",
-                            "name": "[concat(subscription().displayName, '-HybridVMDisconnected')]",
+                            "location": "[parameters('alertResourceGroupLocation')]",
+                            "name": "[concat(subscription().displayName, '-HybridVMDisconnectedAlert')]",
                             "tags": {
                               "_deployed_by_amba": true
                             },
                             "identity": {
                               "type": "UserAssigned",
                               "userAssignedIdentities": {
-                                "[variables('uamiResourceId')]": {}
+                                "[parameters('UAMIResourceId')]": {}
                               }
                             }
                           }
                         ],
-                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
@@ -524,15 +544,13 @@
                     ]
                   }
                 ],
-                "variables": {
-                  "uamiResourceId": "[if(empty(parameters('BYOUserAssignedManagedIdentityResourceId')), resourceId(parameters('managementSubscriptionId'), parameters('alertResourceGroupName'), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedManagedIdentityName')),parameters('BYOUserAssignedManagedIdentityResourceId'))]"
-                },
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
             },
             "location": "australiaeast"
           },
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deploymentScope": "subscription",
           "existenceScope": "resourceGroup"
         }
