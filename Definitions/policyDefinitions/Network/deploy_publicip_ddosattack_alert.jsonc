@@ -7,15 +7,19 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "version": "1.2.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Network",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "version": "1.2.0",
-      "category": "Network",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      ]
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "displayName": "Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,46 +28,49 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
-        "type": "String"
-      },
-      "MonitorDisableTagValues": {
-        "defaultValue": [
-          "true",
-          "Test",
-          "Dev",
-          "Sandbox"
-        ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
-        "type": "Array"
-      },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
         "type": "String"
       },
       "autoMitigate": {
+        "metadata": {
+          "displayName": "Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "type": "String"
+      },
+      "enabled": {
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "displayName": "Window Size",
+          "description": "Window size for the alert"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -75,25 +82,42 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "MonitorDisableTagValues": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
+      },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
+      "threshold": {
+        "metadata": {
+          "displayName": "Threshold",
+          "description": "Threshold for the alert"
+        },
+        "defaultValue": "0",
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "displayName": "Severity",
+          "description": "Severity of the Alert"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -102,30 +126,6 @@
           "4"
         ],
         "defaultValue": "1",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "0",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "type": "String"
       }
     },
@@ -209,17 +209,17 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-ifunderddosattack-threshold-Override_'), field('tags._amba-ifunderddosattack-threshold-Override_'), parameters('threshold'))]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -229,8 +229,8 @@
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
-                      "displayName": "resourceId"
+                      "displayName": "resourceId",
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
                     },
                     "type": "String"
                   },
@@ -240,22 +240,22 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "windowSize": {
-                    "type": "String"
-                  },
                   "enabled": {
                     "type": "String"
                   },
-                  "severity": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "threshold": {
                     "type": "String"
                   },
+                  "severity": {
+                    "type": "String"
+                  },
                   "resourceName": {
                     "metadata": {
-                      "description": "Name of the resource",
-                      "displayName": "resourceName"
+                      "displayName": "resourceName",
+                      "description": "Name of the resource"
                     },
                     "type": "String"
                   }
@@ -267,7 +267,6 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Public IP Address Under Attack",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -275,23 +274,27 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
@@ -305,13 +308,10 @@
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
-                    "apiVersion": "2018-03-01",
                     "location": "global",
+                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-DDOS_Attack')]",
                     "tags": {
                       "_deployed_by_amba": true

@@ -7,15 +7,19 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "version": "1.2.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.2.0",
       "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,46 +28,49 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
-      "MonitorDisableTagValues": {
-        "defaultValue": [
-          "true",
-          "Test",
-          "Dev",
-          "Sandbox"
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
-        "type": "Array"
-      },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
-      "autoMitigate": {
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "type": "String"
+      },
+      "autoMitigate": {
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -75,25 +82,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -102,30 +97,35 @@
           "4"
         ],
         "defaultValue": "0",
+        "type": "String"
+      },
+      "MonitorDisableTagValues": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
         },
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
+      },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "threshold": {
-        "defaultValue": "1",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
+        "defaultValue": "1",
         "type": "String"
       }
     },
@@ -206,14 +206,14 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
-                },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
@@ -225,6 +225,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -237,13 +238,13 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "enabled": {
+                    "type": "String"
+                  },
                   "autoMitigate": {
                     "type": "String"
                   },
                   "windowSize": {
-                    "type": "String"
-                  },
-                  "enabled": {
                     "type": "String"
                   },
                   "severity": {
@@ -261,25 +262,23 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for VPN Gateway BGP peer status",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
-                        },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
@@ -288,39 +287,40 @@
                           "value": "[parameters('threshold')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "enabled": "[parameters('enabled')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
-                            "threshold": "[parameters('threshold')]",
-                            "timeAggregation": "Total",
-                            "operator": "LessThan",
                             "name": "bgppeerstatus",
+                            "threshold": "[parameters('threshold')]",
                             "metricNamespace": "microsoft.network/vpngateways",
+                            "timeAggregation": "Total",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "bgppeerstatus"
+                            "metricName": "bgppeerstatus",
+                            "operator": "LessThan"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
+                    "name": "[concat(parameters('resourceName'), '-BGPPeerStatusAlert')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-BGPPeerStatusAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

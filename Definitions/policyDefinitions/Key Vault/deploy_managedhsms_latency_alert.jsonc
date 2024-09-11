@@ -7,15 +7,43 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "category": "Key Vault",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
       "version": "1.1.0",
-      "category": "Key Vault",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,46 +52,46 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
       "MonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
       "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
           "displayName": "ALZ Monitoring disabled tag name"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -75,25 +103,21 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "threshold": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
+        "defaultValue": "1000",
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -102,30 +126,6 @@
           "4"
         ],
         "defaultValue": "3",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "1000",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "type": "String"
       }
     },
@@ -133,8 +133,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "microsoft.keyvault/managedHSMs",
-            "field": "type"
+            "field": "type",
+            "equals": "microsoft.keyvault/managedHSMs"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -149,48 +149,48 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "Microsoft.KeyVault/managedHSMs",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
+                "equals": "Microsoft.KeyVault/managedHSMs"
               },
               {
-                "equals": "ServiceApiLatency",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
+                "equals": "ServiceApiLatency"
               },
               {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.keyvault/managedHSMs', field('fullName'))]",
-                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+                "field": "Microsoft.Insights/metricalerts/scopes[*]",
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.keyvault/managedHSMs', field('fullName'))]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/metricAlerts/enabled"
+                "field": "Microsoft.Insights/metricAlerts/enabled",
+                "equals": "[parameters('enabled')]"
               },
               {
-                "equals": "[parameters('evaluationFrequency')]",
-                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency",
+                "equals": "[parameters('evaluationFrequency')]"
               },
               {
-                "equals": "[parameters('windowSize')]",
-                "field": "Microsoft.Insights/metricAlerts/windowSize"
+                "field": "Microsoft.Insights/metricAlerts/windowSize",
+                "equals": "[parameters('windowSize')]"
               },
               {
-                "equals": "[parameters('severity')]",
-                "field": "Microsoft.Insights/metricalerts/severity"
+                "field": "Microsoft.Insights/metricalerts/severity",
+                "equals": "[parameters('severity')]"
               },
               {
-                "equals": "[parameters('autoMitigate')]",
-                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate",
+                "equals": "[parameters('autoMitigate')]"
               },
               {
-                "equals": "Average",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation",
+                "equals": "Average"
               },
               {
-                "equals": "GreaterThan",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator",
+                "equals": "GreaterThan"
               },
               {
-                "equals": "[if(contains(field('tags'), '_amba-ServiceApiLatency-threshold-Override_'), field('tags._amba-ServiceApiLatency-threshold-Override_'), parameters('threshold'))]",
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold"
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold",
+                "equals": "[if(contains(field('tags'), '_amba-ServiceApiLatency-threshold-Override_'), field('tags._amba-ServiceApiLatency-threshold-Override_'), parameters('threshold'))]"
               }
             ]
           },
@@ -203,6 +203,9 @@
                 "resourceId": {
                   "value": "[field('id')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
@@ -212,14 +215,11 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "threshold": {
+                  "value": "[if(contains(field('tags'), '_amba-ServiceApiLatency-threshold-Override_'), field('tags._amba-ServiceApiLatency-threshold-Override_'), parameters('threshold'))]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "threshold": {
-                  "value": "[if(contains(field('tags'), '_amba-ServiceApiLatency-threshold-Override_'), field('tags._amba-ServiceApiLatency-threshold-Override_'), parameters('threshold'))]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -234,6 +234,9 @@
                     },
                     "type": "String"
                   },
+                  "enabled": {
+                    "type": "String"
+                  },
                   "evaluationFrequency": {
                     "type": "String"
                   },
@@ -243,13 +246,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "threshold": {
                     "type": "String"
                   },
                   "severity": {
-                    "type": "String"
-                  },
-                  "threshold": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -261,14 +261,15 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for ManagedHSM Latency",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
@@ -278,37 +279,35 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
-                        },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
                         }
                       },
+                      "enabled": "[parameters('enabled')]",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
+                            "name": "ServiceApiLatency",
                             "timeAggregation": "Average",
                             "operator": "GreaterThan",
-                            "name": "ServiceApiLatency",
-                            "metricNamespace": "Microsoft.KeyVault/managedHSMs",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "ServiceApiLatency"
+                            "metricName": "ServiceApiLatency",
+                            "metricNamespace": "Microsoft.KeyVault/managedHSMs"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "apiVersion": "2018-03-01",
                     "location": "global",
@@ -318,6 +317,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

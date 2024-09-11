@@ -6,13 +6,29 @@
     "description": "Policy to audit/deploy ER Direct TxLightLevel Low Alert",
     "mode": "All",
     "metadata": {
-      "_deployed_by_amba": "True",
       "version": "1.2.0",
+      "_deployed_by_amba": "True",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "Category": "Networking"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "String"
+      },
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -21,46 +37,58 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
+        "type": "String"
+      },
+      "enabled": {
         "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "MonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "type": "String"
-      },
       "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "type": "String"
+      },
+      "MonitorDisableTagName": {
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -72,25 +100,21 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "threshold": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
+        "defaultValue": "-10",
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -99,30 +123,6 @@
           "4"
         ],
         "defaultValue": "1",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "-10",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "type": "String"
       }
     },
@@ -143,6 +143,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -195,9 +198,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -207,20 +207,20 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "threshold": {
+                  "value": "[if(contains(field('tags'), '_amba-TxLightLevel-Low-threshold-Override_'), field('tags._amba-TxLightLevel-Low-threshold-Override_'), parameters('threshold'))]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "threshold": {
-                  "value": "[if(contains(field('tags'), '_amba-TxLightLevel-Low-threshold-Override_'), field('tags._amba-TxLightLevel-Low-threshold-Override_'), parameters('threshold'))]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -238,19 +238,19 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "enabled": {
+                    "type": "String"
+                  },
                   "autoMitigate": {
                     "type": "String"
                   },
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "threshold": {
                     "type": "String"
                   },
                   "severity": {
-                    "type": "String"
-                  },
-                  "threshold": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -266,12 +266,16 @@
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
+                    "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-DirectERTxLightLevelLowAlert')]",
                     "properties": {
                       "description": "Metric Alert for ER Direct Connection TxLightLevelLow",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
@@ -279,41 +283,37 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
-                        },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "enabled": "[parameters('enabled')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
+                            "name": "TxLightLevel",
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
                             "operator": "LessThan",
-                            "name": "TxLightLevel",
+                            "metricName": "TxLightLevel",
                             "metricNamespace": "Microsoft.Network/expressRoutePorts",
-                            "criterionType": "StaticThresholdCriterion",
-                            "metricName": "TxLightLevel"
+                            "criterionType": "StaticThresholdCriterion"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "apiVersion": "2018-03-01",
-                    "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-DirectERTxLightLevelLowAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }

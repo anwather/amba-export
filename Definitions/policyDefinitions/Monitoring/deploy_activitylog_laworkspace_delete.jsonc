@@ -7,84 +7,84 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "version": "1.1.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Monitoring",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "version": "1.1.0",
-      "category": "Monitoring",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      ]
     },
     "parameters": {
+      "alertResourceGroupName": {
+        "metadata": {
+          "displayName": "Resource Group Name",
+          "description": "Resource group the alert is placed in"
+        },
+        "defaultValue": "rg-amba-monitoring-001",
+        "type": "String"
+      },
+      "alertResourceGroupLocation": {
+        "metadata": {
+          "displayName": "Resource Group Location",
+          "description": "Location of the Resource group the alert is placed in"
+        },
+        "defaultValue": "centralus",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "MonitorDisableTagValues": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
       "MonitorDisableTagName": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
         "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "type": "String"
-      },
-      "alertResourceGroupLocation": {
-        "defaultValue": "centralus",
-        "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
-        },
-        "type": "String"
-      },
-      "alertResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "alertResourceGroupTags": {
+        "metadata": {
+          "displayName": "Resource Group Tags",
+          "description": "Tags on the Resource group the alert is placed in"
+        },
         "defaultValue": {
           "_deployed_by_amba": true
         },
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
         "type": "Object"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
       }
     },
     "policyRule": {
@@ -146,18 +146,18 @@
               }
             ]
           },
+          "name": "ActivityLAWorkspaceDelete",
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "name": "ActivityLAWorkspaceDelete",
           "deployment": {
             "properties": {
               "parameters": {
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
-                },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
+                },
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
@@ -168,10 +168,10 @@
               },
               "template": {
                 "parameters": {
-                  "alertResourceGroupLocation": {
+                  "alertResourceGroupName": {
                     "type": "string"
                   },
-                  "alertResourceGroupName": {
+                  "alertResourceGroupLocation": {
                     "type": "string"
                   },
                   "enabled": {
@@ -186,8 +186,8 @@
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "apiVersion": "2021-04-01",
                     "location": "[parameters('alertResourceGroupLocation')]",
+                    "apiVersion": "2021-04-01",
                     "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
@@ -247,8 +247,8 @@
                                 ]
                               }
                             },
-                            "apiVersion": "2020-10-01",
                             "location": "global",
+                            "apiVersion": "2020-10-01",
                             "name": "ActivityLAWorkspaceDelete",
                             "tags": {
                               "_deployed_by_amba": true
