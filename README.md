@@ -12,7 +12,8 @@ The definitions files are updated weekly around Thursday by deploying the soluti
   - alerting-management-policySet.jsonc
   - alerting-servicehealth-policySet.jsonc
   - notification-assets-policySet.jsonc
-- Copy the files from the ```Definitions``` folder to your own EPAC repo and delete any assignment files that aren't listed above. See below for how to use these files for non ALZ aligned environments.
+- All other files are designed to be scoped to the landing zones management group in your environment.
+- Copy the files from the ```Definitions``` folder to your own EPAC repo.
 - Adjust the following fields in the assignment files to suit your environment.
   - ```scope```
   - ```managedIdentityLocations```
