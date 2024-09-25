@@ -7,8 +7,8 @@
     "mode": "All",
     "metadata": {
       "category": "Network",
-      "_deployed_by_amba": "True",
       "version": "1.2.0",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
@@ -67,6 +67,14 @@
         "defaultValue": "true",
         "type": "String"
       },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
       "windowSize": {
         "metadata": {
           "description": "Window size for the alert",
@@ -83,14 +91,6 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "MonitorDisableTagName": {
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "enabled": {
@@ -133,12 +133,12 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Network/publicIPAddresses"
+            "equals": "Microsoft.Network/publicIPAddresses",
+            "field": "type"
           },
           {
-            "field": "Microsoft.Network/publicIPAddresses/sku.name",
-            "equals": "Standard"
+            "equals": "Standard",
+            "field": "Microsoft.Network/publicIPAddresses/sku.name"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -150,57 +150,57 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "existenceCondition": {
-            "allOf": [
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "Microsoft.Network/publicIPAddresses"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "VipAvailability"
-              },
-              {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/publicIPAddresses/', field('fullName'))]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency",
-                "equals": "[parameters('evaluationFrequency')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/windowSize",
-                "equals": "[parameters('windowSize')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricalerts/severity",
-                "equals": "[parameters('severity')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/autoMitigate",
-                "equals": "[parameters('autoMitigate')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation",
-                "equals": "Average"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator",
-                "equals": "LessThan"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold",
-                "equals": "[if(contains(field('tags'), '_amba-VipAvailability-threshold-Override_'), field('tags._amba-VipAvailability-threshold-Override_'), parameters('threshold'))]"
-              }
-            ]
-          },
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "equals": "Microsoft.Network/publicIPAddresses",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+              },
+              {
+                "equals": "VipAvailability",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+              },
+              {
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/publicIPAddresses/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+              },
+              {
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "LessThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator"
+              },
+              {
+                "equals": "[if(contains(field('tags'), '_amba-VipAvailability-threshold-Override_'), field('tags._amba-VipAvailability-threshold-Override_'), parameters('threshold'))]",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold"
+              }
+            ]
+          },
           "deployment": {
             "properties": {
               "parameters": {
@@ -229,7 +229,6 @@
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -300,8 +299,8 @@
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
-                            "name": "VipAvailability",
                             "timeAggregation": "Average",
+                            "name": "VipAvailability",
                             "operator": "LessThan",
                             "metricNamespace": "Microsoft.Network/publicIPAddresses",
                             "criterionType": "StaticThresholdCriterion",
@@ -315,8 +314,8 @@
                       ]
                     },
                     "location": "global",
-                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-VIPAvailabityAlert')]",
+                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -324,7 +323,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

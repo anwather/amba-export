@@ -8,11 +8,11 @@
     "metadata": {
       "category": "Key Vault",
       "version": "1.0.0",
+      "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "_deployed_by_amba": "True"
+      ]
     },
     "parameters": {
       "effect": {
@@ -27,44 +27,6 @@
         "defaultValue": "deployIfNotExists",
         "type": "String"
       },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
-      "alertResourceGroupLocation": {
-        "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
-        },
-        "defaultValue": "centralus",
-        "type": "String"
-      },
-      "alertResourceGroupName": {
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "defaultValue": "rg-amba-monitoring-001",
-        "type": "String"
-      },
-      "alertResourceGroupTags": {
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "defaultValue": {
-          "_deployed_by_amba": true
-        },
-        "type": "Object"
-      },
       "MonitorDisableTagValues": {
         "metadata": {
           "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
@@ -78,6 +40,14 @@
         ],
         "type": "Array"
       },
+      "alertResourceGroupLocation": {
+        "metadata": {
+          "description": "Location of the Resource group the alert is placed in",
+          "displayName": "Resource Group Location"
+        },
+        "defaultValue": "centralus",
+        "type": "String"
+      },
       "MonitorDisableTagName": {
         "metadata": {
           "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
@@ -85,6 +55,36 @@
         },
         "defaultValue": "MonitorDisable",
         "type": "String"
+      },
+      "alertResourceGroupName": {
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
+        "defaultValue": "rg-amba-monitoring-001",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "alertResourceGroupTags": {
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
+        "type": "Object"
       }
     },
     "policyRule": {
@@ -104,6 +104,11 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "name": "ActivityManagedHSMDelete",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -146,36 +151,31 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
-          "name": "ActivityManagedHSMDelete",
           "deployment": {
             "properties": {
               "parameters": {
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
-                  "enabled": {
-                    "type": "string"
-                  },
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
                   "alertResourceGroupName": {
+                    "type": "string"
+                  },
+                  "enabled": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
@@ -187,8 +187,8 @@
                   {
                     "type": "Microsoft.Resources/resourceGroups",
                     "location": "[parameters('alertResourceGroupLocation')]",
-                    "apiVersion": "2021-04-01",
                     "name": "[parameters('alertResourceGroupName')]",
+                    "apiVersion": "2021-04-01",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
@@ -196,20 +196,19 @@
                     "type": "Microsoft.Resources/deployments",
                     "properties": {
                       "parameters": {
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         }
                       },
-                      "mode": "Incremental",
                       "template": {
                         "parameters": {
-                          "enabled": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           },
-                          "alertResourceGroupName": {
+                          "enabled": {
                             "type": "string"
                           }
                         },
@@ -248,8 +247,8 @@
                               }
                             },
                             "location": "global",
-                            "apiVersion": "2020-10-01",
                             "name": "ActivityManagedHSMDelete",
+                            "apiVersion": "2020-10-01",
                             "tags": {
                               "_deployed_by_amba": true
                             }
@@ -257,10 +256,11 @@
                         ],
                         "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      }
+                      },
+                      "mode": "Incremental"
                     },
-                    "apiVersion": "2019-10-01",
                     "name": "ActivityManagedHSMDelete",
+                    "apiVersion": "2019-10-01",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
@@ -268,13 +268,13 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             },
             "location": "australiaeast"
           },
-          "existenceScope": "resourcegroup",
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "deploymentScope": "subscription"
+          "deploymentScope": "subscription",
+          "existenceScope": "resourcegroup"
         }
       }
     }

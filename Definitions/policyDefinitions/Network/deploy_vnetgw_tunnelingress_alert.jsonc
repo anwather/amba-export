@@ -7,12 +7,12 @@
     "mode": "All",
     "metadata": {
       "category": "Network",
-      "_deployed_by_amba": "True",
       "version": "1.2.0",
+      "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      ]
     },
     "parameters": {
       "effect": {
@@ -55,16 +55,12 @@
         ],
         "type": "Array"
       },
-      "autoMitigate": {
+      "MonitorDisableTagName": {
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "windowSize": {
@@ -85,18 +81,22 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "MonitorDisableTagName": {
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "defaultValue": "MonitorDisable",
-        "type": "String"
-      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "allowedValues": [
           "true",
@@ -150,6 +150,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -198,9 +201,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -210,14 +210,14 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
@@ -229,7 +229,6 @@
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -242,13 +241,13 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
                   "windowSize": {
                     "type": "String"
                   },
                   "enabled": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "severity": {
@@ -275,14 +274,14 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
@@ -292,15 +291,18 @@
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
-                            "threshold": "[parameters('threshold')]",
                             "name": "TunnelIngressBytes",
+                            "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
                             "operator": "LessThan",
                             "metricNamespace": "Microsoft.Network/virtualNetworkGateways",
@@ -309,14 +311,11 @@
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "location": "global",
-                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-TunnelIngressAlert')]",
+                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -324,7 +323,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }
