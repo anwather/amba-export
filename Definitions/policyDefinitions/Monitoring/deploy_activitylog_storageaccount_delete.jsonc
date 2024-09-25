@@ -9,10 +9,10 @@
       "category": "Monitoring",
       "version": "1.2.0",
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "effect": {
@@ -48,6 +48,18 @@
         "defaultValue": "MonitorDisable",
         "type": "String"
       },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "alertResourceGroupLocation": {
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
@@ -62,18 +74,6 @@
           "displayName": "Resource Group Name"
         },
         "defaultValue": "rg-amba-monitoring-001",
-        "type": "String"
-      },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
         "type": "String"
       },
       "alertResourceGroupTags": {
@@ -91,8 +91,8 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Storage/storageAccounts"
+            "equals": "Microsoft.Storage/storageAccounts",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -104,13 +104,15 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "name": "Activity Log Storage Account Delete",
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/ActivityLogAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
               },
               {
                 "equals": 2,
@@ -121,24 +123,24 @@
                       {
                         "allOf": [
                           {
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field",
-                            "equals": "category"
+                            "equals": "category",
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals",
-                            "equals": "Administrative"
+                            "equals": "Administrative",
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
                       },
                       {
                         "allOf": [
                           {
-                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field",
-                            "equals": "operationName"
+                            "equals": "operationName",
+                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals",
-                            "equals": "Microsoft.Storage/storageAccounts/delete"
+                            "equals": "Microsoft.Storage/storageAccounts/delete",
+                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
                       }
@@ -148,35 +150,32 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deployment": {
             "properties": {
               "parameters": {
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
+                  "enabled": {
+                    "type": "string"
+                  },
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
                   "alertResourceGroupName": {
-                    "type": "string"
-                  },
-                  "enabled": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
@@ -197,20 +196,19 @@
                     "type": "Microsoft.Resources/deployments",
                     "properties": {
                       "parameters": {
-                        "alertResourceGroupName": {
-                          "value": "[parameters('alertResourceGroupName')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "alertResourceGroupName": {
+                          "value": "[parameters('alertResourceGroupName')]"
                         }
                       },
-                      "mode": "Incremental",
                       "template": {
                         "parameters": {
-                          "alertResourceGroupName": {
+                          "enabled": {
                             "type": "string"
                           },
-                          "enabled": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           }
                         },
@@ -232,12 +230,12 @@
                               "condition": {
                                 "allOf": [
                                   {
-                                    "field": "category",
-                                    "equals": "Administrative"
+                                    "equals": "Administrative",
+                                    "field": "category"
                                   },
                                   {
-                                    "field": "operationName",
-                                    "equals": "Microsoft.Storage/storageAccounts/delete"
+                                    "equals": "Microsoft.Storage/storageAccounts/delete",
+                                    "field": "operationName"
                                   },
                                   {
                                     "field": "status",
@@ -258,7 +256,8 @@
                         ],
                         "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      }
+                      },
+                      "mode": "Incremental"
                     },
                     "name": "ActivitySADelete",
                     "apiVersion": "2019-10-01",
@@ -269,7 +268,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             },
             "location": "australiaeast"
           },

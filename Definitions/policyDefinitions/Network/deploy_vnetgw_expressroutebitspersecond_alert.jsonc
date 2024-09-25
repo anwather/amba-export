@@ -9,10 +9,10 @@
       "category": "Network",
       "version": "1.2.0",
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "effect": {
@@ -54,6 +54,18 @@
           "Sandbox"
         ],
         "type": "Array"
+      },
+      "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
       },
       "MonitorDisableTagName": {
         "metadata": {
@@ -108,18 +120,6 @@
         "defaultValue": "0",
         "type": "String"
       },
-      "autoMitigate": {
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
       "threshold": {
         "metadata": {
           "description": "Threshold for the alert",
@@ -133,12 +133,12 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Network/virtualNetworkGateways"
+            "equals": "Microsoft.Network/virtualNetworkGateways",
+            "field": "type"
           },
           {
-            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType",
-            "equals": "ExpressRoute"
+            "equals": "ExpressRoute",
+            "field": "Microsoft.Network/virtualNetworkGateways/gatewayType"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -150,57 +150,57 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "existenceCondition": {
-            "allOf": [
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "Microsoft.Network/virtualNetworkGateways"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "ExpressRouteGatewayBitsPerSecond"
-              },
-              {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworkGateways/', field('fullName'))]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency",
-                "equals": "[parameters('evaluationFrequency')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/windowSize",
-                "equals": "[parameters('windowSize')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricalerts/severity",
-                "equals": "[parameters('severity')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/autoMitigate",
-                "equals": "[parameters('autoMitigate')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation",
-                "equals": "Average"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].operator",
-                "equals": "LessThan"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].threshold",
-                "equals": "[if(contains(field('tags'), '_amba-ExpressRouteGatewayBitsPerSecond-threshold-Override_'), field('tags._amba-ExpressRouteGatewayBitsPerSecond-threshold-Override_'), parameters('threshold'))]"
-              }
-            ]
-          },
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "equals": "Microsoft.Network/virtualNetworkGateways",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+              },
+              {
+                "equals": "ExpressRouteGatewayBitsPerSecond",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName"
+              },
+              {
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworkGateways/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+              },
+              {
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "LessThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].operator"
+              },
+              {
+                "equals": "[if(contains(field('tags'), '_amba-ExpressRouteGatewayBitsPerSecond-threshold-Override_'), field('tags._amba-ExpressRouteGatewayBitsPerSecond-threshold-Override_'), parameters('threshold'))]",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].threshold"
+              }
+            ]
+          },
           "deployment": {
             "properties": {
               "parameters": {
@@ -209,6 +209,9 @@
                 },
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
@@ -219,9 +222,6 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-ExpressRouteGatewayBitsPerSecond-threshold-Override_'), field('tags._amba-ExpressRouteGatewayBitsPerSecond-threshold-Override_'), parameters('threshold'))]"
                 },
@@ -229,7 +229,6 @@
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -242,6 +241,9 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
                   "windowSize": {
                     "type": "String"
                   },
@@ -249,9 +251,6 @@
                     "type": "String"
                   },
                   "severity": {
-                    "type": "String"
-                  },
-                  "autoMitigate": {
                     "type": "String"
                   },
                   "threshold": {
@@ -275,6 +274,9 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
+                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
@@ -284,18 +286,15 @@
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
@@ -324,7 +323,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

@@ -7,8 +7,8 @@
     "mode": "All",
     "metadata": {
       "category": "Network",
-      "_deployed_by_amba": "True",
       "version": "1.2.0",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
@@ -67,6 +67,14 @@
         "defaultValue": "true",
         "type": "String"
       },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
       "windowSize": {
         "metadata": {
           "description": "Window size for the alert",
@@ -83,14 +91,6 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "type": "String"
-      },
-      "MonitorDisableTagName": {
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "enabled": {
@@ -125,8 +125,8 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "microsoft.network/vpngateways"
+            "equals": "microsoft.network/vpngateways",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -138,65 +138,65 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "existenceCondition": {
-            "allOf": [
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "microsoft.network/vpngateways"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "TunnelEgressPacketDropTSMismatch"
-              },
-              {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/vpngateways/', field('fullName'))]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency",
-                "equals": "[parameters('evaluationFrequency')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/windowSize",
-                "equals": "[parameters('windowSize')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricalerts/severity",
-                "equals": "[parameters('severity')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/autoMitigate",
-                "equals": "[parameters('autoMitigate')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].timeAggregation",
-                "equals": "Average"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator",
-                "equals": "GreaterThan"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity",
-                "equals": "Medium"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.minFailingPeriodsToAlert",
-                "equals": 2
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.numberOfEvaluationPeriods",
-                "equals": 2
-              }
-            ]
-          },
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "equals": "microsoft.network/vpngateways",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+              },
+              {
+                "equals": "TunnelEgressPacketDropTSMismatch",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+              },
+              {
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.network/vpngateways/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+              },
+              {
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "GreaterThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
+              },
+              {
+                "equals": "Medium",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
+              },
+              {
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.minFailingPeriodsToAlert"
+              },
+              {
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.numberOfEvaluationPeriods"
+              }
+            ]
+          },
           "deployment": {
             "properties": {
               "parameters": {
@@ -222,7 +222,6 @@
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -286,17 +285,17 @@
                       "criteria": {
                         "allOf": [
                           {
-                            "name": "TunnelEgressPacketDropTSMismatch",
                             "timeAggregation": "Average",
+                            "name": "TunnelEgressPacketDropTSMismatch",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 4,
                               "minFailingPeriodsToAlert": 4
                             },
                             "operator": "GreaterThan",
                             "metricNamespace": "microsoft.network/vpngateways",
-                            "alertSensitivity": "Medium",
                             "criterionType": "DynamicThresholdCriterion",
-                            "metricName": "TunnelEgressPacketDropTSMismatch"
+                            "metricName": "TunnelEgressPacketDropTSMismatch",
+                            "alertSensitivity": "Medium"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
@@ -306,8 +305,8 @@
                       ]
                     },
                     "location": "global",
-                    "apiVersion": "2018-03-01",
                     "name": "[concat(parameters('resourceName'), '-TunnelEgressPacketDropTSMismatchAlert')]",
+                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -315,7 +314,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

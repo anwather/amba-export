@@ -93,6 +93,18 @@
         "defaultValue": "true",
         "type": "String"
       },
+      "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "severity": {
         "metadata": {
           "description": "Severity of the Alert",
@@ -106,18 +118,6 @@
           "4"
         ],
         "defaultValue": "1",
-        "type": "String"
-      },
-      "autoMitigate": {
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
         "type": "String"
       },
       "threshold": {
@@ -146,6 +146,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -194,9 +197,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -212,11 +212,11 @@
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-Availability-threshold-Override_'), field('tags._amba-Availability-threshold-Override_'), parameters('threshold'))]"
@@ -225,7 +225,6 @@
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -244,10 +243,10 @@
                   "enabled": {
                     "type": "String"
                   },
-                  "severity": {
+                  "autoMitigate": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "severity": {
                     "type": "String"
                   },
                   "threshold": {
@@ -277,11 +276,11 @@
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
@@ -290,14 +289,17 @@
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
-                      "severity": "[parameters('severity')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
+                      "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
+                            "name": "Availability",
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "name": "Availability",
                             "operator": "LessThan",
                             "metricNamespace": "Microsoft.Storage/storageAccounts",
                             "criterionType": "StaticThresholdCriterion",
@@ -305,10 +307,7 @@
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "location": "global",
                     "name": "[concat(parameters('resourceName'), '-AvailabilityAlert')]",
@@ -320,7 +319,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

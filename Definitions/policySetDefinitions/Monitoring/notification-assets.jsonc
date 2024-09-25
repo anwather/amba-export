@@ -5,9 +5,9 @@
     "displayName": "Deploy Azure Monitor Baseline Alerts - Notification Assets",
     "description": "This initiative deploys Notification Assets for Azure Monitor Baseline Alerts. This includes the setup of an Alert Processing Rule and an Action Group to manage notifications and actions, along with a Notification Suppression Rule to manage alert notifications, as well as a Notification Suppression Rule to control alert notifications.",
     "metadata": {
-      "_deployed_by_amba": true,
       "category": "Monitoring",
       "version": "1.3.0",
+      "_deployed_by_amba": true,
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
@@ -22,6 +22,14 @@
         "defaultValue": "centralus",
         "type": "String"
       },
+      "ALZMonitorResourceGroupName": {
+        "metadata": {
+          "description": "Name of the resource group to deploy the alerts to",
+          "displayName": "Resource Group Name"
+        },
+        "defaultValue": "ALZ-Monitoring-RG",
+        "type": "String"
+      },
       "ALZMonitorResourceGroupTags": {
         "metadata": {
           "description": "Tags to apply to the resource group",
@@ -32,13 +40,18 @@
         },
         "type": "Object"
       },
-      "ALZMonitorResourceGroupName": {
+      "ALZMonitorDisableTagValues": {
         "metadata": {
-          "description": "Name of the resource group to deploy the alerts to",
-          "displayName": "Resource Group Name"
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
         },
-        "defaultValue": "ALZ-Monitoring-RG",
-        "type": "String"
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
       },
       "ALZMonitorActionGroupEmail": {
         "metadata": {
@@ -47,6 +60,14 @@
         },
         "defaultValue": [],
         "type": "Array"
+      },
+      "ALZMonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
       },
       "BYOAlertProcessingRule": {
         "metadata": {
@@ -64,10 +85,10 @@
         "defaultValue": "",
         "type": "String"
       },
-      "ALZFunctionTriggerUrl": {
+      "ALZFunctionResourceId": {
         "metadata": {
-          "description": "URL that triggers the Function",
-          "displayName": "Function Trigger URL"
+          "description": "Function Resource Id for Action Group to send alerts to",
+          "displayName": "Function Resource Id"
         },
         "defaultValue": "",
         "type": "String"
@@ -80,14 +101,6 @@
         "defaultValue": "",
         "type": "String"
       },
-      "ALZFunctionResourceId": {
-        "metadata": {
-          "description": "Function Resource Id for Action Group to send alerts to",
-          "displayName": "Function Resource Id"
-        },
-        "defaultValue": "",
-        "type": "String"
-      },
       "ALZEventHubResourceId": {
         "metadata": {
           "description": "Event Hub resource Ids for action group to send alerts to",
@@ -95,6 +108,14 @@
         },
         "defaultValue": [],
         "type": "array"
+      },
+      "ALZFunctionTriggerUrl": {
+        "metadata": {
+          "description": "URL that triggers the Function",
+          "displayName": "Function Trigger URL"
+        },
+        "defaultValue": "",
+        "type": "String"
       },
       "ALZWebhookServiceUri": {
         "metadata": {
@@ -119,27 +140,6 @@
         },
         "defaultValue": [],
         "type": "array"
-      },
-      "ALZMonitorDisableTagName": {
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "defaultValue": "MonitorDisable",
-        "type": "String"
-      },
-      "ALZMonitorDisableTagValues": {
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
-        "defaultValue": [
-          "true",
-          "Test",
-          "Dev",
-          "Sandbox"
-        ],
-        "type": "Array"
       }
     },
     "policyDefinitions": [
@@ -156,11 +156,11 @@
           "ALZMonitorResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "ALZMonitorResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
           "ALZMonitorResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
+          },
+          "ALZMonitorResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           },
           "ALZMonitorActionGroupEmail": {
             "value": "[parameters('ALZMonitorActionGroupEmail')]"
@@ -171,17 +171,17 @@
           "ALZLogicappCallbackUrl": {
             "value": "[parameters('ALZLogicappCallbackUrl')]"
           },
-          "ALZFunctionTriggerUrl": {
-            "value": "[parameters('ALZFunctionTriggerUrl')]"
+          "ALZFunctionResourceId": {
+            "value": "[parameters('ALZFunctionResourceId')]"
           },
           "ALZLogicappResourceId": {
             "value": "[parameters('ALZLogicappResourceId')]"
           },
-          "ALZFunctionResourceId": {
-            "value": "[parameters('ALZFunctionResourceId')]"
-          },
           "ALZEventHubResourceId": {
             "value": "[parameters('ALZEventHubResourceId')]"
+          },
+          "ALZFunctionTriggerUrl": {
+            "value": "[parameters('ALZFunctionTriggerUrl')]"
           },
           "ALZWebhookServiceUri": {
             "value": "[parameters('ALZWebhookServiceUri')]"
@@ -207,11 +207,11 @@
           "ALZMonitorResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "ALZMonitorResourceGroupTags": {
-            "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
           "ALZMonitorResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
+          },
+          "ALZMonitorResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
           }
         }
       }

@@ -7,12 +7,12 @@
     "mode": "All",
     "metadata": {
       "category": "Compute",
-      "_deployed_by_amba": "True",
       "version": "1.4.0",
+      "_deployed_by_amba": "True",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      ]
     },
     "parameters": {
       "effect": {
@@ -54,16 +54,28 @@
         ],
         "type": "Array"
       },
-      "autoMitigate": {
+      "alertResourceGroupLocation": {
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "description": "Location of the Resource group the alert is placed in",
+          "displayName": "Resource Group Location"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+        "defaultValue": "centralus",
+        "type": "String"
+      },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
+      "alertResourceGroupName": {
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
+        },
+        "defaultValue": "rg-amba-monitoring-001",
         "type": "String"
       },
       "windowSize": {
@@ -83,18 +95,22 @@
         "defaultValue": "PT15M",
         "type": "String"
       },
-      "MonitorDisableTagName": {
-        "metadata": {
-          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "defaultValue": "MonitorDisable",
-        "type": "String"
-      },
       "enabled": {
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "allowedValues": [
           "true",
@@ -116,22 +132,6 @@
           "4"
         ],
         "defaultValue": "2",
-        "type": "String"
-      },
-      "alertResourceGroupName": {
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "defaultValue": "rg-amba-monitoring-001",
-        "type": "String"
-      },
-      "alertResourceGroupLocation": {
-        "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
-        },
-        "defaultValue": "centralus",
         "type": "String"
       },
       "threshold": {
@@ -170,16 +170,6 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "operator": {
-        "metadata": {
-          "displayName": "Operator"
-        },
-        "allowedValues": [
-          "GreaterThan"
-        ],
-        "defaultValue": "GreaterThan",
-        "type": "String"
-      },
       "UAMIResourceId": {
         "metadata": {
           "description": "The resource Id of the user assigned managed identity.",
@@ -196,12 +186,14 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "autoResolveTime": {
+      "operator": {
         "metadata": {
-          "description": "Auto Resolve time for the alert in ISO 8601 format",
-          "displayName": "Auto Resolve"
+          "displayName": "Operator"
         },
-        "defaultValue": "true",
+        "allowedValues": [
+          "GreaterThan"
+        ],
+        "defaultValue": "GreaterThan",
         "type": "String"
       },
       "computersToInclude": {
@@ -213,6 +205,14 @@
           "*"
         ],
         "type": "array"
+      },
+      "autoResolveTime": {
+        "metadata": {
+          "description": "Auto Resolve time for the alert in ISO 8601 format",
+          "displayName": "Auto Resolve"
+        },
+        "defaultValue": "true",
+        "type": "String"
       },
       "autoResolve": {
         "metadata": {
@@ -244,6 +244,10 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/scheduledQueryRules",
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -300,10 +304,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deployment": {
             "properties": {
               "parameters": {
@@ -313,26 +313,26 @@
                 "MonitorDisableTagValues": {
                   "value": "[parameters('MonitorDisableTagValues')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "MonitorDisableTagName": {
                   "value": "[parameters('MonitorDisableTagName')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
@@ -346,26 +346,25 @@
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
                 },
-                "operator": {
-                  "value": "[parameters('operator')]"
-                },
                 "UAMIResourceId": {
                   "value": "[parameters('UAMIResourceId')]"
                 },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
                 },
-                "autoResolveTime": {
-                  "value": "[parameters('autoResolveTime')]"
+                "operator": {
+                  "value": "[parameters('operator')]"
                 },
                 "computersToInclude": {
                   "value": "[parameters('computersToInclude')]"
+                },
+                "autoResolveTime": {
+                  "value": "[parameters('autoResolveTime')]"
                 },
                 "autoResolve": {
                   "value": "[parameters('autoResolve')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "evaluationFrequency": {
@@ -374,26 +373,26 @@
                   "MonitorDisableTagValues": {
                     "type": "Array"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
-                  "windowSize": {
-                    "type": "String"
+                  "alertResourceGroupLocation": {
+                    "type": "string"
                   },
                   "MonitorDisableTagName": {
-                    "type": "String"
-                  },
-                  "enabled": {
-                    "type": "String"
-                  },
-                  "severity": {
                     "type": "String"
                   },
                   "alertResourceGroupName": {
                     "type": "string"
                   },
-                  "alertResourceGroupLocation": {
-                    "type": "string"
+                  "windowSize": {
+                    "type": "String"
+                  },
+                  "enabled": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
+                  "severity": {
+                    "type": "String"
                   },
                   "threshold": {
                     "type": "String"
@@ -407,20 +406,20 @@
                   "failingPeriods": {
                     "type": "String"
                   },
-                  "operator": {
-                    "type": "String"
-                  },
                   "UAMIResourceId": {
                     "type": "string"
                   },
                   "evaluationPeriods": {
                     "type": "String"
                   },
-                  "autoResolveTime": {
+                  "operator": {
                     "type": "String"
                   },
                   "computersToInclude": {
                     "type": "array"
+                  },
+                  "autoResolveTime": {
+                    "type": "String"
                   },
                   "autoResolve": {
                     "type": "String"
@@ -431,8 +430,8 @@
                   {
                     "type": "Microsoft.Resources/resourceGroups",
                     "location": "[parameters('alertResourceGroupLocation')]",
-                    "apiVersion": "2021-04-01",
                     "name": "[parameters('alertResourceGroupName')]",
+                    "apiVersion": "2021-04-01",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
@@ -440,29 +439,28 @@
                     "type": "Microsoft.Resources/deployments",
                     "properties": {
                       "parameters": {
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
+                        "alertResourceGroupLocation": {
+                          "value": "[parameters('alertResourceGroupLocation')]"
                         },
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
                         },
-                        "alertResourceGroupLocation": {
-                          "value": "[parameters('alertResourceGroupLocation')]"
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "UAMIResourceId": {
                           "value": "[parameters('UAMIResourceId')]"
                         }
                       },
-                      "mode": "Incremental",
                       "template": {
                         "parameters": {
-                          "enabled": {
+                          "alertResourceGroupLocation": {
                             "type": "string"
                           },
                           "alertResourceGroupName": {
                             "type": "string"
                           },
-                          "alertResourceGroupLocation": {
+                          "enabled": {
                             "type": "string"
                           },
                           "UAMIResourceId": {
@@ -483,26 +481,26 @@
                                 "MonitorDisableTagValues": {
                                   "value": "[parameters('MonitorDisableTagValues')]"
                                 },
-                                "autoMitigate": {
-                                  "value": "[parameters('autoMitigate')]"
-                                },
-                                "windowSize": {
-                                  "value": "[parameters('windowSize')]"
+                                "alertResourceGroupLocation": {
+                                  "value": "[parameters('alertResourceGroupLocation')]"
                                 },
                                 "MonitorDisableTagName": {
                                   "value": "[parameters('MonitorDisableTagName')]"
                                 },
-                                "enabled": {
-                                  "value": "[parameters('enabled')]"
-                                },
-                                "severity": {
-                                  "value": "[parameters('severity')]"
-                                },
                                 "alertResourceGroupName": {
                                   "value": "[parameters('alertResourceGroupName')]"
                                 },
-                                "alertResourceGroupLocation": {
-                                  "value": "[parameters('alertResourceGroupLocation')]"
+                                "windowSize": {
+                                  "value": "[parameters('windowSize')]"
+                                },
+                                "enabled": {
+                                  "value": "[parameters('enabled')]"
+                                },
+                                "autoMitigate": {
+                                  "value": "[parameters('autoMitigate')]"
+                                },
+                                "severity": {
+                                  "value": "[parameters('severity')]"
                                 },
                                 "threshold": {
                                   "value": "[parameters('threshold')]"
@@ -516,21 +514,24 @@
                                 "evaluationPeriods": {
                                   "value": "[parameters('evaluationPeriods')]"
                                 },
-                                "autoResolveTime": {
-                                  "value": "[parameters('autoResolveTime')]"
-                                },
                                 "computersToInclude": {
                                   "value": "[parameters('computersToInclude')]"
+                                },
+                                "autoResolveTime": {
+                                  "value": "[parameters('autoResolveTime')]"
                                 },
                                 "autoResolve": {
                                   "value": "[parameters('autoResolve')]"
                                 }
                               },
                               "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                              "autoMitigate": "[parameters('autoMitigate')]",
                               "windowSize": "[parameters('windowSize')]",
                               "enabled": "[parameters('enabled')]",
+                              "autoMitigate": "[parameters('autoMitigate')]",
                               "severity": "[parameters('severity')]",
+                              "scopes": [
+                                "[subscription().Id]"
+                              ],
                               "criteria": {
                                 "allOf": [
                                   {
@@ -560,9 +561,6 @@
                                   }
                                 ]
                               },
-                              "scopes": [
-                                "[subscription().Id]"
-                              ],
                               "ruleResolveConfiguration": {
                                 "timeToResolve": "[parameters('autoResolveTime')]",
                                 "autoResolved": "[parameters('autoResolve')]"
@@ -572,8 +570,8 @@
                               ]
                             },
                             "location": "[parameters('alertResourceGroupLocation')]",
-                            "apiVersion": "2022-08-01-preview",
                             "name": "[concat(subscription().displayName, '-VMHighOSDiskReadLatencyAlert')]",
+                            "apiVersion": "2022-08-01-preview",
                             "tags": {
                               "_deployed_by_amba": true
                             },
@@ -587,10 +585,11 @@
                         ],
                         "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      }
+                      },
+                      "mode": "Incremental"
                     },
-                    "apiVersion": "2019-10-01",
                     "name": "VMOSDiskreadLatencyAlert",
+                    "apiVersion": "2019-10-01",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
@@ -598,12 +597,13 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             },
             "location": "australiaeast"
           },
-          "existenceScope": "resourceGroup",
-          "deploymentScope": "subscription"
+          "deploymentScope": "subscription",
+          "existenceScope": "resourceGroup"
         }
       }
     }
