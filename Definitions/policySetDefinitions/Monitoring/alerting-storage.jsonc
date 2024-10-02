@@ -5,12 +5,12 @@
     "displayName": "Deploy Azure Monitor Baseline Alerts for Storage",
     "description": "This initiative deploys Azure Monitor Baseline Alerts to monitor Storage Services such as Storage accounts.",
     "metadata": {
+      "category": "Monitoring",
+      "version": "1.0.0",
       "_deployed_by_amba": true,
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.0.0",
-      "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
@@ -22,6 +22,14 @@
         "defaultValue": "ALZ-Monitoring-RG",
         "type": "String"
       },
+      "ALZMonitorResourceGroupLocation": {
+        "metadata": {
+          "displayName": "ALZ Monitor Resource Group Location",
+          "description": "Location of the resource group where the ALZ Monitor resources will be deployed"
+        },
+        "defaultValue": "centralus",
+        "type": "String"
+      },
       "ALZMonitorResourceGroupTags": {
         "metadata": {
           "displayName": "ALZ Monitor Resource Group Tags",
@@ -31,22 +39,6 @@
           "_deployed_by_alz_monitor": true
         },
         "type": "Object"
-      },
-      "ALZMonitorResourceGroupLocation": {
-        "metadata": {
-          "displayName": "ALZ Monitor Resource Group Location",
-          "description": "Location of the resource group where the ALZ Monitor resources will be deployed"
-        },
-        "defaultValue": "centralus",
-        "type": "String"
-      },
-      "ALZMonitorDisableTagName": {
-        "metadata": {
-          "displayName": "ALZ Monitoring disabled tag name",
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
-        },
-        "defaultValue": "MonitorDisable",
-        "type": "String"
       },
       "ALZMonitorDisableTagValues": {
         "metadata": {
@@ -60,6 +52,14 @@
           "Sandbox"
         ],
         "type": "Array"
+      },
+      "ALZMonitorDisableTagName": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
       },
       "StorageAccountAvailabilityAlertSeverity": {
         "metadata": {
@@ -109,18 +109,6 @@
         "defaultValue": "PT5M",
         "type": "string"
       },
-      "StorageAccountAvailabilityPolicyEffect": {
-        "metadata": {
-          "displayName": "Storage Account Availability Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "string"
-      },
       "StorageAccountAvailabilityAlertState": {
         "metadata": {
           "displayName": "Storage Account Availability Alert State",
@@ -156,6 +144,18 @@
         },
         "defaultValue": "true",
         "type": "string"
+      },
+      "StorageAccountAvailabilityPolicyEffect": {
+        "metadata": {
+          "displayName": "Storage Account Availability Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
       }
     },
     "policyDefinitions": [
@@ -172,20 +172,20 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "enabled": {
-            "value": "[parameters('StorageAccountAvailabilityAlertState')]"
-          },
           "effect": {
             "value": "[parameters('StorageAccountAvailabilityPolicyEffect')]"
+          },
+          "enabled": {
+            "value": "[parameters('StorageAccountAvailabilityAlertState')]"
           },
           "windowSize": {
             "value": "[parameters('StorageAccountAvailabilityWindowSize')]"
           },
-          "threshold": {
-            "value": "[parameters('StorageAccountAvailabilityThreshold')]"
-          },
           "severity": {
             "value": "[parameters('StorageAccountAvailabilityAlertSeverity')]"
+          },
+          "threshold": {
+            "value": "[parameters('StorageAccountAvailabilityThreshold')]"
           }
         }
       },
@@ -193,11 +193,11 @@
         "policyDefinitionReferenceId": "ALZ_activitySADelete",
         "policyDefinitionName": "Deploy_activitylog_StorageAccount_Delete",
         "parameters": {
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
           "MonitorDisableTagValues": {
             "value": "[parameters('ALZMonitorDisableTagValues')]"
@@ -205,14 +205,14 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
+          "effect": {
+            "value": "[parameters('StorageAccountDeletePolicyEffect')]"
+          },
           "enabled": {
             "value": "[parameters('StorageAccountDeleteAlertState')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
-          },
-          "effect": {
-            "value": "[parameters('StorageAccountDeletePolicyEffect')]"
           }
         }
       }
