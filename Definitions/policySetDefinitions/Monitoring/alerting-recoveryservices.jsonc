@@ -5,19 +5,19 @@
     "displayName": "Deploy Azure Monitor Baseline Alerts for Recovery Services",
     "description": "This initiative deploys Azure Monitor Baseline Alerts to monitor Recovery Services such as Azure Backup, and Azure Site Recovery.",
     "metadata": {
+      "category": "Monitoring",
+      "version": "1.1.0",
       "_deployed_by_amba": true,
-      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "ALZMonitorDisableTagValues": {
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
         "defaultValue": [
           "true",
@@ -29,16 +29,29 @@
       },
       "ALZMonitorDisableTagName": {
         "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
         "defaultValue": "MonitorDisable",
         "type": "String"
       },
+      "RVASRHealthMonitorPolicyEffect": {
+        "metadata": {
+          "displayName": "Recovery Vault ASR Health Monitor Policy Effect",
+          "description": "Policy effect for the alert, modify will modify the alert if it exists, or audit if it does not exist"
+        },
+        "allowedValues": [
+          "modify",
+          "audit",
+          "disabled"
+        ],
+        "defaultValue": "modify",
+        "type": "string"
+      },
       "RVBackupHealthMonitorPolicyEffect": {
         "metadata": {
-          "description": "Policy effect for the alert, modify will modify the alert if it exists, or audit if it does not exist",
-          "displayName": "Recovery Vault Backup Health Monitor Policy Effect"
+          "displayName": "Recovery Vault Backup Health Monitor Policy Effect",
+          "description": "Policy effect for the alert, modify will modify the alert if it exists, or audit if it does not exist"
         },
         "allowedValues": [
           "modify",
@@ -62,6 +75,21 @@
           },
           "effect": {
             "value": "[parameters('RVBackupHealthMonitorPolicyEffect')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_RVASRHealthMonitor",
+        "policyDefinitionName": "Deploy_RecoveryVault_ASRHealthMonitor_Alert",
+        "parameters": {
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "effect": {
+            "value": "[parameters('RVASRHealthMonitorPolicyEffect')]"
           }
         }
       }

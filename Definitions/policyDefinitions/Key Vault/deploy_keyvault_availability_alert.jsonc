@@ -6,27 +6,15 @@
     "description": "Policy to audit/deploy KeyVault Availability Alert",
     "mode": "All",
     "metadata": {
-      "category": "Key Vault",
-      "version": "1.2.0",
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "version": "1.2.0",
+      "category": "Key Vault",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "String"
-      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -63,6 +51,30 @@
         "defaultValue": "MonitorDisable",
         "type": "String"
       },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "windowSize": {
         "metadata": {
           "description": "Window size for the alert",
@@ -81,16 +93,12 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "enabled": {
+      "threshold": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+        "defaultValue": "90",
         "type": "String"
       },
       "severity": {
@@ -108,24 +116,16 @@
         "defaultValue": "1",
         "type": "String"
       },
-      "autoMitigate": {
+      "effect": {
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
-        "type": "String"
-      },
-      "threshold": {
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "defaultValue": "90",
+        "defaultValue": "disabled",
         "type": "String"
       }
     },
@@ -133,8 +133,8 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "microsoft.keyvault/vaults"
+            "equals": "microsoft.keyvault/vaults",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -146,57 +146,57 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
-          "existenceCondition": {
-            "allOf": [
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "microsoft.keyvault/vaults"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "Availability"
-              },
-              {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.keyvault/vaults/', field('fullName'))]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency",
-                "equals": "[parameters('evaluationFrequency')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/windowSize",
-                "equals": "[parameters('windowSize')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricalerts/severity",
-                "equals": "[parameters('severity')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/autoMitigate",
-                "equals": "[parameters('autoMitigate')]"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation",
-                "equals": "Average"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator",
-                "equals": "LessThan"
-              },
-              {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold",
-                "equals": "[if(contains(field('tags'), '_amba-Availability-threshold-Override_'), field('tags._amba-Availability-threshold-Override_'), parameters('threshold'))]"
-              }
-            ]
-          },
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "equals": "microsoft.keyvault/vaults",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+              },
+              {
+                "equals": "Availability",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+              },
+              {
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.keyvault/vaults/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+              },
+              {
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "LessThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator"
+              },
+              {
+                "equals": "[if(contains(field('tags'), '_amba-Availability-threshold-Override_'), field('tags._amba-Availability-threshold-Override_'), parameters('threshold'))]",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold"
+              }
+            ]
+          },
           "deployment": {
             "properties": {
               "parameters": {
@@ -206,26 +206,25 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
-                },
-                "severity": {
-                  "value": "[parameters('severity')]"
                 },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
+                },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-Availability-threshold-Override_'), field('tags._amba-Availability-threshold-Override_'), parameters('threshold'))]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -238,19 +237,19 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "windowSize": {
-                    "type": "String"
-                  },
                   "enabled": {
-                    "type": "String"
-                  },
-                  "severity": {
                     "type": "String"
                   },
                   "autoMitigate": {
                     "type": "String"
                   },
+                  "windowSize": {
+                    "type": "String"
+                  },
                   "threshold": {
+                    "type": "String"
+                  },
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -271,48 +270,48 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
-                        },
-                        "severity": {
-                          "value": "[parameters('severity')]"
                         },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
+                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
-                      "severity": "[parameters('severity')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
+                      "windowSize": "[parameters('windowSize')]",
+                      "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "name": "Availability",
                             "operator": "LessThan",
+                            "name": "Availability",
                             "metricNamespace": "microsoft.keyvault/vaults",
                             "criterionType": "StaticThresholdCriterion",
                             "metricName": "Availability"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
+                    "apiVersion": "2018-03-01",
                     "location": "global",
                     "name": "[concat(parameters('resourceName'), '-Availability')]",
-                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -320,7 +319,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

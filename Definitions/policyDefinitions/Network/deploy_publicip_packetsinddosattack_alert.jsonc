@@ -6,27 +6,15 @@
     "description": "Policy to audit/deploy PIP Packets in DDoS Attack Alert",
     "mode": "All",
     "metadata": {
-      "category": "Network",
-      "version": "1.2.0",
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "version": "1.2.0",
+      "category": "Network",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "String"
-      },
       "evaluationFrequency": {
         "metadata": {
           "description": "Evaluation frequency for the alert",
@@ -42,25 +30,16 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "MonitorDisableTagValues": {
+      "autoMitigate": {
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
-        "defaultValue": [
+        "allowedValues": [
           "true",
-          "Test",
-          "Dev",
-          "Sandbox"
+          "false"
         ],
-        "type": "Array"
-      },
-      "MonitorDisableTagName": {
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "defaultValue": "MonitorDisable",
+        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
@@ -93,6 +72,19 @@
         "defaultValue": "true",
         "type": "String"
       },
+      "MonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
+      },
       "severity": {
         "metadata": {
           "description": "Severity of the Alert",
@@ -108,18 +100,6 @@
         "defaultValue": "4",
         "type": "String"
       },
-      "autoMitigate": {
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
       "threshold": {
         "metadata": {
           "description": "Threshold for the alert",
@@ -127,14 +107,34 @@
         },
         "defaultValue": "40000",
         "type": "String"
+      },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Network/publicIPAddresses"
+            "equals": "Microsoft.Network/publicIPAddresses",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -149,48 +149,48 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "Microsoft.Network/publicIPAddresses"
+                "equals": "Microsoft.Network/publicIPAddresses",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "PacketsInDDoS"
+                "equals": "PacketsInDDoS",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/publicIPAddresses/', field('fullName'))]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/publicIPAddresses/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency",
-                "equals": "[parameters('evaluationFrequency')]"
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/windowSize",
-                "equals": "[parameters('windowSize')]"
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/severity",
-                "equals": "[parameters('severity')]"
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/autoMitigate",
-                "equals": "[parameters('autoMitigate')]"
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation",
-                "equals": "Total"
+                "equals": "Total",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].operator",
-                "equals": "GreaterThanOrEqual"
+                "equals": "GreaterThanOrEqual",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].operator"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].threshold",
-                "equals": "[if(contains(field('tags'), '_amba-PacketsInDDoS-threshold-Override_'), field('tags._amba-PacketsInDDoS-threshold-Override_'), parameters('threshold'))]"
+                "equals": "[if(contains(field('tags'), '_amba-PacketsInDDoS-threshold-Override_'), field('tags._amba-PacketsInDDoS-threshold-Override_'), parameters('threshold'))]",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].threshold"
               }
             ]
           },
@@ -206,6 +206,9 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -215,9 +218,6 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-PacketsInDDoS-threshold-Override_'), field('tags._amba-PacketsInDDoS-threshold-Override_'), parameters('threshold'))]"
                 },
@@ -225,7 +225,6 @@
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -238,6 +237,9 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
                   "windowSize": {
                     "type": "String"
                   },
@@ -245,9 +247,6 @@
                     "type": "String"
                   },
                   "severity": {
-                    "type": "String"
-                  },
-                  "autoMitigate": {
                     "type": "String"
                   },
                   "threshold": {
@@ -271,6 +270,9 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
+                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
@@ -280,27 +282,24 @@
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Total",
-                            "name": "PacketsInDDoS",
                             "operator": "GreaterThanOrEqual",
                             "metricNamespace": "Microsoft.Network/publicIPAddresses",
                             "criterionType": "StaticThresholdCriterion",
+                            "name": "PacketsInDDoS",
                             "metricName": "PacketsInDDoS"
                           }
                         ],
@@ -310,9 +309,9 @@
                         "[parameters('resourceId')]"
                       ]
                     },
+                    "apiVersion": "2018-03-01",
                     "location": "global",
                     "name": "[concat(parameters('resourceName'), '-PacketsInDDosAlert')]",
-                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -320,7 +319,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

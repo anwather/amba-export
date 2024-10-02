@@ -7,30 +7,18 @@
     "mode": "All",
     "metadata": {
       "category": "Web Services",
-      "version": "1.2.0",
       "_deployed_by_amba": "True",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "version": "1.2.0",
       "alzCloudEnvironments": [
         "AzureCloud"
-      ]
+      ],
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
       "evaluationFrequency": {
         "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
+          "displayName": "Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
         },
         "allowedValues": [
           "PT1M",
@@ -42,10 +30,22 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
+      "autoMitigate": {
+        "metadata": {
+          "displayName": "Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "MonitorDisableTagValues": {
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
         "defaultValue": [
           "true",
@@ -55,18 +55,34 @@
         ],
         "type": "Array"
       },
-      "MonitorDisableTagName": {
+      "effect": {
         "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
+          "displayName": "Effect",
+          "description": "Effect of the policy"
         },
-        "defaultValue": "MonitorDisable",
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
         "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
+          "displayName": "Window Size",
+          "description": "Window size for the alert"
         },
         "allowedValues": [
           "PT1M",
@@ -81,22 +97,18 @@
         "defaultValue": "PT5M",
         "type": "String"
       },
-      "enabled": {
+      "MonitorDisableTagName": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "severity": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "displayName": "Severity",
+          "description": "Severity of the Alert"
         },
         "allowedValues": [
           "0",
@@ -107,26 +119,14 @@
         ],
         "defaultValue": "2",
         "type": "String"
-      },
-      "autoMitigate": {
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.Web/serverfarms"
+            "equals": "Microsoft.Web/serverfarms",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -141,56 +141,56 @@
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace",
-                "equals": "Microsoft.Web/serverfarms"
+                "equals": "Microsoft.Web/serverfarms",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName",
-                "equals": "DiskQueueLength"
+                "equals": "DiskQueueLength",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/scopes[*]",
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', field('fullName'))]"
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency",
-                "equals": "[parameters('evaluationFrequency')]"
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/windowSize",
-                "equals": "[parameters('windowSize')]"
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
               },
               {
-                "field": "Microsoft.Insights/metricalerts/severity",
-                "equals": "[parameters('severity')]"
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/autoMitigate",
-                "equals": "[parameters('autoMitigate')]"
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].timeAggregation",
-                "equals": "Average"
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator",
-                "equals": "GreaterThan"
+                "equals": "GreaterThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.operator"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity",
-                "equals": "Medium"
+                "equals": "Medium",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.alertSensitivity"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.minFailingPeriodsToAlert",
-                "equals": 2
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.minFailingPeriodsToAlert"
               },
               {
-                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.numberOfEvaluationPeriods",
-                "equals": 2
+                "equals": 2,
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-MultipleResourceMultipleMetricCriteria.allOf[*].DynamicThresholdCriterion.failingPeriods.numberOfEvaluationPeriods"
               }
             ]
           },
@@ -206,51 +206,50 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
+                },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
-                      "displayName": "resourceId"
+                      "displayName": "resourceId",
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
                     },
                     "type": "String"
                   },
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "enabled": {
                     "type": "String"
                   },
-                  "severity": {
+                  "windowSize": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
                     "metadata": {
-                      "description": "Name of the resource",
-                      "displayName": "resourceName"
+                      "displayName": "resourceName",
+                      "description": "Name of the resource"
                     },
                     "type": "String"
                   }
@@ -265,34 +264,34 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
+                        },
                         "severity": {
                           "value": "[parameters('severity')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
                         }
                       },
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
-                      "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
-                      "severity": "[parameters('severity')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
+                      "enabled": "[parameters('enabled')]",
+                      "windowSize": "[parameters('windowSize')]",
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "timeAggregation": "Average",
-                            "name": "ServiceApiResult",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": 2,
                               "minFailingPeriodsToAlert": 2
                             },
                             "operator": "GreaterThan",
+                            "name": "ServiceApiResult",
                             "metricNamespace": "Microsoft.Web/serverfarms",
                             "criterionType": "DynamicThresholdCriterion",
                             "metricName": "DiskQueueLength",
@@ -305,9 +304,9 @@
                         "[parameters('resourceId')]"
                       ]
                     },
+                    "apiVersion": "2018-03-01",
                     "location": "global",
                     "name": "[concat(parameters('resourceName'), '-DiskQueueLengthAlert')]",
-                    "apiVersion": "2018-03-01",
                     "tags": {
                       "_deployed_by_amba": true
                     }
@@ -315,7 +314,8 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

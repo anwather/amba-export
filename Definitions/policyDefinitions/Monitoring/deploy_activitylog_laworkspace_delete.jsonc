@@ -6,37 +6,21 @@
     "description": "Policy to Deploy Activity Log LA Workspace Delete Alert",
     "mode": "All",
     "metadata": {
-      "category": "Monitoring",
-      "version": "1.1.0",
+      "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
-      "_deployed_by_amba": "True"
+      "version": "1.1.0",
+      "category": "Monitoring",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
+      "alertResourceGroupName": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
         },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+        "defaultValue": "rg-amba-monitoring-001",
         "type": "String"
       },
       "alertResourceGroupLocation": {
@@ -46,24 +30,6 @@
         },
         "defaultValue": "centralus",
         "type": "String"
-      },
-      "alertResourceGroupName": {
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "defaultValue": "rg-amba-monitoring-001",
-        "type": "String"
-      },
-      "alertResourceGroupTags": {
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "defaultValue": {
-          "_deployed_by_amba": true
-        },
-        "type": "Object"
       },
       "MonitorDisableTagValues": {
         "metadata": {
@@ -85,14 +51,48 @@
         },
         "defaultValue": "MonitorDisable",
         "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "alertResourceGroupTags": {
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
+        "type": "Object"
+      },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.OperationalInsights/workspaces"
+            "equals": "Microsoft.OperationalInsights/workspaces",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -104,11 +104,14 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
-                "field": "Microsoft.Insights/ActivityLogAlerts/enabled",
-                "equals": "[parameters('enabled')]"
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
               },
               {
                 "equals": 2,
@@ -119,24 +122,24 @@
                       {
                         "allOf": [
                           {
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field",
-                            "equals": "category"
+                            "equals": "category",
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals",
-                            "equals": "Administrative"
+                            "equals": "Administrative",
+                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
                       },
                       {
                         "allOf": [
                           {
-                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field",
-                            "equals": "operationName"
+                            "equals": "operationName",
+                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals",
-                            "equals": "Microsoft.OperationalInsights/workspaces/delete"
+                            "equals": "Microsoft.OperationalInsights/workspaces/delete",
+                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
                       }
@@ -146,36 +149,34 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "name": "ActivityLAWorkspaceDelete",
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "deploymentScope": "subscription",
           "deployment": {
             "properties": {
               "parameters": {
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "alertResourceGroupName": {
+                  "value": "[parameters('alertResourceGroupName')]"
                 },
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
                 },
-                "alertResourceGroupName": {
-                  "value": "[parameters('alertResourceGroupName')]"
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
-                  "enabled": {
+                  "alertResourceGroupName": {
                     "type": "string"
                   },
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "alertResourceGroupName": {
+                  "enabled": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
@@ -186,8 +187,8 @@
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
-                    "location": "[parameters('alertResourceGroupLocation')]",
                     "apiVersion": "2021-04-01",
+                    "location": "[parameters('alertResourceGroupLocation')]",
                     "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
@@ -196,20 +197,19 @@
                     "type": "Microsoft.Resources/deployments",
                     "properties": {
                       "parameters": {
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         }
                       },
-                      "mode": "Incremental",
                       "template": {
                         "parameters": {
-                          "enabled": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           },
-                          "alertResourceGroupName": {
+                          "enabled": {
                             "type": "string"
                           }
                         },
@@ -225,18 +225,15 @@
                                 }
                               },
                               "enabled": "[parameters('enabled')]",
-                              "scopes": [
-                                "[subscription().id]"
-                              ],
                               "condition": {
                                 "allOf": [
                                   {
-                                    "field": "category",
-                                    "equals": "Administrative"
+                                    "equals": "Administrative",
+                                    "field": "category"
                                   },
                                   {
-                                    "field": "operationName",
-                                    "equals": "Microsoft.OperationalInsights/workspaces/delete"
+                                    "equals": "Microsoft.OperationalInsights/workspaces/delete",
+                                    "field": "operationName"
                                   },
                                   {
                                     "field": "status",
@@ -245,10 +242,13 @@
                                     ]
                                   }
                                 ]
-                              }
+                              },
+                              "scopes": [
+                                "[subscription().id]"
+                              ]
                             },
-                            "location": "global",
                             "apiVersion": "2020-10-01",
+                            "location": "global",
                             "name": "ActivityLAWorkspaceDelete",
                             "tags": {
                               "_deployed_by_amba": true
@@ -257,7 +257,8 @@
                         ],
                         "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      }
+                      },
+                      "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
                     "name": "ActivityLAWorkspaceDelete",
@@ -268,13 +269,12 @@
                 ],
                 "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             },
             "location": "australiaeast"
           },
-          "existenceScope": "resourcegroup",
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "deploymentScope": "subscription"
+          "existenceScope": "resourcegroup"
         }
       }
     }

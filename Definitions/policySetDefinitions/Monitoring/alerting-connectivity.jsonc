@@ -5,34 +5,21 @@
     "displayName": "Deploy Azure Monitor Baseline Alerts for Connectivity",
     "description": "This initiative deploys Azure Monitor Baseline Alerts to monitor Network components such as Azure Firewalls, ExpressRoute, VPN, and Private DNS Zones.",
     "metadata": {
+      "category": "Monitoring",
       "_deployed_by_amba": true,
       "version": "1.1.1",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "ALZMonitorDisableTagValues": {
+      "ALZMonitorResourceGroupLocation": {
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
+          "description": "Location of the resource group where the ALZ Monitor resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Location"
         },
-        "defaultValue": [
-          "true",
-          "Test",
-          "Dev",
-          "Sandbox"
-        ],
-        "type": "Array"
-      },
-      "ALZMonitorDisableTagName": {
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "defaultValue": "MonitorDisableTagName",
+        "defaultValue": "centralus",
         "type": "String"
       },
       "ALZMonitorResourceGroupName": {
@@ -53,12 +40,25 @@
         },
         "type": "Object"
       },
-      "ALZMonitorResourceGroupLocation": {
+      "ALZMonitorDisableTagValues": {
         "metadata": {
-          "description": "Location of the resource group where the ALZ Monitor resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Location"
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
         },
-        "defaultValue": "centralus",
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
+      },
+      "ALZMonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisableTagName",
         "type": "String"
       },
       "ERCIRQoSDropBitsinPerSecAlertSeverity": {
@@ -2841,18 +2841,6 @@
         "defaultValue": "PT1M",
         "type": "string"
       },
-      "LBGlobalBackendAvailabilityPolicyEffect": {
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "LB Global Backend Availability Policy Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "string"
-      },
       "LBGlobalBackendAvailabilityAlertState": {
         "metadata": {
           "description": "Alert state for the alert",
@@ -3472,6 +3460,18 @@
         },
         "defaultValue": "true",
         "type": "string"
+      },
+      "LBGlobalBackendAvailabilityPolicyEffect": {
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "LB Global Backend Availability Policy Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
       }
     },
     "policyDefinitions": [
@@ -3488,11 +3488,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERCIRQoSDropBitsinPerSecEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERCIRQoSDropBitsinPerSecPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERCIRQoSDropBitsinPerSecWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERCIRQoSDropBitsinPerSecPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERCIRQoSDropBitsinPerSecAlertSeverity')]"
@@ -3515,11 +3515,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERCIRQoSDropBitsoutPerSecEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERCIRQoSDropBitsoutPerSecPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERCIRQoSDropBitsoutPerSecWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERCIRQoSDropBitsoutPerSecPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERCIRQoSDropBitsoutPerSecAlertSeverity')]"
@@ -3542,11 +3542,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGwBGPPeerStatusEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VPNGwBGPPeerStatusPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VPNGwBGPPeerStatusWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGwBGPPeerStatusPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VPNGwBGPPeerStatusAlertSeverity')]"
@@ -3572,11 +3572,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwERCpuUtilEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwERCpuUtilPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwERCpuUtilWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwERCpuUtilPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwERCpuUtilAlertSeverity')]"
@@ -3602,11 +3602,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelBWEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwTunnelBWPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelBWWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelBWPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwTunnelBWAlertSeverity')]"
@@ -3632,11 +3632,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelEgressEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwTunnelEgressPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelEgressWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelEgressPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwTunnelEgressAlertSeverity')]"
@@ -3662,11 +3662,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelIngressEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwTunnelIngressPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelIngressWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelIngressPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwTunnelIngressAlertSeverity')]"
@@ -3692,11 +3692,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWBandWidthUtilEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VPNGWBandWidthUtilPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VPNGWBandWidthUtilWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWBandWidthUtilPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VPNGWBandWidthUtilAlertSeverity')]"
@@ -3722,11 +3722,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWEgressEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VPNGWEgressPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VPNGWEgressWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWEgressPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VPNGWEgressAlertSeverity')]"
@@ -3752,11 +3752,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropCountFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VPNGWTunnelEgressPacketDropCountPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropCountWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropCountPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropCountAlertSeverity')]"
@@ -3779,11 +3779,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VPNGWTunnelEgressPacketDropMismatchAlertSeverity')]"
@@ -3806,11 +3806,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWIngressEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VPNGWIngressPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VPNGWIngressWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWIngressPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VPNGWIngressAlertSeverity')]"
@@ -3839,11 +3839,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropCountFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VPNGWTunnelIngressPacketDropCountPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropCountWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropCountPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropCountAlertSeverity')]"
@@ -3866,11 +3866,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VPNGWTunnelIngressPacketDropMismatchAlertSeverity')]"
@@ -3893,11 +3893,11 @@
           "evaluationFrequency": {
             "value": "[parameters('PDNSZCapacityUtilEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('PDNSZCapacityUtilPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('PDNSZCapacityUtilWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PDNSZCapacityUtilPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('PDNSZCapacityUtilAlertSeverity')]"
@@ -3923,11 +3923,11 @@
           "evaluationFrequency": {
             "value": "[parameters('PDNSZQueryVolumeEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('PDNSZQueryVolumePolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('PDNSZQueryVolumeWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PDNSZQueryVolumePolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('PDNSZQueryVolumeAlertSeverity')]"
@@ -3953,11 +3953,11 @@
           "evaluationFrequency": {
             "value": "[parameters('PDNSZRecordSetCapacityEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('PDNSZRecordSetCapacityPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('PDNSZRecordSetCapacityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PDNSZRecordSetCapacityPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('PDNSZRecordSetCapacityAlertSeverity')]"
@@ -3983,11 +3983,11 @@
           "evaluationFrequency": {
             "value": "[parameters('PDNSZRegistrationCapacityUtilEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('PDNSZRegistrationCapacityUtilPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('PDNSZRegistrationCapacityUtilWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PDNSZRegistrationCapacityUtilPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('PDNSZRegistrationCapacityUtilAlertSeverity')]"
@@ -4013,11 +4013,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERGwExpressRouteBitsInEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERGwExpressRouteBitsInPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERGwExpressRouteBitsInWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERGwExpressRouteBitsInPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERGwExpressRouteBitsInAlertSeverity')]"
@@ -4043,11 +4043,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERGwExpressRouteBitsOutEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERGwExpressRouteBitsOutPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERGwExpressRouteBitsOutWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERGwExpressRouteBitsOutPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERGwExpressRouteBitsOutAlertSeverity')]"
@@ -4073,11 +4073,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERGwExpressRouteCpuUtilEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERGwExpressRouteCpuUtilPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERGwExpressRouteCpuUtilWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERGwExpressRouteCpuUtilPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERGwExpressRouteCpuUtilAlertSeverity')]"
@@ -4103,11 +4103,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropCountEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwTunnelEgressPacketDropCountPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropCountWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropCountPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropCountAlertSeverity')]"
@@ -4130,11 +4130,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwTunnelEgressPacketDropMismatchAlertSeverity')]"
@@ -4157,11 +4157,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwExpressRouteBitsPerSecondEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwExpressRouteBitsPerSecondPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwExpressRouteBitsPerSecondWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwExpressRouteBitsPerSecondPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwExpressRouteBitsPerSecondAlertSeverity')]"
@@ -4187,11 +4187,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropMismatchAlertSeverity')]"
@@ -4214,11 +4214,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropCountEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VnetGwTunnelIngressPacketDropCountPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropCountWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VnetGwTunnelIngressPacketDropCountPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VnetGwTunnelIngressPacketDropCountAlertSeverity')]"
@@ -4241,11 +4241,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERCIRBgpAvailabilityEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERCIRBgpAvailabilityPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERCIRBgpAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERCIRBgpAvailabilityPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERCIRBgpAvailabilityAlertSeverity')]"
@@ -4271,11 +4271,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERCIRArpAvailabilityFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERCIRArpAvailabilityPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERCIRArpAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERCIRArpAvailabilityPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERCIRArpAvailabilityAlertSeverity')]"
@@ -4301,11 +4301,11 @@
           "evaluationFrequency": {
             "value": "[parameters('AFWSNATPortUtilizationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('AFWSNATPortUtilizationPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('AFWSNATPortUtilizationWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('AFWSNATPortUtilizationPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('AFWSNATPortUtilizationAlertSeverity')]"
@@ -4331,11 +4331,11 @@
           "evaluationFrequency": {
             "value": "[parameters('PIPBytesInDDoSEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('PIPBytesInDDoSPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('PIPBytesInDDoSWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPBytesInDDoSPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('PIPBytesInDDoSAlertSeverity')]"
@@ -4361,11 +4361,11 @@
           "evaluationFrequency": {
             "value": "[parameters('PIPDDoSAttackEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('PIPDDoSAttackPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('PIPDDoSAttackWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPDDoSAttackPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('PIPDDoSAttackAlertSeverity')]"
@@ -4391,11 +4391,11 @@
           "evaluationFrequency": {
             "value": "[parameters('PIPPacketsInDDoSEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('PIPPacketsInDDoSPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('PIPPacketsInDDoSWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPPacketsInDDoSPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('PIPPacketsInDDoSAlertSeverity')]"
@@ -4421,11 +4421,11 @@
           "evaluationFrequency": {
             "value": "[parameters('PIPVIPAvailabilityEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('PIPVIPAvailabilityPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('PIPVIPAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('PIPVIPAvailabilityPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('PIPVIPAvailabilityAlertSeverity')]"
@@ -4451,11 +4451,11 @@
           "evaluationFrequency": {
             "value": "[parameters('VNETDDOSAttackEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('VNETDDOSAttackPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('VNETDDOSAttackWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('VNETDDOSAttackPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('VNETDDOSAttackAlertSeverity')]"
@@ -4481,11 +4481,11 @@
           "evaluationFrequency": {
             "value": "[parameters('FirewallHealthEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('FirewallHealthPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('FirewallHealthWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('FirewallHealthPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('FirewallHealthAlertSeverity')]"
@@ -4517,11 +4517,11 @@
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           }
         }
       },
@@ -4544,11 +4544,11 @@
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           }
         }
       },
@@ -4571,11 +4571,11 @@
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           }
         }
       },
@@ -4598,11 +4598,11 @@
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           }
         }
       },
@@ -4619,11 +4619,11 @@
           "evaluationFrequency": {
             "value": "[parameters('LBDataPathAvailabilityEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('LBDataPathAvailabilityPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('LBDataPathAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('LBDataPathAvailabilityPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('LBDataPathAvailabilityAlertSeverity')]"
@@ -4646,11 +4646,11 @@
           "evaluationFrequency": {
             "value": "[parameters('LBGlobalBackendAvailabilityEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('LBGlobalBackendAvailabilityPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('LBGlobalBackendAvailabilityWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('LBGlobalBackendAvailabilityPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('LBGlobalBackendAvailabilityAlertSeverity')]"
@@ -4673,11 +4673,11 @@
           "evaluationFrequency": {
             "value": "[parameters('LBHealthProbeStatusEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('LBHealthProbeStatusPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('LBHealthProbeStatusWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('LBHealthProbeStatusPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('LBHealthProbeStatusAlertSeverity')]"
@@ -4700,11 +4700,11 @@
           "evaluationFrequency": {
             "value": "[parameters('LBUsedSNATPortsEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('LBUsedSNATPortsPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('LBUsedSNATPortsWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('LBUsedSNATPortsPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('LBUsedSNATPortsAlertSeverity')]"
@@ -4727,11 +4727,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPBitsInPerSecondEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERPBitsInPerSecondPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERPBitsInPerSecondWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPBitsInPerSecondPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERPBitsInPerSecondAlertSeverity')]"
@@ -4754,11 +4754,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPBitsOutPerSecondEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERPBitsOutPerSecondPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERPBitsOutPerSecondWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPBitsOutPerSecondPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERPBitsOutPerSecondAlertSeverity')]"
@@ -4781,11 +4781,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPLineProtocolEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERPLineProtocolPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERPLineProtocolWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPLineProtocolPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERPLineProtocolAlertSeverity')]"
@@ -4808,11 +4808,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPRxLightLevelHighEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERPRxLightLevelHighPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERPRxLightLevelHighWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPRxLightLevelHighPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERPRxLightLevelHighAlertSeverity')]"
@@ -4835,11 +4835,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPRxLightLevelLowEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERPRxLightLevelLowPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERPRxLightLevelLowWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPRxLightLevelLowPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERPRxLightLevelLowAlertSeverity')]"
@@ -4862,11 +4862,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPTxLightLevelHighEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERPTxLightLevelHighPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERPTxLightLevelHighWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPTxLightLevelHighPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERPTxLightLevelHighAlertSeverity')]"
@@ -4889,11 +4889,11 @@
           "evaluationFrequency": {
             "value": "[parameters('ERPTxLightLevelLowEvaluationFrequency')]"
           },
-          "effect": {
-            "value": "[parameters('ERPTxLightLevelLowPolicyEffect')]"
-          },
           "windowSize": {
             "value": "[parameters('ERPTxLightLevelLowWindowSize')]"
+          },
+          "effect": {
+            "value": "[parameters('ERPTxLightLevelLowPolicyEffect')]"
           },
           "severity": {
             "value": "[parameters('ERPTxLightLevelLowAlertSeverity')]"

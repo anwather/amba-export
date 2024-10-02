@@ -1,0 +1,327 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
+  "name": "Deploy_WSF_MemoryPercentage_Alert",
+  "properties": {
+    "displayName": "Deploy App Service Plan Memory Percentage Alert",
+    "description": "Policy to audit/deploy App Service Plan Memory Percentage  Alert",
+    "mode": "All",
+    "metadata": {
+      "_deployed_by_amba": "True",
+      "version": "1.2.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "Category": "Web Services"
+    },
+    "parameters": {
+      "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT5M",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
+      "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "type": "String"
+      },
+      "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "threshold": {
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
+        },
+        "defaultValue": "85",
+        "type": "String"
+      },
+      "MonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
+      },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "equals": "Microsoft.Web/serverfarms",
+            "field": "type"
+          },
+          {
+            "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
+            "notIn": "[parameters('MonitorDisableTagValues')]"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "equals": "Microsoft.Web/serverfarms",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricNamespace"
+              },
+              {
+                "equals": "MemoryPercentage",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].metricName"
+              },
+              {
+                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', field('fullName'))]",
+                "field": "Microsoft.Insights/metricalerts/scopes[*]"
+              },
+              {
+                "equals": "[parameters('enabled')]",
+                "field": "Microsoft.Insights/metricAlerts/enabled"
+              },
+              {
+                "equals": "[parameters('evaluationFrequency')]",
+                "field": "Microsoft.Insights/metricAlerts/evaluationFrequency"
+              },
+              {
+                "equals": "[parameters('windowSize')]",
+                "field": "Microsoft.Insights/metricAlerts/windowSize"
+              },
+              {
+                "equals": "[parameters('severity')]",
+                "field": "Microsoft.Insights/metricalerts/severity"
+              },
+              {
+                "equals": "[parameters('autoMitigate')]",
+                "field": "Microsoft.Insights/metricAlerts/autoMitigate"
+              },
+              {
+                "equals": "Average",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft-Azure-Monitor-SingleResourceMultipleMetricCriteria.allOf[*].timeAggregation"
+              },
+              {
+                "equals": "GreaterThan",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.operator"
+              },
+              {
+                "equals": "[if(contains(field('tags'), '_amba-MemoryPercentage-threshold-Override_'), field('tags._amba-MemoryPercentage-threshold-Override_'), parameters('threshold'))]",
+                "field": "Microsoft.Insights/metricAlerts/criteria.Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria.allOf[*].StaticThresholdCriterion.threshold"
+              }
+            ]
+          },
+          "deployment": {
+            "properties": {
+              "parameters": {
+                "resourceId": {
+                  "value": "[field('id')]"
+                },
+                "evaluationFrequency": {
+                  "value": "[parameters('evaluationFrequency')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
+                "resourceName": {
+                  "value": "[field('name')]"
+                },
+                "threshold": {
+                  "value": "[if(contains(field('tags'), '_amba-MemoryPercentage-threshold-Override_'), field('tags._amba-MemoryPercentage-threshold-Override_'), parameters('threshold'))]"
+                }
+              },
+              "mode": "incremental",
+              "template": {
+                "parameters": {
+                  "resourceId": {
+                    "metadata": {
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
+                      "displayName": "resourceId"
+                    },
+                    "type": "String"
+                  },
+                  "evaluationFrequency": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
+                  "windowSize": {
+                    "type": "String"
+                  },
+                  "severity": {
+                    "type": "String"
+                  },
+                  "enabled": {
+                    "type": "String"
+                  },
+                  "resourceName": {
+                    "metadata": {
+                      "description": "Name of the resource",
+                      "displayName": "resourceName"
+                    },
+                    "type": "String"
+                  },
+                  "threshold": {
+                    "type": "String"
+                  }
+                },
+                "contentVersion": "1.0.0.0",
+                "variables": {},
+                "resources": [
+                  {
+                    "type": "Microsoft.Insights/metricAlerts",
+                    "properties": {
+                      "description": "Metric Alert for App Service Plan Memory Percentage",
+                      "parameters": {
+                        "evaluationFrequency": {
+                          "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
+                        },
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
+                        }
+                      },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "windowSize": "[parameters('windowSize')]",
+                      "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
+                      "criteria": {
+                        "allOf": [
+                          {
+                            "threshold": "[parameters('threshold')]",
+                            "metricNamespace": "Microsoft.Web/serverfarms",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion",
+                            "name": "MemoryPercentage",
+                            "metricName": "MemoryPercentage",
+                            "operator": "GreaterThan"
+                          }
+                        ],
+                        "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                      },
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ]
+                    },
+                    "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-MemoryPercentage')]",
+                    "apiVersion": "2018-03-01",
+                    "tags": {
+                      "_deployed_by_amba": true
+                    }
+                  }
+                ],
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
