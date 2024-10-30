@@ -6,32 +6,16 @@
     "description": "Policy to audit/deploy KeyVault Availability Alert",
     "mode": "All",
     "metadata": {
-      "version": "1.2.0",
-      "category": "Key Vault",
       "_deployed_by_amba": "True",
+      "version": "1.2.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "category": "Key Vault",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "String"
-      },
       "evaluationFrequency": {
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -40,25 +24,46 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
+        "type": "String"
+      },
+      "MonitorDisableTagValues": {
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
+        "type": "Array"
+      },
+      "MonitorDisableTagName": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
         "type": "String"
       },
       "autoMitigate": {
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "type": "String"
       },
       "windowSize": {
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -70,13 +75,25 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
+        "type": "String"
+      },
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "type": "String"
       },
       "severity": {
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "allowedValues": [
           "0",
           "1",
@@ -85,47 +102,30 @@
           "4"
         ],
         "defaultValue": "1",
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "type": "String"
       },
       "threshold": {
+        "defaultValue": "90",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
-        "defaultValue": "90",
         "type": "String"
       },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
+      "effect": {
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
-        "type": "String"
-      },
-      "MonitorDisableTagValues": {
+        "defaultValue": "disabled",
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
-        "defaultValue": [
-          "true",
-          "Test",
-          "Dev",
-          "Sandbox"
-        ],
-        "type": "Array"
-      },
-      "MonitorDisableTagName": {
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -212,20 +212,19 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-Availability-threshold-Override_'), field('tags._amba-Availability-threshold-Override_'), parameters('threshold'))]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
-                },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
-              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -244,13 +243,13 @@
                   "windowSize": {
                     "type": "String"
                   },
+                  "enabled": {
+                    "type": "String"
+                  },
                   "severity": {
                     "type": "String"
                   },
                   "threshold": {
-                    "type": "String"
-                  },
-                  "enabled": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -262,12 +261,12 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for KeyVault Availability",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -278,31 +277,30 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
-                        },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
                         }
                       },
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "severity": "[parameters('severity')]",
                       "enabled": "[parameters('enabled')]",
+                      "severity": "[parameters('severity')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
+                            "name": "Availability",
+                            "operator": "LessThan",
                             "metricNamespace": "microsoft.keyvault/vaults",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "Availability",
-                            "name": "Availability",
-                            "operator": "LessThan"
+                            "metricName": "Availability"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -312,15 +310,17 @@
                       ]
                     },
                     "apiVersion": "2018-03-01",
-                    "name": "[concat(parameters('resourceName'), '-Availability')]",
                     "location": "global",
+                    "name": "[concat(parameters('resourceName'), '-Availability')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              }
+              },
+              "mode": "incremental"
             }
           }
         }

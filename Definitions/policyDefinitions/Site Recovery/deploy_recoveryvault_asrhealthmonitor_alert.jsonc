@@ -8,45 +8,45 @@
     "metadata": {
       "_deployed_by_amba": "True",
       "version": "1.0.0",
-      "category": "Site Recovery",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "category": "Site Recovery",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "modify",
-          "audit",
-          "disabled"
-        ],
-        "defaultValue": "modify",
-        "type": "String"
-      },
       "MonitorDisableTagValues": {
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
         "type": "Array"
       },
       "MonitorDisableTagName": {
+        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
           "displayName": "ALZ Monitoring disabled tag name"
         },
-        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "modify",
+          "audit",
+          "disabled"
+        ],
+        "defaultValue": "modify",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "type": "String"
       }
     },
@@ -54,8 +54,8 @@
       "if": {
         "allOf": [
           {
-            "field": "type",
-            "equals": "Microsoft.RecoveryServices/Vaults"
+            "equals": "Microsoft.RecoveryServices/Vaults",
+            "field": "type"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -81,7 +81,6 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "conflictEffect": "audit",
           "operations": [
             {
               "value": "Disabled",
@@ -98,7 +97,8 @@
               "field": "Microsoft.RecoveryServices/vaults/monitoringSettings.azureMonitorAlertSettings.alertsForAllFailoverIssues",
               "operation": "addOrReplace"
             }
-          ]
+          ],
+          "conflictEffect": "audit"
         }
       }
     }
