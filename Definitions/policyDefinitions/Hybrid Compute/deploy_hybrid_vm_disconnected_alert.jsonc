@@ -7,10 +7,10 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.4.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.4.0",
       "category": "Hybrid Compute",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -145,18 +145,6 @@
         },
         "type": "String"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "failingPeriods": {
         "defaultValue": "1",
         "metadata": {
@@ -201,6 +189,18 @@
         },
         "type": "string"
       },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "operator": {
         "allowedValues": [
           "GreaterThan"
@@ -216,8 +216,8 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.HybridCompute/machines",
-            "field": "type"
+            "field": "type",
+            "equals": "Microsoft.HybridCompute/machines"
           },
           {
             "field": "[concat('tags[', parameters('MonitorDisableTagName'), ']')]",
@@ -232,52 +232,52 @@
           "existenceCondition": {
             "allOf": [
               {
-                "equals": "[concat(subscription().displayName, '-HybridVMDisconnectedAlert')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/displayName"
+                "field": "Microsoft.Insights/scheduledQueryRules/displayName",
+                "equals": "[concat(subscription().displayName, '-HybridVMDisconnectedAlert')]"
               },
               {
-                "equals": "[subscription().id]",
-                "field": "Microsoft.Insights/scheduledQueryRules/scopes[*]"
+                "field": "Microsoft.Insights/scheduledQueryRules/scopes[*]",
+                "equals": "[subscription().id]"
               },
               {
-                "equals": "[parameters('enabled')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/enabled"
+                "field": "Microsoft.Insights/scheduledQueryRules/enabled",
+                "equals": "[parameters('enabled')]"
               },
               {
-                "equals": "[parameters('evaluationFrequency')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/evaluationFrequency"
+                "field": "Microsoft.Insights/scheduledQueryRules/evaluationFrequency",
+                "equals": "[parameters('evaluationFrequency')]"
               },
               {
-                "equals": "[parameters('windowSize')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/windowSize"
+                "field": "Microsoft.Insights/scheduledQueryRules/windowSize",
+                "equals": "[parameters('windowSize')]"
               },
               {
-                "equals": "[parameters('severity')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/severity"
+                "field": "Microsoft.Insights/scheduledQueryRules/severity",
+                "equals": "[parameters('severity')]"
               },
               {
-                "equals": "[parameters('autoMitigate')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/autoMitigate"
+                "field": "Microsoft.Insights/scheduledQueryRules/autoMitigate",
+                "equals": "[parameters('autoMitigate')]"
               },
               {
-                "equals": "[parameters('operator')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].operator"
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].operator",
+                "equals": "[parameters('operator')]"
               },
               {
-                "equals": "[parameters('timeAggregation')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].timeAggregation"
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].timeAggregation",
+                "equals": "[parameters('timeAggregation')]"
               },
               {
-                "equals": "[parameters('evaluationPeriods')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.numberOfEvaluationPeriods"
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.numberOfEvaluationPeriods",
+                "equals": "[parameters('evaluationPeriods')]"
               },
               {
-                "equals": "[parameters('failingPeriods')]",
-                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.minFailingPeriodsToAlert"
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.minFailingPeriodsToAlert",
+                "equals": "[parameters('failingPeriods')]"
               },
               {
-                "equals": "[format('let policyThresholdString = \"{2}\"; arg(\"\").resources | where type == \"microsoft.hybridcompute/machines\" | where parse_json(tostring(tags.{0})) !in~ (\"{1}\") | where tostring(properties.status) == \"Disconnected\" | extend lastContactedDate = todatetime(properties.lastStatusChange) | where lastContactedDate <= ago(totimespan(policyThresholdString)) | extend status = tostring(properties.status) | project id, Computer=name, status, lastContactedDate', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), parameters('threshold'))]",
-                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].query"
+                "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].query",
+                "equals": "[format('let policyThresholdString = \"{2}\"; arg(\"\").resources | where type == \"microsoft.hybridcompute/machines\" | where parse_json(tostring(tags.{0})) !in~ (\"{1}\") | where tostring(properties.status) == \"Disconnected\" | extend lastContactedDate = todatetime(properties.lastStatusChange) | where lastContactedDate <= ago(totimespan(policyThresholdString)) | extend status = tostring(properties.status) | project id, Computer=name, status, lastContactedDate', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), parameters('threshold'))]"
               },
               {
                 "field": "identity.userAssignedIdentities",
@@ -499,8 +499,8 @@
                                     "resourceIdColumn": "id",
                                     "dimensions": [
                                       {
-                                        "name": "Computer",
                                         "operator": "Include",
+                                        "name": "Computer",
                                         "values": [
                                           "*"
                                         ]

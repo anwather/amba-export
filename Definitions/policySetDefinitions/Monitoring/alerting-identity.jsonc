@@ -14,32 +14,6 @@
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "ALZMonitorResourceGroupName": {
-        "defaultValue": "ALZ-Monitoring-RG",
-        "metadata": {
-          "description": "Name of the resource group where the alerting resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Name"
-        },
-        "type": "String"
-      },
-      "ALZMonitorResourceGroupLocation": {
-        "defaultValue": "centralus",
-        "metadata": {
-          "description": "Location of the resource group where the alerting resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Location"
-        },
-        "type": "String"
-      },
-      "ALZMonitorResourceGroupTags": {
-        "defaultValue": {
-          "_deployed_by_alz_monitor": true
-        },
-        "metadata": {
-          "description": "Tags for the resource group where the alerting resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Tags"
-        },
-        "type": "Object"
-      },
       "ALZMonitorDisableTagValues": {
         "defaultValue": [
           "true",
@@ -53,11 +27,37 @@
         },
         "type": "Array"
       },
+      "ALZMonitorResourceGroupLocation": {
+        "defaultValue": "centralus",
+        "metadata": {
+          "description": "Location of the resource group where the alerting resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Location"
+        },
+        "type": "String"
+      },
       "ALZMonitorDisableTagName": {
         "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
           "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "type": "String"
+      },
+      "ALZMonitorResourceGroupTags": {
+        "defaultValue": {
+          "_deployed_by_alz_monitor": true
+        },
+        "metadata": {
+          "description": "Tags for the resource group where the alerting resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Tags"
+        },
+        "type": "Object"
+      },
+      "ALZMonitorResourceGroupName": {
+        "defaultValue": "ALZ-Monitoring-RG",
+        "metadata": {
+          "description": "Name of the resource group where the alerting resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Name"
         },
         "type": "String"
       },
@@ -148,14 +148,6 @@
         },
         "type": "String"
       },
-      "HSMsLatencyAvailabilityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Key Vault Managed HSMs Latency Availability Alert State"
-        },
-        "type": "string"
-      },
       "KvLatencyAvailabilityPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -201,11 +193,27 @@
         },
         "type": "string"
       },
+      "HSMsLatencyAvailabilityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Key Vault Managed HSMs Latency Availability Alert State"
+        },
+        "type": "string"
+      },
       "HSMsLatencyAvailabilityThreshold": {
         "defaultValue": "1000",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Key Vault Managed HSMs Latency Availability Threshold"
+        },
+        "type": "string"
+      },
+      "KvLatencyAvailabilityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "State of the alert, true will enable the alert, false will disable the alert",
+          "displayName": "KeyVault Latency Alert State"
         },
         "type": "string"
       },
@@ -227,11 +235,11 @@
         },
         "type": "string"
       },
-      "KvLatencyAvailabilityAlertState": {
-        "defaultValue": "true",
+      "KvLatencyAvailabilityThreshold": {
+        "defaultValue": "1000",
         "metadata": {
-          "description": "State of the alert, true will enable the alert, false will disable the alert",
-          "displayName": "KeyVault Latency Alert State"
+          "description": "Threshold for the alert",
+          "displayName": "KeyVault Latency Alert Threshold"
         },
         "type": "string"
       },
@@ -247,11 +255,18 @@
         },
         "type": "string"
       },
-      "KvLatencyAvailabilityThreshold": {
-        "defaultValue": "1000",
+      "KVCapacityEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "KeyVault Latency Alert Threshold"
+          "description": "Evaluation frequency for the alert",
+          "displayName": "KeyVault Capacity Alert Evaluation Frequency"
         },
         "type": "string"
       },
@@ -269,29 +284,6 @@
           "displayName": "Key Vault Managed HSMs Availability Alert Severity"
         },
         "type": "String"
-      },
-      "KVCapacityEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "KeyVault Capacity Alert Evaluation Frequency"
-        },
-        "type": "string"
-      },
-      "activityHSMsDeleteAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Activity Key Vault Managed HSMs Delete Alert State"
-        },
-        "type": "string"
       },
       "activityKVDeletePolicyEffect": {
         "allowedValues": [
@@ -332,6 +324,14 @@
         },
         "type": "string"
       },
+      "activityHSMsDeleteAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Activity Key Vault Managed HSMs Delete Alert State"
+        },
+        "type": "string"
+      },
       "KvAvailabilityAlertSeverity": {
         "allowedValues": [
           "0",
@@ -355,6 +355,26 @@
         },
         "type": "string"
       },
+      "KvAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "KeyVault Availability Alert Policy Effect"
+        },
+        "type": "string"
+      },
+      "activityKVDeleteAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "State of the alert, true will enable the alert, false will disable the alert",
+          "displayName": "Activity Log KeyVault Delete Alert State"
+        },
+        "type": "string"
+      },
       "HSMsAvailabilityWindowSize": {
         "allowedValues": [
           "PT1M",
@@ -373,39 +393,11 @@
         },
         "type": "string"
       },
-      "activityKVDeleteAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "State of the alert, true will enable the alert, false will disable the alert",
-          "displayName": "Activity Log KeyVault Delete Alert State"
-        },
-        "type": "string"
-      },
-      "KvAvailabilityPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "KeyVault Availability Alert Policy Effect"
-        },
-        "type": "string"
-      },
       "HSMsAvailabilityThreshold": {
         "defaultValue": "20",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Key Vault Managed HSMs Availability Threshold"
-        },
-        "type": "string"
-      },
-      "KvAvailabilityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "State of the alert, true will enable the alert, false will disable the alert",
-          "displayName": "KeyVault Availability Alert State"
         },
         "type": "string"
       },
@@ -427,11 +419,11 @@
         },
         "type": "string"
       },
-      "KVAvailabilityThreshold": {
-        "defaultValue": "20",
+      "KvAvailabilityAlertState": {
+        "defaultValue": "true",
         "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "KeyVault Availability Alert Threshold"
+          "description": "State of the alert, true will enable the alert, false will disable the alert",
+          "displayName": "KeyVault Availability Alert State"
         },
         "type": "string"
       },
@@ -450,15 +442,11 @@
         },
         "type": "String"
       },
-      "KVCapacityPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
+      "KVAvailabilityThreshold": {
+        "defaultValue": "20",
         "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
-          "displayName": "KeyVault Capacity Alert Policy Effect"
+          "description": "Threshold for the alert",
+          "displayName": "KeyVault Availability Alert Threshold"
         },
         "type": "string"
       },
@@ -477,6 +465,18 @@
         },
         "type": "String"
       },
+      "KVCapacityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "disabled",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "KeyVault Capacity Alert Policy Effect"
+        },
+        "type": "string"
+      },
       "KVRequestPolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
@@ -486,14 +486,6 @@
         "metadata": {
           "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
           "displayName": "KeyVault Request Alert Policy Effect"
-        },
-        "type": "string"
-      },
-      "KVCapacityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "State of the alert, true will enable the alert, false will disable the alert",
-          "displayName": "KeyVault Capacity Alert State"
         },
         "type": "string"
       },
@@ -512,6 +504,14 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "KeyVault Capacity Alert Window Size"
+        },
+        "type": "string"
+      },
+      "KVCapacityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "State of the alert, true will enable the alert, false will disable the alert",
+          "displayName": "KeyVault Capacity Alert State"
         },
         "type": "string"
       },
@@ -678,20 +678,20 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
           "enabled": {
             "value": "[parameters('activityKVDeleteAlertState')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "effect": {
-            "value": "[parameters('activityKVDeletePolicyEffect')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('activityKVDeletePolicyEffect')]"
           }
         }
       },
@@ -765,20 +765,20 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
           "enabled": {
             "value": "[parameters('activityHSMsDeleteAlertState')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
-          "effect": {
-            "value": "[parameters('activityHSMsDeletePolicyEffect')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('activityHSMsDeletePolicyEffect')]"
           }
         }
       }
