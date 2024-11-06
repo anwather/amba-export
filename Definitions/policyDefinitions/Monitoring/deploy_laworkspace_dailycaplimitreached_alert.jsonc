@@ -7,10 +7,10 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.0.0",
       "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -50,14 +50,6 @@
         },
         "type": "Array"
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "type": "String"
-      },
       "autoMitigate": {
         "allowedValues": [
           "true",
@@ -67,6 +59,14 @@
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
+        },
+        "type": "String"
+      },
+      "MonitorDisableTagName": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
         },
         "type": "String"
       },
@@ -120,31 +120,19 @@
         },
         "type": "String"
       },
-      "threshold": {
-        "defaultValue": "0",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
-      },
       "failingPeriods": {
         "defaultValue": "1",
         "metadata": {
           "description": "Number of failing periods before alert is fired",
           "displayName": "Failing Periods"
+        },
+        "type": "String"
+      },
+      "threshold": {
+        "defaultValue": "0",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Threshold"
         },
         "type": "String"
       },
@@ -182,6 +170,18 @@
         "defaultValue": "GreaterThan",
         "metadata": {
           "displayName": "Operator"
+        },
+        "type": "String"
+      },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       }
@@ -277,11 +277,11 @@
                 "MonitorDisableTagValues": {
                   "value": "[parameters('MonitorDisableTagValues')]"
                 },
-                "MonitorDisableTagName": {
-                  "value": "[parameters('MonitorDisableTagName')]"
-                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
+                },
+                "MonitorDisableTagName": {
+                  "value": "[parameters('MonitorDisableTagName')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
@@ -292,11 +292,11 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "threshold": {
-                  "value": "[parameters('threshold')]"
-                },
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
+                },
+                "threshold": {
+                  "value": "[parameters('threshold')]"
                 },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
@@ -336,10 +336,10 @@
                   "MonitorDisableTagValues": {
                     "type": "Array"
                   },
-                  "MonitorDisableTagName": {
+                  "autoMitigate": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "MonitorDisableTagName": {
                     "type": "String"
                   },
                   "windowSize": {
@@ -351,10 +351,10 @@
                   "severity": {
                     "type": "String"
                   },
-                  "threshold": {
+                  "failingPeriods": {
                     "type": "String"
                   },
-                  "failingPeriods": {
+                  "threshold": {
                     "type": "String"
                   },
                   "evaluationPeriods": {
@@ -378,6 +378,7 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/scheduledQueryRules",
@@ -392,11 +393,11 @@
                         "MonitorDisableTagValues": {
                           "value": "[parameters('MonitorDisableTagValues')]"
                         },
-                        "MonitorDisableTagName": {
-                          "value": "[parameters('MonitorDisableTagName')]"
-                        },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
+                        },
+                        "MonitorDisableTagName": {
+                          "value": "[parameters('MonitorDisableTagName')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
@@ -407,11 +408,11 @@
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "threshold": {
-                          "value": "[parameters('threshold')]"
-                        },
                         "failingPeriods": {
                           "value": "[parameters('failingPeriods')]"
+                        },
+                        "threshold": {
+                          "value": "[parameters('threshold')]"
                         },
                         "evaluationPeriods": {
                           "value": "[parameters('evaluationPeriods')]"
@@ -433,18 +434,18 @@
                       "criteria": {
                         "allOf": [
                           {
-                            "threshold": "[parameters('threshold')]",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": "[parameters('evaluationPeriods')]",
                               "minFailingPeriodsToAlert": "[parameters('failingPeriods')]"
                             },
+                            "threshold": "[parameters('threshold')]",
                             "timeAggregation": "[parameters('timeAggregation')]",
                             "operator": "[parameters('operator')]",
                             "resourceIdColumn": "id",
                             "dimensions": [
                               {
-                                "name": "workspaceName",
                                 "operator": "Include",
+                                "name": "workspaceName",
                                 "values": [
                                   "*"
                                 ]
@@ -472,7 +473,6 @@
                     }
                   }
                 ],
-                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

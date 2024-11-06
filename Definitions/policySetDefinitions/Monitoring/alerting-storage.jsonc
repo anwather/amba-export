@@ -6,27 +6,27 @@
     "description": "This initiative deploys Azure Monitor Baseline Alerts to monitor Storage Services such as Storage accounts.",
     "metadata": {
       "_deployed_by_amba": true,
-      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "category": "Monitoring",
-      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+      "version": "1.0.0",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/",
+      "category": "Monitoring"
     },
     "parameters": {
-      "ALZMonitorResourceGroupName": {
-        "defaultValue": "ALZ-Monitoring-RG",
-        "metadata": {
-          "description": "Name of the resource group where the ALZ Monitor resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Name"
-        },
-        "type": "String"
-      },
       "ALZMonitorResourceGroupLocation": {
         "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the resource group where the ALZ Monitor resources will be deployed",
           "displayName": "ALZ Monitor Resource Group Location"
+        },
+        "type": "String"
+      },
+      "ALZMonitorResourceGroupName": {
+        "defaultValue": "ALZ-Monitoring-RG",
+        "metadata": {
+          "description": "Name of the resource group where the ALZ Monitor resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Name"
         },
         "type": "String"
       },
@@ -76,6 +76,18 @@
         },
         "type": "String"
       },
+      "StorageAccountAvailabilityPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist",
+          "displayName": "Storage Account Availability Policy Effect"
+        },
+        "type": "string"
+      },
       "StorageAccountAvailabilityWindowSize": {
         "allowedValues": [
           "PT1M",
@@ -94,6 +106,14 @@
         },
         "type": "string"
       },
+      "StorageAccountAvailabilityAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Storage Account Availability Alert State"
+        },
+        "type": "string"
+      },
       "StorageAccountAvailabilityFrequency": {
         "allowedValues": [
           "PT1M",
@@ -106,26 +126,6 @@
         "metadata": {
           "description": "Evaluation frequency for the alert",
           "displayName": "Storage Account Availability Evaluation Frequency"
-        },
-        "type": "string"
-      },
-      "StorageAccountAvailabilityPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist",
-          "displayName": "Storage Account Availability Policy Effect"
-        },
-        "type": "string"
-      },
-      "StorageAccountAvailabilityAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Storage Account Availability Alert State"
         },
         "type": "string"
       },
@@ -166,20 +166,20 @@
           "evaluationFrequency": {
             "value": "[parameters('StorageAccountAvailabilityFrequency')]"
           },
+          "windowSize": {
+            "value": "[parameters('StorageAccountAvailabilityWindowSize')]"
+          },
           "MonitorDisableTagValues": {
             "value": "[parameters('ALZMonitorDisableTagValues')]"
           },
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "windowSize": {
-            "value": "[parameters('StorageAccountAvailabilityWindowSize')]"
+          "severity": {
+            "value": "[parameters('StorageAccountAvailabilityAlertSeverity')]"
           },
           "enabled": {
             "value": "[parameters('StorageAccountAvailabilityAlertState')]"
-          },
-          "severity": {
-            "value": "[parameters('StorageAccountAvailabilityAlertSeverity')]"
           },
           "threshold": {
             "value": "[parameters('StorageAccountAvailabilityThreshold')]"
@@ -199,17 +199,17 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "alertResourceGroupLocation": {
-            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
-          },
           "enabled": {
             "value": "[parameters('StorageAccountDeleteAlertState')]"
           },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "effect": {
             "value": "[parameters('StorageAccountDeletePolicyEffect')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
