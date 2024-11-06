@@ -45,6 +45,14 @@ Remove-Item -Path tmp -Recurse -Force
 
 Export-AzPolicyResources -DefinitionsRootFolder ./Definitions -OutputFolder ./Output
 
+# Remove the folders first:
+
+Remove-Item -Path ./Definitions/policyDefinitions -Recurse -Force
+Remove-Item -Path ./Definitions/policySetDefinitions -Recurse -Force
+Remove-Item -Path ./Definitions/policyAssignments -Recurse -Force
+
+# Copy new files:
+
 Copy-Item ./Output/export/Definitions/policyDefinitions ./Definitions -Force -Recurse
 Copy-Item ./Output/export/Definitions/policySetDefinitions ./Definitions -Force -Recurse
 Copy-Item ./Output/export/Definitions/policyAssignments ./Definitions -Force -Recurse
