@@ -6,84 +6,84 @@
     "description": "Policy to Deploy Activity Log LA Workspace Regenerate Key Alert",
     "mode": "All",
     "metadata": {
+      "category": "Monitoring",
       "_deployed_by_amba": "True",
+      "version": "1.1.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.1.0",
-      "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
+      "alertResourceGroupName": {
+        "metadata": {
+          "displayName": "Resource Group Name",
+          "description": "Resource group the alert is placed in"
+        },
+        "defaultValue": "rg-amba-monitoring-001",
+        "type": "String"
+      },
+      "alertResourceGroupLocation": {
+        "metadata": {
+          "displayName": "Resource Group Location",
+          "description": "Location of the Resource group the alert is placed in"
+        },
+        "defaultValue": "centralus",
+        "type": "String"
+      },
+      "alertResourceGroupTags": {
+        "metadata": {
+          "displayName": "Resource Group Tags",
+          "description": "Tags on the Resource group the alert is placed in"
+        },
+        "defaultValue": {
+          "Project": "amba-monitoring"
+        },
+        "type": "Object"
+      },
       "MonitorDisableTagValues": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "type": "String"
-      },
-      "alertResourceGroupLocation": {
-        "defaultValue": "centralus",
-        "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
-        },
-        "type": "String"
-      },
-      "alertResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "type": "String"
-      },
       "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
-      "alertResourceGroupTags": {
-        "defaultValue": {
-          "Project": "amba-monitoring"
-        },
+      "MonitorDisableTagName": {
         "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
-        "type": "Object"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -104,6 +104,8 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "name": "ActivityLAWorkspaceRegenKey",
           "existenceCondition": {
             "allOf": [
               {
@@ -149,36 +151,37 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "name": "ActivityLAWorkspaceRegenKey",
+          "deploymentScope": "subscription",
+          "existenceScope": "resourceGroup",
           "deployment": {
             "properties": {
               "parameters": {
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
-                },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
+                },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 }
               },
               "template": {
                 "parameters": {
-                  "alertResourceGroupLocation": {
-                    "type": "string"
-                  },
                   "alertResourceGroupName": {
                     "type": "string"
                   },
-                  "enabled": {
+                  "alertResourceGroupLocation": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
                     "type": "object"
+                  },
+                  "enabled": {
+                    "type": "string"
                   }
                 },
                 "contentVersion": "1.0.0.0",
@@ -193,6 +196,7 @@
                   {
                     "resourceGroup": "[parameters('alertResourceGroupName')]",
                     "type": "Microsoft.Resources/deployments",
+                    "apiVersion": "2019-10-01",
                     "properties": {
                       "parameters": {
                         "alertResourceGroupName": {
@@ -215,6 +219,7 @@
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
+                            "apiVersion": "2020-10-01",
                             "properties": {
                               "description": "Activity Log LA Workspace Regenerate Key",
                               "parameters": {
@@ -245,7 +250,6 @@
                                 ]
                               }
                             },
-                            "apiVersion": "2020-10-01",
                             "location": "global",
                             "name": "ActivityLAWorkspaceRegenKey",
                             "tags": {
@@ -258,7 +262,6 @@
                       },
                       "mode": "Incremental"
                     },
-                    "apiVersion": "2019-10-01",
                     "name": "ActivityLAWorkspaceRegenKey",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
@@ -271,10 +274,7 @@
               "mode": "incremental"
             },
             "location": "australiaeast"
-          },
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "deploymentScope": "subscription",
-          "existenceScope": "resourceGroup"
+          }
         }
       }
     }
