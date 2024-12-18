@@ -28,7 +28,7 @@ $gs | Out-File ./Definitions/global-settings.jsonc -Verbose
 
 git clone https://github.com/Azure/azure-monitor-baseline-alerts.git tmp
 
-Copy-Item ./tmp/patterns/alz/scripts/Start-AMBACleanup.ps1 ./assets/Start-AMBACleanup.ps1 -Verbose
+Copy-Item ./tmp/patterns/alz/scripts/Start-ALZMonitorCleanup.ps1 ./assets/Start-ALZMonitorCleanup.ps1 -Verbose
 
 $pseudoRootManagementGroup = "amba"
 
@@ -65,9 +65,9 @@ Remove-Item -Path ./Definitions/global-settings.jsonc -Force
 
 # Fix missing displaynames in the policy set definitions
 
-./assets/Start-AMBACleanup.ps1 -pseudoRootManagementGroup $pseudoRootManagementGroup -Confirm:$false
+./assets/Start-ALZMonitorCleanup.ps1 -Confirm:$false
 
-Remove-Item -Path ./assets/Start-AMBACleanup.ps1 -Force
+Remove-Item -Path ./assets/Start-ALZMonitorCleanup.ps1 -Force
 
 
 
