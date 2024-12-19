@@ -1,0 +1,488 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-set-definition-schema.json",
+  "name": "Alerting-Web",
+  "properties": {
+    "displayName": "Deploy Azure Monitor Baseline Alerts for Web",
+    "description": "This initiative deploys Azure Monitor Baseline Alerts to monitor Web Services such as App Services.",
+    "metadata": {
+      "_deployed_by_amba": true,
+      "alzCloudEnvironments": [
+        "AzureCloud"
+      ],
+      "version": "1.0.0",
+      "category": "Monitoring",
+      "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
+    },
+    "parameters": {
+      "ALZMonitorDisableTagValues": {
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
+        "type": "Array"
+      },
+      "ALZMonitorDisableTagName": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
+        "type": "String"
+      },
+      "WSFMemoryPercentageAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "WSF Memory Percentage Alert Severity",
+          "description": "Severity of the alert"
+        },
+        "type": "String"
+      },
+      "WSFMemoryPercentageWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "WSF Memory Percentage  Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
+      "WSFMemoryPercentageEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
+        "metadata": {
+          "displayName": "WSF Memory Percentage Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "WSFMemoryPercentagePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "displayName": "WSF Memory Percentage Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
+        },
+        "type": "string"
+      },
+      "WSFMemoryPercentageAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "WSF Memory Percentage Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "WSFMemoryPercentageThreshold": {
+        "defaultValue": "85",
+        "metadata": {
+          "displayName": "WSF Memory Percentage Threshold",
+          "description": "Threshold for the alert"
+        },
+        "type": "string"
+      },
+      "WSFDiskQueueLengthAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "WSF Disk Queue Lenght Alert Severity",
+          "description": "Severity of the alert"
+        },
+        "type": "String"
+      },
+      "WSFCPUPercentagePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "displayName": "WSF CPU Percentage Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
+        "metadata": {
+          "displayName": "WSF CPU Percentage Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "WSF CPU Percentage Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "WSF CPU Percentage Alert Severity",
+          "description": "Severity of the alert"
+        },
+        "type": "String"
+      },
+      "WSFHttpQueueLengthAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "WSF HTTP Queue Lenght Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "WSFDiskQueueLengthWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "WSF Disk Queue Lenght Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
+      "WSFDiskQueueLengthEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
+        "metadata": {
+          "displayName": "WSF Disk Queue Lenght Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "WSFDiskQueueLengthPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "displayName": "WSF Disk Queue Lenght Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
+        },
+        "type": "string"
+      },
+      "WSFHttpQueueLengthEvaluationPeriods": {
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "WSF HTTP Queue Lenght Evaluation Periods",
+          "description": "The number of aggregated lookback points."
+        },
+        "type": "string"
+      },
+      "WSFDiskQueueLengthAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "WSF Disk Queue Lenght Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "WSFDiskQueueLengthFailingPeriods": {
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "WSF Disk Queue Lenght Failing Periods",
+          "description": "Number of failing periods before alert is fired"
+        },
+        "type": "string"
+      },
+      "WSFDiskQueueLengthEvaluationPeriods": {
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "WSF Disk Queue Lenght Evaluation Periods",
+          "description": "The number of aggregated lookback points."
+        },
+        "type": "string"
+      },
+      "WSFHttpQueueLengthAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "WSF HTTP Queue Lenght Alert Severity",
+          "description": "Severity of the alert"
+        },
+        "type": "String"
+      },
+      "WSFHttpQueueLengthWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "displayName": "WSF HTTP Queue Lenght Window Size",
+          "description": "Window size for the alert"
+        },
+        "type": "string"
+      },
+      "WSFHttpQueueLengthFailingPeriods": {
+        "defaultValue": "2",
+        "metadata": {
+          "displayName": "WSF HTTP Queue Lenght Failing Periods",
+          "description": "Number of failing periods before alert is fired"
+        },
+        "type": "string"
+      },
+      "WSFHttpQueueLengthPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "displayName": "WSF HTTP Queue Lenght Policy Effect",
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
+        },
+        "type": "string"
+      },
+      "WSFHttpQueueLengthEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
+        "metadata": {
+          "displayName": "WSF HTTP Queue Lenght Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "displayName": "WSF CPU Percentage Alert State",
+          "description": "Alert state for the alert"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageThreshold": {
+        "defaultValue": "90",
+        "metadata": {
+          "displayName": "WSF CPU Percentage Threshold",
+          "description": "Threshold for the alert"
+        },
+        "type": "string"
+      }
+    },
+    "policyDefinitions": [
+      {
+        "policyDefinitionReferenceId": "ALZ_WSFCPUPercentage",
+        "policyDefinitionName": "Deploy_WSF_CPUPercentage_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('WSFCPUPercentageEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('WSFCPUPercentageAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('WSFCPUPercentageWindowSize')]"
+          },
+          "threshold": {
+            "value": "[parameters('WSFCPUPercentageThreshold')]"
+          },
+          "severity": {
+            "value": "[parameters('WSFCPUPercentageAlertSeverity')]"
+          },
+          "effect": {
+            "value": "[parameters('WSFCPUPercentagePolicyEffect')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_WSFMemoryPercentage",
+        "policyDefinitionName": "Deploy_WSF_MemoryPercentage_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('WSFMemoryPercentageEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('WSFMemoryPercentageAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('WSFMemoryPercentageWindowSize')]"
+          },
+          "threshold": {
+            "value": "[parameters('WSFMemoryPercentageThreshold')]"
+          },
+          "severity": {
+            "value": "[parameters('WSFMemoryPercentageAlertSeverity')]"
+          },
+          "effect": {
+            "value": "[parameters('WSFMemoryPercentagePolicyEffect')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_WSFDiskQueueLength",
+        "policyDefinitionName": "Deploy_WSF_DiskQueueLength_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('WSFDiskQueueLengthEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('WSFDiskQueueLengthAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('WSFDiskQueueLengthWindowSize')]"
+          },
+          "failingPeriods": {
+            "value": "[parameters('WSFDiskQueueLengthFailingPeriods')]"
+          },
+          "evaluationPeriods": {
+            "value": "[parameters('WSFDiskQueueLengthEvaluationPeriods')]"
+          },
+          "severity": {
+            "value": "[parameters('WSFDiskQueueLengthAlertSeverity')]"
+          },
+          "effect": {
+            "value": "[parameters('WSFDiskQueueLengthPolicyEffect')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_WSFHttpQueueLength",
+        "policyDefinitionName": "Deploy_WSF_HttpQueueLength_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('WSFHttpQueueLengthEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('WSFHttpQueueLengthAlertState')]"
+          },
+          "windowSize": {
+            "value": "[parameters('WSFHttpQueueLengthWindowSize')]"
+          },
+          "failingPeriods": {
+            "value": "[parameters('WSFHttpQueueLengthFailingPeriods')]"
+          },
+          "evaluationPeriods": {
+            "value": "[parameters('WSFHttpQueueLengthEvaluationPeriods')]"
+          },
+          "severity": {
+            "value": "[parameters('WSFHttpQueueLengthAlertSeverity')]"
+          },
+          "effect": {
+            "value": "[parameters('WSFHttpQueueLengthPolicyEffect')]"
+          }
+        }
+      }
+    ]
+  }
+}
