@@ -6,16 +6,20 @@
     "description": "Policy to audit/deploy VPN Gateway Ingress Alert",
     "mode": "All",
     "metadata": {
+      "category": "Network",
+      "version": "1.2.0",
       "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.2.0",
-      "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,46 +28,25 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
-      "MonitorDisableTagValues": {
-        "defaultValue": [
-          "true",
-          "Test",
-          "Dev",
-          "Sandbox"
-        ],
+      "effect": {
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
-        "type": "Array"
-      },
-      "autoMitigate": {
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
+        "defaultValue": "disabled",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -75,25 +58,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -102,30 +73,59 @@
           "4"
         ],
         "defaultValue": "0",
+        "type": "String"
+      },
+      "enabled": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "threshold": {
-        "defaultValue": "1",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
+        "defaultValue": "1",
         "type": "String"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
+      "MonitorDisableTagValues": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
         },
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
+      },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       }
     },
@@ -206,17 +206,17 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-tunnelingressbytes-threshold-Override_'), field('tags._amba-tunnelingressbytes-threshold-Override_'), parameters('threshold'))]"
@@ -225,6 +225,7 @@
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -237,16 +238,16 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "windowSize": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "severity": {
                     "type": "String"
                   },
                   "enabled": {
                     "type": "String"
                   },
-                  "severity": {
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "threshold": {
@@ -267,31 +268,31 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for VPN Gateway tunnel ingress bytes",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
@@ -311,16 +312,15 @@
                       ]
                     },
                     "apiVersion": "2018-03-01",
-                    "location": "global",
                     "name": "[concat(parameters('resourceName'), '-TunnelIngressAlert')]",
+                    "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

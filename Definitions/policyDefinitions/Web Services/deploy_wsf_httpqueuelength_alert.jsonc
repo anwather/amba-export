@@ -15,7 +15,36 @@
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
+      "MonitorDisableTagValues": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
+      },
       "evaluationFrequency": {
+        "metadata": {
+          "displayName": "Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,46 +53,61 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
-      "MonitorDisableTagValues": {
-        "defaultValue": [
-          "true",
-          "Test",
-          "Dev",
-          "Sandbox"
-        ],
+      "MonitorDisableTagName": {
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
-        "type": "Array"
+        "defaultValue": "MonitorDisable",
+        "type": "String"
       },
-      "autoMitigate": {
+      "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "type": "String"
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
+      "failingPeriods": {
         "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
+          "displayName": "Failing Periods",
+          "description": "Number of failing periods before alert is fired"
         },
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "evaluationPeriods": {
+        "metadata": {
+          "displayName": "Evaluation Periods",
+          "description": "The number of aggregated lookback points."
+        },
+        "defaultValue": "2",
+        "type": "String"
+      },
+      "autoMitigate": {
+        "metadata": {
+          "displayName": "Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "displayName": "Window Size",
+          "description": "Window size for the alert"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -75,25 +119,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "displayName": "Severity",
+          "description": "Severity of the Alert"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -102,38 +134,6 @@
           "4"
         ],
         "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "failingPeriods": {
-        "defaultValue": "2",
-        "metadata": {
-          "description": "Number of failing periods before alert is fired",
-          "displayName": "Failing Periods"
-        },
-        "type": "String"
-      },
-      "evaluationPeriods": {
-        "defaultValue": "2",
-        "metadata": {
-          "description": "The number of aggregated lookback points.",
-          "displayName": "Evaluation Periods"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "type": "String"
       }
     },
@@ -222,23 +222,23 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
-                },
-                "severity": {
-                  "value": "[parameters('severity')]"
                 },
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
                 },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
+                },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -248,24 +248,15 @@
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
-                      "displayName": "resourceId"
+                      "displayName": "resourceId",
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
                     },
                     "type": "String"
                   },
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
-                  "windowSize": {
-                    "type": "String"
-                  },
                   "enabled": {
-                    "type": "String"
-                  },
-                  "severity": {
                     "type": "String"
                   },
                   "failingPeriods": {
@@ -274,25 +265,41 @@
                   "evaluationPeriods": {
                     "type": "String"
                   },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
+                  "windowSize": {
+                    "type": "String"
+                  },
+                  "severity": {
+                    "type": "String"
+                  },
                   "resourceName": {
                     "metadata": {
-                      "description": "Name of the resource",
-                      "displayName": "resourceName"
+                      "displayName": "resourceName",
+                      "description": "Name of the resource"
                     },
                     "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for App Service Plan Http Queue Length",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
+                        "failingPeriods": {
+                          "value": "[parameters('failingPeriods')]"
+                        },
+                        "evaluationPeriods": {
+                          "value": "[parameters('evaluationPeriods')]"
                         },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
@@ -300,23 +307,18 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
-                        },
-                        "failingPeriods": {
-                          "value": "[parameters('failingPeriods')]"
-                        },
-                        "evaluationPeriods": {
-                          "value": "[parameters('evaluationPeriods')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                      "enabled": "[parameters('enabled')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
@@ -334,10 +336,7 @@
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "apiVersion": "2018-03-01",
                     "location": "global",
@@ -347,6 +346,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

@@ -1,16 +1,16 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_activitylog_ServiceHealth_Maintenance",
+  "name": "Deploy_ActivityLog_AppInsights_Delete",
   "properties": {
-    "displayName": "Deploy Service Health Maintenance Alert",
-    "description": "Policy to Deploy Service Health Maintenance Alert",
+    "displayName": "Deploy Activity Log Application Insights Delete Alert (Preview)",
+    "description": "Policy to Deploy Activity Log Application Insights Delete Alert",
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.3.0",
       "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -31,18 +31,6 @@
         "defaultValue": "rg-amba-monitoring-001",
         "type": "String"
       },
-      "effect": {
-        "metadata": {
-          "displayName": "Effect",
-          "description": "Effect of the policy"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "disabled",
-        "type": "String"
-      },
       "MonitorDisableTagValues": {
         "metadata": {
           "displayName": "ALZ Monitoring disabled tag values(s)",
@@ -56,10 +44,22 @@
         ],
         "type": "Array"
       },
+      "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
       "MonitorDisableTagName": {
         "metadata": {
           "displayName": "ALZ Monitoring disabled tag name",
-          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled"
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
         "defaultValue": "MonitorDisable",
         "type": "String"
@@ -74,40 +74,24 @@
         },
         "type": "Object"
       },
-      "enabled": {
+      "effect": {
         "metadata": {
-          "displayName": "Alert State",
-          "description": "Alert state for the alert"
+          "displayName": "Effect",
+          "description": "Effect of the policy"
         },
         "allowedValues": [
-          "true",
-          "false"
+          "deployIfNotExists",
+          "disabled"
         ],
-        "defaultValue": "true",
+        "defaultValue": "deployIfNotExists",
         "type": "String"
-      },
-      "ALZMonitorActionGroupEmail": {
-        "metadata": {
-          "displayName": "Action Group Email Addresses",
-          "description": "Email addresses to send alerts to"
-        },
-        "defaultValue": [],
-        "type": "Array"
-      },
-      "BYOActionGroup": {
-        "metadata": {
-          "displayName": "Customer defined Action Group Resource IDs",
-          "description": "The Resource IDs of existing Action Groups currently deployed in the environment."
-        },
-        "defaultValue": [],
-        "type": "array"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Resources/subscriptions",
+            "equals": "microsoft.insights/components",
             "field": "type"
           },
           {
@@ -120,49 +104,12 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "name": "ActivityAppInsightsDelete",
           "existenceCondition": {
             "allOf": [
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
-              },
-              {
-                "anyOf": [
-                  {
-                    "allOf": [
-                      {
-                        "value": "[empty(parameters('BYOActionGroup'))]",
-                        "equals": true
-                      },
-                      {
-                        "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
-                        "contains": "ag-AMBA-SH-"
-                      }
-                    ]
-                  },
-                  {
-                    "allOf": [
-                      {
-                        "value": "[empty(parameters('BYOActionGroup'))]",
-                        "equals": false
-                      },
-                      {
-                        "count": {
-                          "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*]",
-                          "where": {
-                            "anyOf": [
-                              {
-                                "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
-                                "in": "[parameters('BYOActionGroup')]"
-                              }
-                            ]
-                          }
-                        },
-                        "greaterOrEquals": 1
-                      }
-                    ]
-                  }
-                ]
               },
               {
                 "equals": 2,
@@ -177,7 +124,7 @@
                             "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "equals": "ServiceHealth",
+                            "equals": "Administrative",
                             "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
@@ -185,11 +132,11 @@
                       {
                         "allOf": [
                           {
-                            "equals": "properties.incidentType",
+                            "equals": "operationName",
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "equals": "Maintenance",
+                            "equals": "Microsoft.Insights/Components/Delete",
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
@@ -203,9 +150,6 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "deploymentScope": "subscription",
-          "existenceScope": "resourcegroup",
           "deployment": {
             "properties": {
               "parameters": {
@@ -215,17 +159,11 @@
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
-                "alertResourceGroupTags": {
-                  "value": "[parameters('alertResourceGroupTags')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "ALZMonitorActionGroupEmail": {
-                  "value": "[parameters('ALZMonitorActionGroupEmail')]"
-                },
-                "BYOActionGroup": {
-                  "value": "[parameters('BYOActionGroup')]"
+                "alertResourceGroupTags": {
+                  "value": "[parameters('alertResourceGroupTags')]"
                 }
               },
               "template": {
@@ -236,31 +174,26 @@
                   "alertResourceGroupName": {
                     "type": "string"
                   },
-                  "alertResourceGroupTags": {
-                    "type": "object"
-                  },
                   "enabled": {
                     "type": "string"
                   },
-                  "ALZMonitorActionGroupEmail": {
-                    "type": "Array"
-                  },
-                  "BYOActionGroup": {
-                    "type": "array"
+                  "alertResourceGroupTags": {
+                    "type": "object"
                   }
                 },
                 "contentVersion": "1.0.0.0",
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
+                    "name": "[parameters('alertResourceGroupName')]",
                     "apiVersion": "2021-04-01",
                     "location": "[parameters('alertResourceGroupLocation')]",
-                    "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
                     "resourceGroup": "[parameters('alertResourceGroupName')]",
                     "type": "Microsoft.Resources/deployments",
+                    "name": "ActivityAppInsightsDeleteAlert",
                     "properties": {
                       "parameters": {
                         "alertResourceGroupName": {
@@ -268,12 +201,6 @@
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
-                        },
-                        "ALZMonitorActionGroupEmail": {
-                          "value": "[parameters('ALZMonitorActionGroupEmail')]"
-                        },
-                        "BYOActionGroup": {
-                          "value": "[parameters('BYOActionGroup')]"
                         }
                       },
                       "template": {
@@ -283,90 +210,46 @@
                           },
                           "enabled": {
                             "type": "string"
-                          },
-                          "ALZMonitorActionGroupEmail": {
-                            "type": "Array"
-                          },
-                          "BYOActionGroup": {
-                            "type": "array"
                           }
                         },
                         "contentVersion": "1.0.0.0",
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
+                            "name": "ActivityAppInsightsDelete",
                             "properties": {
-                              "description": "Service Health Planned Maintenance Alert",
+                              "displayName": "Application Insights Resource Delete Alert (Preview)",
+                              "description": "Activity Log Application Insights Delete Alert",
                               "parameters": {
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
                                 }
                               },
                               "enabled": "[parameters('enabled')]",
-                              "condition": {
-                                "allOf": [
-                                  {
-                                    "equals": "ServiceHealth",
-                                    "field": "category"
-                                  },
-                                  {
-                                    "equals": "Maintenance",
-                                    "field": "properties.incidentType"
-                                  }
-                                ]
-                              },
                               "scopes": [
                                 "[subscription().id]"
                               ],
-                              "actions": {
-                                "actionGroups": [
+                              "condition": {
+                                "allOf": [
                                   {
-                                    "actionGroupId": "[concat(subscription().Id, '/resourceGroups/', parameters('alertResourceGroupName'), '/providers/microsoft.insights/actionGroups/', 'ag-AMBA-SH-', subscription().displayName, '-001')]"
+                                    "equals": "Administrative",
+                                    "field": "category"
+                                  },
+                                  {
+                                    "equals": "Microsoft.Insights/Components/Delete",
+                                    "field": "operationName"
+                                  },
+                                  {
+                                    "field": "status",
+                                    "containsAny": [
+                                      "succeeded"
+                                    ]
                                   }
                                 ]
                               }
                             },
                             "apiVersion": "2020-10-01",
                             "location": "global",
-                            "name": "ServiceHealthPlannedMaintenance",
-                            "condition": "[empty(parameters('BYOActionGroup'))]",
-                            "tags": {
-                              "_deployed_by_amba": true
-                            }
-                          },
-                          {
-                            "type": "microsoft.insights/activityLogAlerts",
-                            "properties": {
-                              "description": "Service Health Planned Maintenance Alert",
-                              "parameters": {
-                                "enabled": {
-                                  "value": "[parameters('enabled')]"
-                                }
-                              },
-                              "enabled": "[parameters('enabled')]",
-                              "condition": {
-                                "allOf": [
-                                  {
-                                    "equals": "ServiceHealth",
-                                    "field": "category"
-                                  },
-                                  {
-                                    "equals": "Maintenance",
-                                    "field": "properties.incidentType"
-                                  }
-                                ]
-                              },
-                              "scopes": [
-                                "[subscription().id]"
-                              ],
-                              "actions": {
-                                "actionGroups": "[variables('varActionGroupIds')]"
-                              }
-                            },
-                            "apiVersion": "2020-10-01",
-                            "location": "global",
-                            "name": "ServiceHealthPlannedMaintenance",
-                            "condition": "[not(empty(parameters('BYOActionGroup')))]",
                             "tags": {
                               "_deployed_by_amba": true
                             }
@@ -378,30 +261,21 @@
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ServiceHealthMaintenance",
                     "dependsOn": [
-                      "[resourceId('Microsoft.Resources/resourceGroups', parameters('alertResourceGroupName'))]"
+                      "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
                   }
                 ],
-                "variables": {
-                  "copy": [
-                    {
-                      "name": "varActionGroupIds",
-                      "mode": "serial",
-                      "count": "[length(parameters('BYOActionGroup'))]",
-                      "input": {
-                        "actionGroupId": "[trim(parameters('BYOActionGroup')[copyIndex('varActionGroupIds')])]"
-                      }
-                    }
-                  ]
-                },
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
               },
               "mode": "incremental"
             },
             "location": "australiaeast"
-          }
+          },
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "deploymentScope": "subscription",
+          "existenceScope": "resourcegroup"
         }
       }
     }
