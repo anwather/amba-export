@@ -1,36 +1,20 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_activitylog_StorageAccount_Delete",
+  "name": "Deploy_ActivityLog_AppInsights_Delete",
   "properties": {
-    "displayName": "Deploy Activity Log Storage Account Delete Alert",
-    "description": "Policy to Deploy Activity Log Storage Account Delete Alert",
+    "displayName": "Deploy Activity Log Application Insights Delete Alert (Preview)",
+    "description": "Policy to Deploy Activity Log Application Insights Delete Alert",
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "category": "Monitoring",
+      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.2.0",
-      "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "alertResourceGroupLocation": {
-        "metadata": {
-          "displayName": "Resource Group Location",
-          "description": "Location of the Resource group the alert is placed in"
-        },
-        "defaultValue": "centralus",
-        "type": "String"
-      },
-      "alertResourceGroupName": {
-        "metadata": {
-          "displayName": "Resource Group Name",
-          "description": "Resource group the alert is placed in"
-        },
-        "defaultValue": "rg-amba-monitoring-001",
-        "type": "String"
-      },
       "MonitorDisableTagValues": {
         "metadata": {
           "displayName": "ALZ Monitoring disabled tag values(s)",
@@ -47,9 +31,17 @@
       "MonitorDisableTagName": {
         "metadata": {
           "displayName": "ALZ Monitoring disabled tag name",
-          "description": "Tag name to disable monitoring on resource. Set to true if monitoring should be disabled"
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
         "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
+      "alertResourceGroupLocation": {
+        "metadata": {
+          "displayName": "Resource Group Location",
+          "description": "Location of the Resource group the alert is placed in"
+        },
+        "defaultValue": "centralus",
         "type": "String"
       },
       "enabled": {
@@ -64,15 +56,13 @@
         "defaultValue": "true",
         "type": "String"
       },
-      "alertResourceGroupTags": {
+      "alertResourceGroupName": {
         "metadata": {
-          "displayName": "Resource Group Tags",
-          "description": "Tags on the Resource group the alert is placed in"
+          "displayName": "Resource Group Name",
+          "description": "Resource group the alert is placed in"
         },
-        "defaultValue": {
-          "_deployed_by_amba": true
-        },
-        "type": "Object"
+        "defaultValue": "rg-amba-monitoring-001",
+        "type": "String"
       },
       "effect": {
         "metadata": {
@@ -85,13 +75,23 @@
         ],
         "defaultValue": "deployIfNotExists",
         "type": "String"
+      },
+      "alertResourceGroupTags": {
+        "metadata": {
+          "displayName": "Resource Group Tags",
+          "description": "Tags on the Resource group the alert is placed in"
+        },
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
+        "type": "Object"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Storage/storageAccounts",
+            "equals": "microsoft.insights/components",
             "field": "type"
           },
           {
@@ -104,7 +104,6 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
-          "name": "Activity Log Storage Account Delete",
           "existenceCondition": {
             "allOf": [
               {
@@ -136,7 +135,7 @@
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "equals": "Microsoft.Storage/storageAccounts/delete",
+                            "equals": "Microsoft.Insights/Components/Delete",
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
@@ -147,23 +146,22 @@
               }
             ]
           },
+          "name": "ActivityAppInsightsDelete",
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
-          "deploymentScope": "subscription",
-          "existenceScope": "resourcegroup",
           "deployment": {
             "properties": {
               "parameters": {
                 "alertResourceGroupLocation": {
                   "value": "[parameters('alertResourceGroupLocation')]"
                 },
-                "alertResourceGroupName": {
-                  "value": "[parameters('alertResourceGroupName')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "alertResourceGroupName": {
+                  "value": "[parameters('alertResourceGroupName')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
@@ -174,10 +172,10 @@
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "alertResourceGroupName": {
+                  "enabled": {
                     "type": "string"
                   },
-                  "enabled": {
+                  "alertResourceGroupName": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
@@ -199,19 +197,19 @@
                     "type": "Microsoft.Resources/deployments",
                     "properties": {
                       "parameters": {
-                        "alertResourceGroupName": {
-                          "value": "[parameters('alertResourceGroupName')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "alertResourceGroupName": {
+                          "value": "[parameters('alertResourceGroupName')]"
                         }
                       },
                       "template": {
                         "parameters": {
-                          "alertResourceGroupName": {
+                          "enabled": {
                             "type": "string"
                           },
-                          "enabled": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           }
                         },
@@ -221,7 +219,8 @@
                           {
                             "type": "microsoft.insights/activityLogAlerts",
                             "properties": {
-                              "description": "Activity Log Storage Account Delete",
+                              "displayName": "Application Insights Resource Delete Alert (Preview)",
+                              "description": "Activity Log Application Insights Delete Alert",
                               "parameters": {
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
@@ -238,7 +237,7 @@
                                     "field": "category"
                                   },
                                   {
-                                    "equals": "Microsoft.Storage/storageAccounts/delete",
+                                    "equals": "Microsoft.Insights/Components/Delete",
                                     "field": "operationName"
                                   },
                                   {
@@ -252,7 +251,7 @@
                             },
                             "apiVersion": "2020-10-01",
                             "location": "global",
-                            "name": "Activity Log Storage Account Delete",
+                            "name": "ActivityAppInsightsDelete",
                             "tags": {
                               "_deployed_by_amba": true
                             }
@@ -263,7 +262,7 @@
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ActivitySADelete",
+                    "name": "ActivityAppInsightsDeleteAlert",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
@@ -274,7 +273,9 @@
               "mode": "incremental"
             },
             "location": "australiaeast"
-          }
+          },
+          "deploymentScope": "subscription",
+          "existenceScope": "resourcegroup"
         }
       }
     }
