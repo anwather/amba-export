@@ -16,75 +16,75 @@
     },
     "parameters": {
       "MonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "type": "String"
-      },
       "alertResourceGroupLocation": {
-        "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the Resource group the alert is placed in",
           "displayName": "Resource Group Location"
         },
+        "defaultValue": "centralus",
         "type": "String"
       },
       "alertResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
         "metadata": {
           "description": "Resource group the alert is placed in",
           "displayName": "Resource Group Name"
         },
+        "defaultValue": "rg-amba-monitoring-001",
+        "type": "String"
+      },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "enabled": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
-      "alertResourceGroupTags": {
-        "defaultValue": {
-          "_deployed_by_amba": true
-        },
-        "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
-        },
-        "type": "Object"
-      },
       "effect": {
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
         "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "type": "String"
+      },
+      "alertResourceGroupTags": {
+        "metadata": {
+          "description": "Tags on the Resource group the alert is placed in",
+          "displayName": "Resource Group Tags"
+        },
+        "defaultValue": {
+          "_deployed_by_amba": true
+        },
+        "type": "Object"
       }
     },
     "policyRule": {
@@ -104,6 +104,7 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
+          "name": "ActivityKeyVaultDelete",
           "existenceCondition": {
             "allOf": [
               {
@@ -149,7 +150,6 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "name": "ActivityKeyVaultDelete",
           "deployment": {
             "properties": {
               "parameters": {
@@ -166,6 +166,7 @@
                   "value": "[parameters('alertResourceGroupTags')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "alertResourceGroupLocation": {
@@ -186,9 +187,9 @@
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
+                    "name": "[parameters('alertResourceGroupName')]",
                     "apiVersion": "2021-04-01",
                     "location": "[parameters('alertResourceGroupLocation')]",
-                    "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
@@ -203,6 +204,7 @@
                           "value": "[parameters('enabled')]"
                         }
                       },
+                      "mode": "Incremental",
                       "template": {
                         "parameters": {
                           "alertResourceGroupName": {
@@ -247,28 +249,26 @@
                                 ]
                               }
                             },
+                            "name": "ActivityKeyVaultDelete",
                             "apiVersion": "2020-10-01",
                             "location": "global",
-                            "name": "ActivityKeyVaultDelete",
                             "tags": {
                               "_deployed_by_amba": true
                             }
                           }
                         ],
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-                      },
-                      "mode": "Incremental"
+                      }
                     },
-                    "apiVersion": "2019-10-01",
                     "name": "ActivityKeyVaultDelete",
+                    "apiVersion": "2019-10-01",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             },
             "location": "australiaeast"
           },

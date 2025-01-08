@@ -6,99 +6,99 @@
     "description": "This initiative implements Azure Monitor Baseline Alerts to monitor alterations in Network Routing and Security, such as modifications to Route Tables and the removal of Network Security Groups.",
     "metadata": {
       "_deployed_by_amba": true,
+      "category": "Monitoring",
       "version": "1.0.1",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "ALZMonitorResourceGroupLocation": {
-        "defaultValue": "centralus",
         "metadata": {
           "description": "Location of the resource group where the ALZ Monitor resources will be deployed",
           "displayName": "ALZ Monitor Resource Group Location"
         },
-        "type": "String"
-      },
-      "ALZMonitorResourceGroupTags": {
-        "defaultValue": {
-          "_deployed_by_alz_monitor": true
-        },
-        "metadata": {
-          "description": "Tags for the resource group where the ALZ Monitor resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Tags"
-        },
-        "type": "Object"
-      },
-      "ALZMonitorResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
-        "metadata": {
-          "description": "Name of the resource group where the ALZ Monitor resources will be deployed",
-          "displayName": "ALZ Monitor Resource Group Name"
-        },
+        "defaultValue": "centralus",
         "type": "String"
       },
       "ALZMonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
       "ALZMonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
           "displayName": "ALZ Monitoring disabled tag name"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
-      "activityUDRUpdateAlertState": {
-        "defaultValue": "true",
+      "ALZMonitorResourceGroupTags": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Activity UDR Update Alert State"
+          "description": "Tags for the resource group where the ALZ Monitor resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Tags"
         },
-        "type": "string"
+        "defaultValue": {
+          "_deployed_by_alz_monitor": true
+        },
+        "type": "Object"
       },
-      "activityNSGDeleteAlertState": {
-        "defaultValue": "true",
+      "ALZMonitorResourceGroupName": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Activity NSG Delete Alert State"
+          "description": "Name of the resource group where the ALZ Monitor resources will be deployed",
+          "displayName": "ALZ Monitor Resource Group Name"
         },
-        "type": "string"
+        "defaultValue": "rg-amba-monitoring-001",
+        "type": "String"
       },
       "activityUDRUpdatePolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
         "metadata": {
           "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
           "displayName": "Activity UDR Update Policy Effect"
         },
-        "type": "string"
-      },
-      "activityNSGDeletePolicyEffect": {
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
         "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "activityNSGDeletePolicyEffect": {
         "metadata": {
           "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
           "displayName": "Activity NSG Delete Policy Effect"
         },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "string"
+      },
+      "activityUDRUpdateAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Activity UDR Update Alert State"
+        },
+        "defaultValue": "true",
+        "type": "string"
+      },
+      "activityNSGDeleteAlertState": {
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Activity NSG Delete Alert State"
+        },
+        "defaultValue": "true",
         "type": "string"
       }
     },
@@ -107,23 +107,23 @@
         "policyDefinitionReferenceId": "ALZ_activityNSGDelete",
         "policyDefinitionName": "Deploy_activitylog_NSG_Delete",
         "parameters": {
-          "MonitorDisableTagValues": {
-            "value": "[parameters('ALZMonitorDisableTagValues')]"
-          },
-          "MonitorDisableTagName": {
-            "value": "[parameters('ALZMonitorDisableTagName')]"
-          },
-          "enabled": {
-            "value": "[parameters('activityNSGDeleteAlertState')]"
-          },
           "effect": {
             "value": "[parameters('activityNSGDeletePolicyEffect')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
           },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityNSGDeleteAlertState')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
@@ -134,23 +134,23 @@
         "policyDefinitionReferenceId": "ALZ_activityUDRUpdate",
         "policyDefinitionName": "Deploy_activitylog_RouteTable_Update",
         "parameters": {
-          "MonitorDisableTagValues": {
-            "value": "[parameters('ALZMonitorDisableTagValues')]"
-          },
-          "MonitorDisableTagName": {
-            "value": "[parameters('ALZMonitorDisableTagName')]"
-          },
-          "enabled": {
-            "value": "[parameters('activityUDRUpdateAlertState')]"
-          },
           "effect": {
             "value": "[parameters('activityUDRUpdatePolicyEffect')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
           },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
           "alertResourceGroupName": {
             "value": "[parameters('ALZMonitorResourceGroupName')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityUDRUpdateAlertState')]"
           },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"

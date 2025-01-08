@@ -13,6 +13,10 @@
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -21,46 +25,58 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
       "MonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
       "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "type": "String"
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
+      "enabled": {
         "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -72,25 +88,25 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "effect": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -99,51 +115,35 @@
           "4"
         ],
         "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
         "type": "String"
       },
       "failingPeriods": {
-        "defaultValue": "2",
         "metadata": {
           "description": "Number of failing periods before alert is fired",
           "displayName": "Failing Periods"
         },
+        "defaultValue": "2",
         "type": "String"
       },
       "evaluationPeriods": {
-        "defaultValue": "2",
         "metadata": {
           "description": "The number of aggregated lookback points.",
           "displayName": "Evaluation Periods"
         },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
+        "defaultValue": "2",
         "type": "String"
       },
       "alertSensitivity": {
+        "metadata": {
+          "description": "Alert Sensitivity for the alert",
+          "displayName": "Alert Sensitivity"
+        },
         "allowedValues": [
           "Low",
           "Medium",
           "High"
         ],
         "defaultValue": "Medium",
-        "metadata": {
-          "description": "Alert Sensitivity for the alert",
-          "displayName": "Alert Sensitivity"
-        },
         "type": "String"
       }
     },
@@ -242,11 +242,11 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
@@ -264,6 +264,7 @@
                   "value": "[parameters('alertSensitivity')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -279,10 +280,10 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "enabled": {
                     "type": "String"
                   },
-                  "enabled": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "severity": {
@@ -312,7 +313,6 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for App Gateway ApplicationGatewayTotalTime",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -320,11 +320,11 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
@@ -339,43 +339,43 @@
                           "value": "[parameters('alertSensitivity')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
+                            "name": "ApplicationGatewayTotalTime",
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": "[parameters('evaluationPeriods')]",
                               "minFailingPeriodsToAlert": "[parameters('failingPeriods')]"
                             },
                             "timeAggregation": "Average",
                             "operator": "GreaterThan",
-                            "name": "ApplicationGatewayTotalTime",
+                            "alertSensitivity": "[parameters('alertSensitivity')]",
                             "metricNamespace": "Microsoft.Network/applicationgateways",
                             "criterionType": "DynamicThresholdCriterion",
-                            "metricName": "ApplicationGatewayTotalTime",
-                            "alertSensitivity": "[parameters('alertSensitivity')]"
+                            "metricName": "ApplicationGatewayTotalTime"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
+                    "name": "[concat(parameters('resourceName'), '-agApplicationGatewayTotalTime')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-agApplicationGatewayTotalTime')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

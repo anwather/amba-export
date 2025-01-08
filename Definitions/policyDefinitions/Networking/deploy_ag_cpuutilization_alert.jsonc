@@ -13,6 +13,10 @@
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -21,46 +25,46 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
       "MonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "effect": {
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
         "metadata": {
           "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
           "displayName": "ALZ Monitoring disabled tag name"
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -72,25 +76,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -99,30 +91,38 @@
           "4"
         ],
         "defaultValue": "2",
+        "type": "String"
+      },
+      "enabled": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       },
       "threshold": {
-        "defaultValue": "80",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
         },
+        "defaultValue": "80",
         "type": "String"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
+      "autoMitigate": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "type": "String"
       }
     },
@@ -210,25 +210,26 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
-                },
-                "enabled": {
-                  "value": "[parameters('enabled')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
+                "enabled": {
+                  "value": "[parameters('enabled')]"
+                },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-CpuUtilization-threshold-Override_'), field('tags._amba-CpuUtilization-threshold-Override_'), parameters('threshold'))]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
                 }
               },
+              "mode": "incremental",
               "template": {
                 "parameters": {
                   "resourceId": {
@@ -241,19 +242,19 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
-                    "type": "String"
-                  },
                   "windowSize": {
-                    "type": "String"
-                  },
-                  "enabled": {
                     "type": "String"
                   },
                   "severity": {
                     "type": "String"
                   },
+                  "enabled": {
+                    "type": "String"
+                  },
                   "threshold": {
+                    "type": "String"
+                  },
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -271,41 +272,41 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for App Gateway CPU Utilization",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
-                        },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
                         },
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
+                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "criteria": {
                         "allOf": [
                           {
                             "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
-                            "operator": "GreaterThan",
-                            "name": "CpuUtilization",
                             "metricNamespace": "Microsoft.Network/applicationgateways",
+                            "name": "CpuUtilization",
                             "criterionType": "StaticThresholdCriterion",
-                            "metricName": "CpuUtilization"
+                            "metricName": "CpuUtilization",
+                            "operator": "GreaterThan"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
@@ -314,17 +315,16 @@
                         "[parameters('resourceId')]"
                       ]
                     },
+                    "name": "[concat(parameters('resourceName'), '-agCpuUtilization')]",
                     "apiVersion": "2018-03-01",
                     "location": "global",
-                    "name": "[concat(parameters('resourceName'), '-agCpuUtilization')]",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
-              },
-              "mode": "incremental"
+              }
             }
           }
         }

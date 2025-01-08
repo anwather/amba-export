@@ -7,15 +7,19 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "version": "1.4.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.4.0",
       "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Evaluation Frequency"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,46 +28,37 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
-      "MonitorDisableTagValues": {
-        "defaultValue": [
-          "true",
-          "Test",
-          "Dev",
-          "Sandbox"
-        ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
-        "type": "Array"
-      },
       "autoMitigate": {
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
         "type": "String"
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
+      "effect": {
         "metadata": {
-          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
-          "displayName": "ALZ Monitoring disabled tag name"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -75,25 +70,13 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Severity"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -102,38 +85,55 @@
           "4"
         ],
         "defaultValue": "3",
+        "type": "String"
+      },
+      "enabled": {
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "MonitorDisableTagValues": {
+        "metadata": {
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
+        },
+        "defaultValue": [
+          "true",
+          "Test",
+          "Dev",
+          "Sandbox"
+        ],
+        "type": "Array"
+      },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "failingPeriods": {
-        "defaultValue": "4",
         "metadata": {
           "description": "Number of failing periods before alert is fired",
           "displayName": "Failing Periods"
         },
+        "defaultValue": "4",
         "type": "String"
       },
       "evaluationPeriods": {
-        "defaultValue": "4",
         "metadata": {
           "description": "The number of aggregated lookback points.",
           "displayName": "Evaluation Periods"
         },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
+        "defaultValue": "4",
         "type": "String"
       }
     },
@@ -158,6 +158,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -214,9 +217,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -232,20 +232,20 @@
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
+                "severity": {
+                  "value": "[parameters('severity')]"
+                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
+                "resourceName": {
+                  "value": "[field('name')]"
                 },
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
                 },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
-                },
-                "resourceName": {
-                  "value": "[field('name')]"
                 }
               },
               "template": {
@@ -266,16 +266,10 @@
                   "windowSize": {
                     "type": "String"
                   },
-                  "enabled": {
-                    "type": "String"
-                  },
                   "severity": {
                     "type": "String"
                   },
-                  "failingPeriods": {
-                    "type": "String"
-                  },
-                  "evaluationPeriods": {
+                  "enabled": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -284,16 +278,20 @@
                       "displayName": "resourceName"
                     },
                     "type": "String"
+                  },
+                  "failingPeriods": {
+                    "type": "String"
+                  },
+                  "evaluationPeriods": {
+                    "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Vnet Gateway tunnel TunnelEgressPacketDropCount",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -304,11 +302,11 @@
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
                         },
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         },
                         "failingPeriods": {
                           "value": "[parameters('failingPeriods')]"
@@ -317,10 +315,11 @@
                           "value": "[parameters('evaluationPeriods')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
-                      "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "enabled": "[parameters('enabled')]",
                       "criteria": {
                         "allOf": [
                           {
@@ -329,11 +328,11 @@
                               "minFailingPeriodsToAlert": "[parameters('failingPeriods')]"
                             },
                             "timeAggregation": "Average",
-                            "operator": "GreaterThan",
-                            "name": "TunnelEgressPacketDropCount",
                             "metricNamespace": "microsoft.network/virtualNetworkGateways",
                             "criterionType": "DynamicThresholdCriterion",
+                            "name": "TunnelEgressPacketDropCount",
                             "metricName": "TunnelEgressPacketDropCount",
+                            "operator": "GreaterThan",
                             "alertSensitivity": "Medium"
                           }
                         ],
@@ -344,13 +343,14 @@
                       ]
                     },
                     "apiVersion": "2018-03-01",
-                    "location": "global",
                     "name": "[concat(parameters('resourceName'), '-TunnelEgressPacketDropCountAlert')]",
+                    "location": "global",
                     "tags": {
                       "_deployed_by_amba": true
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

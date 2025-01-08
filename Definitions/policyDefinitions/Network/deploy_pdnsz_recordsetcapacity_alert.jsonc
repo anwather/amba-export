@@ -7,15 +7,19 @@
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
+      "version": "1.2.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.2.0",
       "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "displayName": "Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -24,46 +28,34 @@
           "PT1H"
         ],
         "defaultValue": "PT1H",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
       "MonitorDisableTagValues": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
       "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
         "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
+        "defaultValue": "MonitorDisable",
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "displayName": "Window Size",
+          "description": "Window size for the alert"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -75,25 +67,25 @@
           "P1D"
         ],
         "defaultValue": "PT1H",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
       "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "displayName": "Severity",
+          "description": "Severity of the Alert"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -102,30 +94,38 @@
           "4"
         ],
         "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "80",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
         "type": "String"
       },
       "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
         "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
+      "autoMitigate": {
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "displayName": "Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
         },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "threshold": {
+        "metadata": {
+          "displayName": "Threshold",
+          "description": "Threshold for the alert"
+        },
+        "defaultValue": "80",
         "type": "String"
       }
     },
@@ -206,9 +206,6 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
@@ -217,6 +214,9 @@
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-RecordSetCapacityUtilization-threshold-Override_'), field('tags._amba-RecordSetCapacityUtilization-threshold-Override_'), parameters('threshold'))]"
@@ -229,15 +229,12 @@
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
-                      "displayName": "resourceId"
+                      "displayName": "resourceId",
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
                     },
                     "type": "String"
                   },
                   "evaluationFrequency": {
-                    "type": "String"
-                  },
-                  "autoMitigate": {
                     "type": "String"
                   },
                   "windowSize": {
@@ -249,13 +246,16 @@
                   "severity": {
                     "type": "String"
                   },
+                  "autoMitigate": {
+                    "type": "String"
+                  },
                   "threshold": {
                     "type": "String"
                   },
                   "resourceName": {
                     "metadata": {
-                      "description": "Name of the resource",
-                      "displayName": "resourceName"
+                      "displayName": "resourceName",
+                      "description": "Name of the resource"
                     },
                     "type": "String"
                   }
@@ -267,13 +267,9 @@
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for Private DNS Zone Record Set Capacity Utilization",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
-                        },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
                         },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
@@ -284,19 +280,26 @@
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
+                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
-                            "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Maximum",
+                            "threshold": "[parameters('threshold')]",
                             "operator": "GreaterThanOrEqual",
                             "name": "RecordSetCapacityUtilization",
                             "metricNamespace": "Microsoft.Network/privateDnsZones",
@@ -305,10 +308,7 @@
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "apiVersion": "2018-03-01",
                     "location": "global",

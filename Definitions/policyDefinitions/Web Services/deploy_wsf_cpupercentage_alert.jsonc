@@ -13,6 +13,10 @@
     },
     "parameters": {
       "evaluationFrequency": {
+        "metadata": {
+          "displayName": "Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -21,46 +25,46 @@
           "PT1H"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
         "type": "String"
       },
       "MonitorDisableTagValues": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
         "defaultValue": [
           "true",
           "Test",
           "Dev",
           "Sandbox"
         ],
-        "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
         "type": "Array"
       },
+      "MonitorDisableTagName": {
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        },
+        "defaultValue": "MonitorDisable",
+        "type": "String"
+      },
       "autoMitigate": {
+        "metadata": {
+          "displayName": "Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
         "type": "String"
       },
       "windowSize": {
+        "metadata": {
+          "displayName": "Window Size",
+          "description": "Window size for the alert"
+        },
         "allowedValues": [
           "PT1M",
           "PT5M",
@@ -72,25 +76,33 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
         "type": "String"
       },
       "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        },
         "allowedValues": [
           "true",
           "false"
         ],
         "defaultValue": "true",
+        "type": "String"
+      },
+      "threshold": {
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "displayName": "Threshold",
+          "description": "Threshold for the alert"
         },
+        "defaultValue": "90",
         "type": "String"
       },
       "severity": {
+        "metadata": {
+          "displayName": "Severity",
+          "description": "Severity of the Alert"
+        },
         "allowedValues": [
           "0",
           "1",
@@ -99,30 +111,18 @@
           "4"
         ],
         "defaultValue": "2",
-        "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "90",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
         "type": "String"
       },
       "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
         "allowedValues": [
           "deployIfNotExists",
           "disabled"
         ],
         "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
         "type": "String"
       }
     },
@@ -143,6 +143,9 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/metricAlerts",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -191,9 +194,6 @@
               }
             ]
           },
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "deployment": {
             "properties": {
               "parameters": {
@@ -212,11 +212,11 @@
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
-                },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-CpuPercentage-threshold-Override_'), field('tags._amba-CpuPercentage-threshold-Override_'), parameters('threshold'))]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -226,8 +226,8 @@
                 "parameters": {
                   "resourceId": {
                     "metadata": {
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
-                      "displayName": "resourceId"
+                      "displayName": "resourceId",
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
                     },
                     "type": "String"
                   },
@@ -243,28 +243,26 @@
                   "enabled": {
                     "type": "String"
                   },
-                  "severity": {
+                  "threshold": {
                     "type": "String"
                   },
-                  "threshold": {
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
                     "metadata": {
-                      "description": "Name of the resource",
-                      "displayName": "resourceName"
+                      "displayName": "resourceName",
+                      "description": "Name of the resource"
                     },
                     "type": "String"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
                     "properties": {
                       "description": "Metric Alert for App Service Plan CPU Percentage",
-                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
@@ -278,13 +276,14 @@
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
-                        },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
+                      "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
@@ -292,8 +291,8 @@
                       "criteria": {
                         "allOf": [
                           {
-                            "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
+                            "threshold": "[parameters('threshold')]",
                             "operator": "GreaterThan",
                             "name": "CpuPercentage",
                             "metricNamespace": "Microsoft.Web/serverfarms",
@@ -315,6 +314,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

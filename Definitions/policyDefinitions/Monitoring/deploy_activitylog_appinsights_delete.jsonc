@@ -1,48 +1,24 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_activitylog_NSG_Delete",
+  "name": "Deploy_ActivityLog_AppInsights_Delete",
   "properties": {
-    "displayName": "Deploy Activity Log NSG Delete Alert",
-    "description": "Policy to Deploy Activity Log NSG Delete Alert",
+    "displayName": "Deploy Activity Log Application Insights Delete Alert (Preview)",
+    "description": "Policy to Deploy Activity Log Application Insights Delete Alert",
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
-      "version": "1.1.0",
+      "version": "1.0.0",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "category": "Network",
+      "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
-      "effect": {
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "type": "String"
-      },
-      "enabled": {
-        "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "type": "String"
-      },
       "MonitorDisableTagValues": {
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
         "defaultValue": [
           "true",
@@ -54,35 +30,59 @@
       },
       "MonitorDisableTagName": {
         "metadata": {
-          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
-          "displayName": "ALZ Monitoring disabled tag name"
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
         },
         "defaultValue": "MonitorDisable",
         "type": "String"
       },
-      "alertResourceGroupName": {
-        "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
-        },
-        "defaultValue": "rg-amba-monitoring-001",
-        "type": "String"
-      },
       "alertResourceGroupLocation": {
         "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
+          "displayName": "Resource Group Location",
+          "description": "Location of the Resource group the alert is placed in"
         },
         "defaultValue": "centralus",
         "type": "String"
       },
+      "alertResourceGroupName": {
+        "metadata": {
+          "displayName": "Resource Group Name",
+          "description": "Resource group the alert is placed in"
+        },
+        "defaultValue": "rg-amba-monitoring-001",
+        "type": "String"
+      },
+      "enabled": {
+        "metadata": {
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String"
+      },
+      "effect": {
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        },
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "type": "String"
+      },
       "alertResourceGroupTags": {
         "metadata": {
-          "description": "Tags on the Resource group the alert is placed in",
-          "displayName": "Resource Group Tags"
+          "displayName": "Resource Group Tags",
+          "description": "Tags on the Resource group the alert is placed in"
         },
         "defaultValue": {
-          "Project": "amba-monitoring"
+          "_deployed_by_amba": true
         },
         "type": "Object"
       }
@@ -91,7 +91,7 @@
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Network/networkSecurityGroups",
+            "equals": "microsoft.insights/components",
             "field": "type"
           },
           {
@@ -104,9 +104,6 @@
         "effect": "[parameters('effect')]",
         "details": {
           "type": "Microsoft.Insights/activityLogAlerts",
-          "roleDefinitionIds": [
-            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
-          ],
           "existenceCondition": {
             "allOf": [
               {
@@ -138,7 +135,7 @@
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "equals": "Microsoft.Network/networkSecurityGroups/delete",
+                            "equals": "Microsoft.Insights/Components/Delete",
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
@@ -149,18 +146,22 @@
               }
             ]
           },
-          "name": "ActivityNSGDelete",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
+          "resourceGroupName": "[parameters('alertResourceGroupName')]",
+          "name": "ActivityAppInsightsDelete",
           "deployment": {
             "properties": {
               "parameters": {
-                "enabled": {
-                  "value": "[parameters('enabled')]"
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "alertResourceGroupName": {
                   "value": "[parameters('alertResourceGroupName')]"
                 },
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
+                "enabled": {
+                  "value": "[parameters('enabled')]"
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
@@ -168,13 +169,13 @@
               },
               "template": {
                 "parameters": {
-                  "enabled": {
+                  "alertResourceGroupLocation": {
                     "type": "string"
                   },
                   "alertResourceGroupName": {
                     "type": "string"
                   },
-                  "alertResourceGroupLocation": {
+                  "enabled": {
                     "type": "string"
                   },
                   "alertResourceGroupTags": {
@@ -182,12 +183,13 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
                     "apiVersion": "2021-04-01",
-                    "name": "[parameters('alertResourceGroupName')]",
                     "location": "[parameters('alertResourceGroupLocation')]",
+                    "name": "[parameters('alertResourceGroupName')]",
                     "tags": "[parameters('alertResourceGroupTags')]"
                   },
                   {
@@ -195,28 +197,30 @@
                     "type": "Microsoft.Resources/deployments",
                     "properties": {
                       "parameters": {
-                        "enabled": {
-                          "value": "[parameters('enabled')]"
-                        },
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
+                        },
+                        "enabled": {
+                          "value": "[parameters('enabled')]"
                         }
                       },
                       "template": {
                         "parameters": {
-                          "enabled": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           },
-                          "alertResourceGroupName": {
+                          "enabled": {
                             "type": "string"
                           }
                         },
                         "contentVersion": "1.0.0.0",
+                        "variables": {},
                         "resources": [
                           {
                             "type": "microsoft.insights/activityLogAlerts",
                             "properties": {
-                              "description": "Activity Log NSG Delete",
+                              "displayName": "Application Insights Resource Delete Alert (Preview)",
+                              "description": "Activity Log Application Insights Delete Alert",
                               "parameters": {
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
@@ -233,7 +237,7 @@
                                     "field": "category"
                                   },
                                   {
-                                    "equals": "Microsoft.Network/networkSecurityGroups/delete",
+                                    "equals": "Microsoft.Insights/Components/Delete",
                                     "field": "operationName"
                                   },
                                   {
@@ -246,33 +250,30 @@
                               }
                             },
                             "apiVersion": "2020-10-01",
-                            "name": "ActivityNSGDelete",
                             "location": "global",
+                            "name": "ActivityAppInsightsDelete",
                             "tags": {
                               "_deployed_by_amba": true
                             }
                           }
                         ],
-                        "variables": {},
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       },
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ActivityNSGDelete",
+                    "name": "ActivityAppInsightsDeleteAlert",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
                   }
                 ],
-                "variables": {},
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
+                "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
               },
               "mode": "incremental"
             },
             "location": "australiaeast"
           },
-          "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deploymentScope": "subscription",
           "existenceScope": "resourcegroup"
         }
