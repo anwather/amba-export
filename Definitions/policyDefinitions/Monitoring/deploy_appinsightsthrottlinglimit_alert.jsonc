@@ -1,16 +1,16 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_LAWorkspace_DailyCapLimitReached_Alert",
+  "name": "Deploy_AppInsightsThrottlingLimit_Alert",
   "properties": {
-    "displayName": "Deploy LA Workspace Daily Cap Limit Reached Alert",
-    "description": "Policy to audit/deploy LA Workspace Daily Cap Limit Reached Alert",
+    "displayName": "Deploy Application Insights Throttling Limit Reached Alert (Preview)",
+    "description": "Policy to audit/deploy Application Insights Throttling Limit Reached Alert",
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.1.0",
+      "version": "1.0.0",
       "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -58,6 +58,29 @@
         },
         "type": "String"
       },
+      "windowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT10M",
+          "PT15M",
+          "PT30M",
+          "PT45M",
+          "PT1H",
+          "PT2H",
+          "PT3H",
+          "PT4H",
+          "PT5H",
+          "PT6H",
+          "P1D"
+        ],
+        "defaultValue": "P1D",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Window Size"
+        },
+        "type": "String"
+      },
       "autoMitigate": {
         "allowedValues": [
           "true",
@@ -82,45 +105,6 @@
         },
         "type": "String"
       },
-      "windowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT10M",
-          "PT15M",
-          "PT30M",
-          "PT45M",
-          "PT1H",
-          "PT2H",
-          "PT3H",
-          "PT4H",
-          "PT5H",
-          "PT6H",
-          "P1D"
-        ],
-        "defaultValue": "P1D",
-        "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
-        "type": "String"
-      },
-      "failingPeriods": {
-        "defaultValue": "1",
-        "metadata": {
-          "description": "Number of failing periods before alert is fired",
-          "displayName": "Failing Periods"
-        },
-        "type": "String"
-      },
-      "evaluationPeriods": {
-        "defaultValue": "1",
-        "metadata": {
-          "description": "The number of aggregated lookback points.",
-          "displayName": "Evaluation Periods"
-        },
-        "type": "String"
-      },
       "severity": {
         "allowedValues": [
           "0",
@@ -136,40 +120,11 @@
         },
         "type": "String"
       },
-      "UAMIResourceId": {
-        "defaultValue": "",
-        "metadata": {
-          "description": "The resource Id of the user assigned managed identity.",
-          "displayName": "User Assigned managed Identity resource Id."
-        },
-        "type": "string"
-      },
-      "timeAggregation": {
-        "allowedValues": [
-          "Count"
-        ],
-        "defaultValue": "Count",
-        "metadata": {
-          "displayName": "TimeAggregation"
-        },
-        "type": "String"
-      },
       "threshold": {
-        "defaultValue": "0",
+        "defaultValue": "32000",
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "Threshold"
-        },
-        "type": "String"
-      },
-      "operator": {
-        "allowedValues": [
-          "GreaterThan",
-          "GreaterThanOrEqual"
-        ],
-        "defaultValue": "GreaterThan",
-        "metadata": {
-          "displayName": "Operator"
         },
         "type": "String"
       },
@@ -184,13 +139,58 @@
           "displayName": "Effect"
         },
         "type": "String"
+      },
+      "evaluationPeriods": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "The number of aggregated lookback points.",
+          "displayName": "Evaluation Periods"
+        },
+        "type": "String"
+      },
+      "failingPeriods": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "Number of failing periods before alert is fired",
+          "displayName": "Failing Periods"
+        },
+        "type": "String"
+      },
+      "timeAggregation": {
+        "allowedValues": [
+          "Count"
+        ],
+        "defaultValue": "Count",
+        "metadata": {
+          "displayName": "TimeAggregation"
+        },
+        "type": "String"
+      },
+      "operator": {
+        "allowedValues": [
+          "GreaterThan",
+          "GreaterThanOrEqual"
+        ],
+        "defaultValue": "GreaterThan",
+        "metadata": {
+          "displayName": "Operator"
+        },
+        "type": "String"
+      },
+      "UAMIResourceId": {
+        "defaultValue": "",
+        "metadata": {
+          "description": "The resource Id of the user assigned managed identity.",
+          "displayName": "User Assigned managed Identity resource Id."
+        },
+        "type": "string"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.OperationalInsights/workspaces",
+            "equals": "Microsoft.Insights/components",
             "field": "type"
           },
           {
@@ -205,10 +205,6 @@
           "type": "Microsoft.Insights/scheduledQueryRules",
           "existenceCondition": {
             "allOf": [
-              {
-                "equals": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationalInsights/workspaces/', field('fullName'))]",
-                "field": "Microsoft.Insights/scheduledQueryRules/scopes[*]"
-              },
               {
                 "equals": "[parameters('enabled')]",
                 "field": "Microsoft.Insights/scheduledQueryRules/enabled"
@@ -230,7 +226,7 @@
                 "field": "Microsoft.Insights/scheduledQueryRules/autoMitigate"
               },
               {
-                "equals": "[parameters('threshold')]",
+                "equals": 0,
                 "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].threshold"
               },
               {
@@ -250,7 +246,7 @@
                 "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.minFailingPeriodsToAlert"
               },
               {
-                "equals": "[format('let excludedResources = (arg(\"\").resources | where type =~ \"Microsoft.OperationalInsights/workspaces\" | where parse_json(tostring(tags.[\"{0}\"])) in~ (\"{1}\") | project customerId = tostring(properties.customerId)); let workspaceResources = (arg(\"\").resources | where type =~ \"Microsoft.OperationalInsights/workspaces\" | project id, customerId = tostring(properties.customerId), workspaceName = tostring(name)); Operation | where TenantId !in~ (excludedResources) | where OperationCategory == \"Data Collection Status\" | where Detail has_any(\"RespectQuota\", \"OverQuota\") | summarize arg_max(TimeGenerated, *) by TenantId | where Detail has \"OverQuota\" | join hint.remote=left kind=inner workspaceResources on $left.TenantId == $right.customerId | project TimeGenerated, id, workspaceName, workspaceId = TenantId, Detail', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'))]",
+                "equals": "[format('let policyThresholdString = \"{2}\"; let overridenResource = (arg(\"\").resources | where type =~ \"Microsoft.Insights/components\" | project _ResourceId = tolower(id), tags | where tags contains \"_amba-Throttling-threshold-override_\"); let excludedResources = (arg(\"\").resources | where type =~ \"Microsoft.Insights/components\" | where parse_json(tostring(tags.[\"{0}\"])) in~ (\"{1}\") | project _ResourceId = tolower(id)); let appInsightsResources = (arg(\"\").resources | where type =~ \"Microsoft.Insights/components\" | project _ResourceId = tolower(id), name); AppSystemEvents | where _ResourceId =~ \"{3}\" | where _ResourceId !in~ (excludedResources) | summarize numOfEvents = sum(toint(Measurements[\"BillingTelemetryCount\"])) by _ResourceId, Type, bin(TimeGenerated, 1h) | join hint.remote=left kind=leftouter overridenResource on _ResourceId | project-away _ResourceId1 | extend appliedThresholdString = iif(tags contains \"_amba-Throttling-threshold-override_\", tags.[\"_amba-Throttling-threshold-override_\"], policyThresholdString) | extend appliedThreshold = toint(appliedThresholdString) | where numOfEvents > appliedThreshold | join hint.remote=left kind=inner appInsightsResources on _ResourceId | project TimeGenerated, _ResourceId, name, numOfEvents', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), parameters('threshold'), field('id'))]",
                 "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].query"
               },
               {
@@ -280,38 +276,38 @@
                 "MonitorDisableTagName": {
                   "value": "[parameters('MonitorDisableTagName')]"
                 },
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
+                },
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
-                "failingPeriods": {
-                  "value": "[parameters('failingPeriods')]"
-                },
-                "evaluationPeriods": {
-                  "value": "[parameters('evaluationPeriods')]"
-                },
                 "severity": {
                   "value": "[parameters('severity')]"
-                },
-                "UAMIResourceId": {
-                  "value": "[parameters('UAMIResourceId')]"
-                },
-                "timeAggregation": {
-                  "value": "[parameters('timeAggregation')]"
                 },
                 "threshold": {
                   "value": "[parameters('threshold')]"
                 },
-                "operator": {
-                  "value": "[parameters('operator')]"
+                "evaluationPeriods": {
+                  "value": "[parameters('evaluationPeriods')]"
+                },
+                "failingPeriods": {
+                  "value": "[parameters('failingPeriods')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
+                },
+                "timeAggregation": {
+                  "value": "[parameters('timeAggregation')]"
+                },
+                "operator": {
+                  "value": "[parameters('operator')]"
+                },
+                "UAMIResourceId": {
+                  "value": "[parameters('UAMIResourceId')]"
                 }
               },
               "template": {
@@ -339,34 +335,25 @@
                   "MonitorDisableTagName": {
                     "type": "String"
                   },
+                  "windowSize": {
+                    "type": "String"
+                  },
                   "autoMitigate": {
                     "type": "String"
                   },
                   "enabled": {
                     "type": "String"
                   },
-                  "windowSize": {
-                    "type": "String"
-                  },
-                  "failingPeriods": {
-                    "type": "String"
-                  },
-                  "evaluationPeriods": {
-                    "type": "String"
-                  },
                   "severity": {
-                    "type": "String"
-                  },
-                  "UAMIResourceId": {
-                    "type": "string"
-                  },
-                  "timeAggregation": {
                     "type": "String"
                   },
                   "threshold": {
                     "type": "String"
                   },
-                  "operator": {
+                  "evaluationPeriods": {
+                    "type": "String"
+                  },
+                  "failingPeriods": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -375,16 +362,24 @@
                       "displayName": "resourceName"
                     },
                     "type": "String"
+                  },
+                  "timeAggregation": {
+                    "type": "String"
+                  },
+                  "operator": {
+                    "type": "String"
+                  },
+                  "UAMIResourceId": {
+                    "type": "string"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/scheduledQueryRules",
                     "properties": {
-                      "description": "Log Alert for Daily Cap Limit Reached",
-                      "displayName": "[concat(parameters('resourceName'), '-DailyCapLimitReachedAlert')]",
+                      "description": "Log Alert for Application Insights Throttling Limit Reached",
+                      "displayName": "[concat(parameters('resourceName'), '-Application Insights Throttling Limit Reached (Preview)')]",
                       "evaluationFrequency": "[parameters('evaluationFrequency')]",
                       "parameters": {
                         "evaluationFrequency": {
@@ -396,72 +391,72 @@
                         "MonitorDisableTagName": {
                           "value": "[parameters('MonitorDisableTagName')]"
                         },
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
+                        },
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
-                        "failingPeriods": {
-                          "value": "[parameters('failingPeriods')]"
-                        },
-                        "evaluationPeriods": {
-                          "value": "[parameters('evaluationPeriods')]"
-                        },
                         "severity": {
                           "value": "[parameters('severity')]"
-                        },
-                        "UAMIResourceId": {
-                          "value": "[parameters('UAMIResourceId')]"
-                        },
-                        "timeAggregation": {
-                          "value": "[parameters('timeAggregation')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
                         },
+                        "evaluationPeriods": {
+                          "value": "[parameters('evaluationPeriods')]"
+                        },
+                        "failingPeriods": {
+                          "value": "[parameters('failingPeriods')]"
+                        },
+                        "timeAggregation": {
+                          "value": "[parameters('timeAggregation')]"
+                        },
                         "operator": {
                           "value": "[parameters('operator')]"
+                        },
+                        "UAMIResourceId": {
+                          "value": "[parameters('UAMIResourceId')]"
                         }
                       },
+                      "windowSize": "[parameters('windowSize')]",
                       "autoMitigate": "[parameters('autoMitigate')]",
                       "enabled": "[parameters('enabled')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ],
                       "criteria": {
                         "allOf": [
                           {
+                            "threshold": 0,
                             "failingPeriods": {
                               "numberOfEvaluationPeriods": "[parameters('evaluationPeriods')]",
                               "minFailingPeriodsToAlert": "[parameters('failingPeriods')]"
                             },
                             "timeAggregation": "[parameters('timeAggregation')]",
-                            "threshold": "[parameters('threshold')]",
                             "operator": "[parameters('operator')]",
-                            "resourceIdColumn": "id",
                             "dimensions": [
                               {
                                 "operator": "Include",
-                                "name": "workspaceName",
+                                "name": "name",
                                 "values": [
                                   "*"
                                 ]
                               }
                             ],
-                            "query": "[format('let excludedResources = (arg(\"\").resources | where type =~ \"Microsoft.OperationalInsights/workspaces\" | where parse_json(tostring(tags.[\"{0}\"])) in~ (\"{1}\") | project customerId = tostring(properties.customerId)); let workspaceResources = (arg(\"\").resources | where type =~ \"Microsoft.OperationalInsights/workspaces\" | project id, customerId = tostring(properties.customerId), workspaceName = tostring(name)); Operation | where TenantId !in~ (excludedResources) | where OperationCategory == \"Data Collection Status\" | where Detail has_any(\"RespectQuota\", \"OverQuota\") | summarize arg_max(TimeGenerated, *) by TenantId | where Detail has \"OverQuota\" | join hint.remote=left kind=inner workspaceResources on $left.TenantId == $right.customerId | project TimeGenerated, id, workspaceName, workspaceId = TenantId, Detail', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'))]"
+                            "resourceIdColumn": "_ResourceId",
+                            "query": "[format('let policyThresholdString = \"{2}\"; let overridenResource = (arg(\"\").resources | where type =~ \"Microsoft.Insights/components\" | project _ResourceId = tolower(id), tags | where tags contains \"_amba-Throttling-threshold-override_\"); let excludedResources = (arg(\"\").resources | where type =~ \"Microsoft.Insights/components\" | where parse_json(tostring(tags.[\"{0}\"])) in~ (\"{1}\") | project _ResourceId = tolower(id)); let appInsightsResources = (arg(\"\").resources | where type =~ \"Microsoft.Insights/components\" | project _ResourceId = tolower(id), name); AppSystemEvents | where _ResourceId =~ \"{3}\" | where _ResourceId !in~ (excludedResources) | summarize numOfEvents = sum(toint(Measurements[\"BillingTelemetryCount\"])) by _ResourceId, Type, bin(TimeGenerated, 1h) | join hint.remote=left kind=leftouter overridenResource on _ResourceId | project-away _ResourceId1 | extend appliedThresholdString = iif(tags contains \"_amba-Throttling-threshold-override_\", tags.[\"_amba-Throttling-threshold-override_\"], policyThresholdString) | extend appliedThreshold = toint(appliedThresholdString) | where numOfEvents > appliedThreshold | join hint.remote=left kind=inner appInsightsResources on _ResourceId | project TimeGenerated, _ResourceId, name, numOfEvents', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), parameters('threshold'), parameters('resourceId'))]"
                           }
                         ]
-                      }
+                      },
+                      "scopes": [
+                        "[reference(parameters('resourceId'),'2020-02-02').WorkspaceResourceId]"
+                      ]
                     },
                     "apiVersion": "2022-08-01-preview",
                     "location": "[parameters('resourceLocation')]",
-                    "name": "[concat(parameters('resourceName'), '-DailyCapLimitReachedAlert')]",
+                    "name": "[concat(parameters('resourceName'), '-ApplicationInsightsThrottlingLimitReachedAlert')]",
                     "tags": {
                       "_deployed_by_amba": true
                     },
@@ -473,6 +468,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

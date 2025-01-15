@@ -9,11 +9,37 @@
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "ALZMonitorResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
+        "metadata": {
+          "description": "Name of the resource group to deploy the ALZ monitoring resources to",
+          "displayName": "ALZ Monitoring Resource Group Name"
+        },
+        "type": "String"
+      },
+      "ALZMonitorResourceGroupLocation": {
+        "defaultValue": "centralus",
+        "metadata": {
+          "description": "Location of the resource group",
+          "displayName": "ALZ Monitoring Resource Group Location"
+        },
+        "type": "String"
+      },
+      "ALZMonitorResourceGroupTags": {
+        "defaultValue": {
+          "_deployed_by_alz_monitor": true
+        },
+        "metadata": {
+          "description": "Tags to apply to the resource group",
+          "displayName": "ALZ Monitoring Resource Group Tags"
+        },
+        "type": "Object"
+      },
       "ALZMonitorDisableTagValues": {
         "defaultValue": [
           "true",
@@ -22,18 +48,117 @@
           "Sandbox"
         ],
         "metadata": {
-          "displayName": "ALZ Monitoring disabled tag values(s)",
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag values(s)"
         },
         "type": "Array"
       },
       "ALZMonitorDisableTagName": {
         "defaultValue": "MonitorDisable",
         "metadata": {
-          "displayName": "ALZ Monitoring disabled tag name",
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
         },
         "type": "String"
+      },
+      "BYOUserAssignedManagedIdentityResourceId": {
+        "defaultValue": "",
+        "metadata": {
+          "description": "The resource Id of the user assigned managed identity provided by the customer.",
+          "displayName": "Customer defined User Assigned managed Identity resource Id."
+        },
+        "type": "string"
+      },
+      "ALZUserAssignedManagedIdentityName": {
+        "defaultValue": "id-AMBA-ARG-Reader-001",
+        "metadata": {
+          "description": "The name of the user assigned managed identity to be created for monitoring purpose.",
+          "displayName": "Name of the user assigned managed identity to be created."
+        },
+        "type": "string"
+      },
+      "ALZManagementSubscriptionId": {
+        "defaultValue": "",
+        "metadata": {
+          "description": "The subscription ID of the management subscription where the user assigned managed identity will be created."
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageAlertSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "description": "Severity of the alert",
+          "displayName": "WSF CPU Percentage Alert Severity"
+        },
+        "type": "String"
+      },
+      "WSFCPUPercentageWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ],
+        "defaultValue": "PT5M",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "WSF CPU Percentage Window Size"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageEvaluationFrequency": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ],
+        "defaultValue": "PT1M",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "WSF CPU Percentage Evaluation Frequency"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentagePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "WSF CPU Percentage Policy Effect"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "WSF CPU Percentage Alert State"
+        },
+        "type": "string"
+      },
+      "WSFCPUPercentageThreshold": {
+        "defaultValue": "90",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "WSF CPU Percentage Threshold"
+        },
+        "type": "string"
       },
       "WSFMemoryPercentageAlertSeverity": {
         "allowedValues": [
@@ -45,8 +170,8 @@
         ],
         "defaultValue": "2",
         "metadata": {
-          "displayName": "WSF Memory Percentage Alert Severity",
-          "description": "Severity of the alert"
+          "description": "Severity of the alert",
+          "displayName": "WSF Memory Percentage Alert Severity"
         },
         "type": "String"
       },
@@ -63,8 +188,8 @@
         ],
         "defaultValue": "PT5M",
         "metadata": {
-          "displayName": "WSF Memory Percentage  Window Size",
-          "description": "Window size for the alert"
+          "description": "Window size for the alert",
+          "displayName": "WSF Memory Percentage  Window Size"
         },
         "type": "string"
       },
@@ -78,8 +203,8 @@
         ],
         "defaultValue": "PT1M",
         "metadata": {
-          "displayName": "WSF Memory Percentage Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
+          "description": "Evaluation frequency for the alert",
+          "displayName": "WSF Memory Percentage Evaluation Frequency"
         },
         "type": "string"
       },
@@ -90,24 +215,24 @@
         ],
         "defaultValue": "deployIfNotExists",
         "metadata": {
-          "displayName": "WSF Memory Percentage Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "WSF Memory Percentage Policy Effect"
         },
         "type": "string"
       },
       "WSFMemoryPercentageAlertState": {
         "defaultValue": "true",
         "metadata": {
-          "displayName": "WSF Memory Percentage Alert State",
-          "description": "Alert state for the alert"
+          "description": "Alert state for the alert",
+          "displayName": "WSF Memory Percentage Alert State"
         },
         "type": "string"
       },
       "WSFMemoryPercentageThreshold": {
         "defaultValue": "85",
         "metadata": {
-          "displayName": "WSF Memory Percentage Threshold",
-          "description": "Threshold for the alert"
+          "description": "Threshold for the alert",
+          "displayName": "WSF Memory Percentage Threshold"
         },
         "type": "string"
       },
@@ -121,78 +246,10 @@
         ],
         "defaultValue": "2",
         "metadata": {
-          "displayName": "WSF Disk Queue Lenght Alert Severity",
-          "description": "Severity of the alert"
+          "description": "Severity of the alert",
+          "displayName": "WSF Disk Queue Lenght Alert Severity"
         },
         "type": "String"
-      },
-      "WSFCPUPercentagePolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "displayName": "WSF CPU Percentage Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
-        },
-        "type": "string"
-      },
-      "WSFCPUPercentageEvaluationFrequency": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H"
-        ],
-        "defaultValue": "PT1M",
-        "metadata": {
-          "displayName": "WSF CPU Percentage Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
-        },
-        "type": "string"
-      },
-      "WSFCPUPercentageWindowSize": {
-        "allowedValues": [
-          "PT1M",
-          "PT5M",
-          "PT15M",
-          "PT30M",
-          "PT1H",
-          "PT6H",
-          "PT12H",
-          "P1D"
-        ],
-        "defaultValue": "PT5M",
-        "metadata": {
-          "displayName": "WSF CPU Percentage Window Size",
-          "description": "Window size for the alert"
-        },
-        "type": "string"
-      },
-      "WSFCPUPercentageAlertSeverity": {
-        "allowedValues": [
-          "0",
-          "1",
-          "2",
-          "3",
-          "4"
-        ],
-        "defaultValue": "2",
-        "metadata": {
-          "displayName": "WSF CPU Percentage Alert Severity",
-          "description": "Severity of the alert"
-        },
-        "type": "String"
-      },
-      "WSFHttpQueueLengthAlertState": {
-        "defaultValue": "true",
-        "metadata": {
-          "displayName": "WSF HTTP Queue Lenght Alert State",
-          "description": "Alert state for the alert"
-        },
-        "type": "string"
       },
       "WSFDiskQueueLengthWindowSize": {
         "allowedValues": [
@@ -207,8 +264,8 @@
         ],
         "defaultValue": "PT5M",
         "metadata": {
-          "displayName": "WSF Disk Queue Lenght Window Size",
-          "description": "Window size for the alert"
+          "description": "Window size for the alert",
+          "displayName": "WSF Disk Queue Lenght Window Size"
         },
         "type": "string"
       },
@@ -222,8 +279,8 @@
         ],
         "defaultValue": "PT1M",
         "metadata": {
-          "displayName": "WSF Disk Queue Lenght Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
+          "description": "Evaluation frequency for the alert",
+          "displayName": "WSF Disk Queue Lenght Evaluation Frequency"
         },
         "type": "string"
       },
@@ -234,40 +291,32 @@
         ],
         "defaultValue": "deployIfNotExists",
         "metadata": {
-          "displayName": "WSF Disk Queue Lenght Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
-        },
-        "type": "string"
-      },
-      "WSFHttpQueueLengthEvaluationPeriods": {
-        "defaultValue": "2",
-        "metadata": {
-          "displayName": "WSF HTTP Queue Lenght Evaluation Periods",
-          "description": "The number of aggregated lookback points."
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "WSF Disk Queue Lenght Policy Effect"
         },
         "type": "string"
       },
       "WSFDiskQueueLengthAlertState": {
         "defaultValue": "true",
         "metadata": {
-          "displayName": "WSF Disk Queue Lenght Alert State",
-          "description": "Alert state for the alert"
+          "description": "Alert state for the alert",
+          "displayName": "WSF Disk Queue Lenght Alert State"
         },
         "type": "string"
       },
       "WSFDiskQueueLengthFailingPeriods": {
         "defaultValue": "2",
         "metadata": {
-          "displayName": "WSF Disk Queue Lenght Failing Periods",
-          "description": "Number of failing periods before alert is fired"
+          "description": "Number of failing periods before alert is fired",
+          "displayName": "WSF Disk Queue Lenght Failing Periods"
         },
         "type": "string"
       },
       "WSFDiskQueueLengthEvaluationPeriods": {
         "defaultValue": "2",
         "metadata": {
-          "displayName": "WSF Disk Queue Lenght Evaluation Periods",
-          "description": "The number of aggregated lookback points."
+          "description": "The number of aggregated lookback points.",
+          "displayName": "WSF Disk Queue Lenght Evaluation Periods"
         },
         "type": "string"
       },
@@ -281,8 +330,8 @@
         ],
         "defaultValue": "2",
         "metadata": {
-          "displayName": "WSF HTTP Queue Lenght Alert Severity",
-          "description": "Severity of the alert"
+          "description": "Severity of the alert",
+          "displayName": "WSF HTTP Queue Lenght Alert Severity"
         },
         "type": "String"
       },
@@ -299,28 +348,8 @@
         ],
         "defaultValue": "PT5M",
         "metadata": {
-          "displayName": "WSF HTTP Queue Lenght Window Size",
-          "description": "Window size for the alert"
-        },
-        "type": "string"
-      },
-      "WSFHttpQueueLengthFailingPeriods": {
-        "defaultValue": "2",
-        "metadata": {
-          "displayName": "WSF HTTP Queue Lenght Failing Periods",
-          "description": "Number of failing periods before alert is fired"
-        },
-        "type": "string"
-      },
-      "WSFHttpQueueLengthPolicyEffect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "displayName": "WSF HTTP Queue Lenght Policy Effect",
-          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert"
+          "description": "Window size for the alert",
+          "displayName": "WSF HTTP Queue Lenght Window Size"
         },
         "type": "string"
       },
@@ -334,24 +363,201 @@
         ],
         "defaultValue": "PT1M",
         "metadata": {
-          "displayName": "WSF HTTP Queue Lenght Evaluation Frequency",
-          "description": "Evaluation frequency for the alert"
+          "description": "Evaluation frequency for the alert",
+          "displayName": "WSF HTTP Queue Lenght Evaluation Frequency"
         },
         "type": "string"
       },
-      "WSFCPUPercentageAlertState": {
+      "WSFHttpQueueLengthPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will deploy the alert if it does not exist, disabled will not deploy the alert",
+          "displayName": "WSF HTTP Queue Lenght Policy Effect"
+        },
+        "type": "string"
+      },
+      "WSFHttpQueueLengthAlertState": {
         "defaultValue": "true",
         "metadata": {
-          "displayName": "WSF CPU Percentage Alert State",
-          "description": "Alert state for the alert"
+          "description": "Alert state for the alert",
+          "displayName": "WSF HTTP Queue Lenght Alert State"
         },
         "type": "string"
       },
-      "WSFCPUPercentageThreshold": {
-        "defaultValue": "90",
+      "WSFHttpQueueLengthFailingPeriods": {
+        "defaultValue": "2",
         "metadata": {
-          "displayName": "WSF CPU Percentage Threshold",
-          "description": "Threshold for the alert"
+          "description": "Number of failing periods before alert is fired",
+          "displayName": "WSF HTTP Queue Lenght Failing Periods"
+        },
+        "type": "string"
+      },
+      "WSFHttpQueueLengthEvaluationPeriods": {
+        "defaultValue": "2",
+        "metadata": {
+          "description": "The number of aggregated lookback points.",
+          "displayName": "WSF HTTP Queue Lenght Evaluation Periods"
+        },
+        "type": "string"
+      },
+      "AppInsightsThrottlingLimitSeverity": {
+        "allowedValues": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "defaultValue": "2",
+        "metadata": {
+          "description": "Severity of the Alert",
+          "displayName": "Application Insights Throttling Limit Reached Alert Severity"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitOperator": {
+        "allowedValues": [
+          "GreaterThan",
+          "GreaterThanOrEqual"
+        ],
+        "defaultValue": "GreaterThan",
+        "metadata": {
+          "displayName": "Application Insights Throttling Limit Reached Alert Operator"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitTimeAggregation": {
+        "allowedValues": [
+          "Count"
+        ],
+        "defaultValue": "Count",
+        "metadata": {
+          "displayName": "Application Insights Throttling Limit Reached Alert TimeAggregation"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitWindowSize": {
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT10M",
+          "PT15M",
+          "PT30M",
+          "PT45M",
+          "PT1H",
+          "PT2H",
+          "PT3H",
+          "PT4H",
+          "PT5H",
+          "PT6H",
+          "P1D"
+        ],
+        "defaultValue": "P1D",
+        "metadata": {
+          "description": "Window size for the alert",
+          "displayName": "Application Insights Throttling Limit Reached Alert Window Size"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitEvaluationFrequency": {
+        "allowedValues": [
+          "PT5M",
+          "PT10M",
+          "PT15M",
+          "PT30M",
+          "PT45M",
+          "PT1H",
+          "PT2H",
+          "PT3H",
+          "PT4H",
+          "PT5H",
+          "PT6H",
+          "P1D"
+        ],
+        "defaultValue": "PT1H",
+        "metadata": {
+          "description": "Evaluation frequency for the alert",
+          "displayName": "Application Insights Throttling Limit Reached Alert Evaluation Frequency"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitAutoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Application Insights Throttling Limit Reached Alert Auto Mitigate"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitThreshold": {
+        "defaultValue": "32000",
+        "metadata": {
+          "description": "Threshold for the alert",
+          "displayName": "Application Insights Throttling Limit Reached Alert Threshold"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitFailingPeriods": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "Number of failing periods before alert is fired",
+          "displayName": "Application Insights Throttling Limit Reached Alert Failing Periods"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitEvaluationPeriods": {
+        "defaultValue": "1",
+        "metadata": {
+          "description": "The number of aggregated lookback points.",
+          "displayName": "Application Insights Throttling Limit Reached Alert Evaluation Periods"
+        },
+        "type": "String"
+      },
+      "AppInsightsThrottlingLimitPolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will create the alert if it does not exist, disabled will not create the alert",
+          "displayName": "Application Insights Throttling Limit Reached Alert Policy Effect"
+        },
+        "type": "string"
+      },
+      "AppInsightsThrottlingLimitAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "AApplication Insights Throttling Limit Reached Alert State"
+        },
+        "type": "string"
+      },
+      "activityAppInsightsDeletePolicyEffect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Policy effect for the alert, deployIfNotExists will create the alert if it does not exist, disabled will not create the alert",
+          "displayName": "Activity Log Application Insights Alert Delete Policy Effect"
+        },
+        "type": "string"
+      },
+      "activityAppInsightsDeleteAlertState": {
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Alert state for the alert",
+          "displayName": "Activity Log Application Insights Alert Delete Alert State"
         },
         "type": "string"
       }
@@ -370,17 +576,17 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "enabled": {
-            "value": "[parameters('WSFCPUPercentageAlertState')]"
-          },
           "windowSize": {
             "value": "[parameters('WSFCPUPercentageWindowSize')]"
           },
-          "threshold": {
-            "value": "[parameters('WSFCPUPercentageThreshold')]"
+          "enabled": {
+            "value": "[parameters('WSFCPUPercentageAlertState')]"
           },
           "severity": {
             "value": "[parameters('WSFCPUPercentageAlertSeverity')]"
+          },
+          "threshold": {
+            "value": "[parameters('WSFCPUPercentageThreshold')]"
           },
           "effect": {
             "value": "[parameters('WSFCPUPercentagePolicyEffect')]"
@@ -400,17 +606,17 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "enabled": {
-            "value": "[parameters('WSFMemoryPercentageAlertState')]"
-          },
           "windowSize": {
             "value": "[parameters('WSFMemoryPercentageWindowSize')]"
           },
-          "threshold": {
-            "value": "[parameters('WSFMemoryPercentageThreshold')]"
+          "enabled": {
+            "value": "[parameters('WSFMemoryPercentageAlertState')]"
           },
           "severity": {
             "value": "[parameters('WSFMemoryPercentageAlertSeverity')]"
+          },
+          "threshold": {
+            "value": "[parameters('WSFMemoryPercentageThreshold')]"
           },
           "effect": {
             "value": "[parameters('WSFMemoryPercentagePolicyEffect')]"
@@ -430,20 +636,20 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
+          "windowSize": {
+            "value": "[parameters('WSFDiskQueueLengthWindowSize')]"
+          },
           "enabled": {
             "value": "[parameters('WSFDiskQueueLengthAlertState')]"
           },
-          "windowSize": {
-            "value": "[parameters('WSFDiskQueueLengthWindowSize')]"
+          "severity": {
+            "value": "[parameters('WSFDiskQueueLengthAlertSeverity')]"
           },
           "failingPeriods": {
             "value": "[parameters('WSFDiskQueueLengthFailingPeriods')]"
           },
           "evaluationPeriods": {
             "value": "[parameters('WSFDiskQueueLengthEvaluationPeriods')]"
-          },
-          "severity": {
-            "value": "[parameters('WSFDiskQueueLengthAlertSeverity')]"
           },
           "effect": {
             "value": "[parameters('WSFDiskQueueLengthPolicyEffect')]"
@@ -463,11 +669,14 @@
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
+          "windowSize": {
+            "value": "[parameters('WSFHttpQueueLengthWindowSize')]"
+          },
           "enabled": {
             "value": "[parameters('WSFHttpQueueLengthAlertState')]"
           },
-          "windowSize": {
-            "value": "[parameters('WSFHttpQueueLengthWindowSize')]"
+          "severity": {
+            "value": "[parameters('WSFHttpQueueLengthAlertSeverity')]"
           },
           "failingPeriods": {
             "value": "[parameters('WSFHttpQueueLengthFailingPeriods')]"
@@ -475,11 +684,83 @@
           "evaluationPeriods": {
             "value": "[parameters('WSFHttpQueueLengthEvaluationPeriods')]"
           },
-          "severity": {
-            "value": "[parameters('WSFHttpQueueLengthAlertSeverity')]"
-          },
           "effect": {
             "value": "[parameters('WSFHttpQueueLengthPolicyEffect')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_AppInsightsThrottlingLimitReached_Alert",
+        "policyDefinitionName": "Deploy_AppInsightsThrottlingLimit_Alert",
+        "parameters": {
+          "evaluationFrequency": {
+            "value": "[parameters('AppInsightsThrottlingLimitEvaluationFrequency')]"
+          },
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "autoMitigate": {
+            "value": "[parameters('AppInsightsThrottlingLimitAutoMitigate')]"
+          },
+          "windowSize": {
+            "value": "[parameters('AppInsightsThrottlingLimitWindowSize')]"
+          },
+          "enabled": {
+            "value": "[parameters('AppInsightsThrottlingLimitAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('AppInsightsThrottlingLimitSeverity')]"
+          },
+          "threshold": {
+            "value": "[parameters('AppInsightsThrottlingLimitThreshold')]"
+          },
+          "failingPeriods": {
+            "value": "[parameters('AppInsightsThrottlingLimitFailingPeriods')]"
+          },
+          "evaluationPeriods": {
+            "value": "[parameters('AppInsightsThrottlingLimitEvaluationPeriods')]"
+          },
+          "timeAggregation": {
+            "value": "[parameters('AppInsightsThrottlingLimitTimeAggregation')]"
+          },
+          "UAMIResourceId": {
+            "value": "[if(empty(parameters('BYOUserAssignedManagedIdentityResourceId')), concat('/subscriptions/', parameters('ALZManagementSubscriptionId'), '/resourceGroups/', parameters('ALZMonitorResourceGroupName'), '/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('ALZUserAssignedManagedIdentityName')),parameters('BYOUserAssignedManagedIdentityResourceId'))]"
+          },
+          "effect": {
+            "value": "[parameters('AppInsightsThrottlingLimitPolicyEffect')]"
+          },
+          "operator": {
+            "value": "[parameters('AppInsightsThrottlingLimitOperator')]"
+          }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "ALZ_activityAppInsightsDelete",
+        "policyDefinitionName": "Deploy_ActivityLog_AppInsights_Delete",
+        "parameters": {
+          "MonitorDisableTagValues": {
+            "value": "[parameters('ALZMonitorDisableTagValues')]"
+          },
+          "MonitorDisableTagName": {
+            "value": "[parameters('ALZMonitorDisableTagName')]"
+          },
+          "alertResourceGroupLocation": {
+            "value": "[parameters('ALZMonitorResourceGroupLocation')]"
+          },
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
+          },
+          "enabled": {
+            "value": "[parameters('activityAppInsightsDeleteAlertState')]"
+          },
+          "alertResourceGroupTags": {
+            "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('activityAppInsightsDeletePolicyEffect')]"
           }
         }
       }

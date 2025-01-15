@@ -43,6 +43,14 @@
         },
         "type": "Array"
       },
+      "MonitorDisableTagName": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "type": "String"
+      },
       "autoMitigate": {
         "allowedValues": [
           "true",
@@ -55,11 +63,15 @@
         },
         "type": "String"
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
         "metadata": {
-          "description": "Tag name used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag name"
+          "description": "Alert state for the alert",
+          "displayName": "Alert State"
         },
         "type": "String"
       },
@@ -81,15 +93,19 @@
         },
         "type": "String"
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "failingPeriods": {
+        "defaultValue": "2",
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
+          "description": "Number of failing periods before alert is fired",
+          "displayName": "Failing Periods"
+        },
+        "type": "String"
+      },
+      "evaluationPeriods": {
+        "defaultValue": "2",
+        "metadata": {
+          "description": "The number of aggregated lookback points.",
+          "displayName": "Evaluation Periods"
         },
         "type": "String"
       },
@@ -105,22 +121,6 @@
         "metadata": {
           "description": "Severity of the Alert",
           "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "failingPeriods": {
-        "defaultValue": "2",
-        "metadata": {
-          "description": "Number of failing periods before alert is fired",
-          "displayName": "Failing Periods"
-        },
-        "type": "String"
-      },
-      "evaluationPeriods": {
-        "defaultValue": "2",
-        "metadata": {
-          "description": "The number of aggregated lookback points.",
-          "displayName": "Evaluation Periods"
         },
         "type": "String"
       },
@@ -225,20 +225,20 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "failingPeriods": {
                   "value": "[parameters('failingPeriods')]"
                 },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -259,19 +259,19 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "windowSize": {
-                    "type": "String"
-                  },
                   "enabled": {
                     "type": "String"
                   },
-                  "severity": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "failingPeriods": {
                     "type": "String"
                   },
                   "evaluationPeriods": {
+                    "type": "String"
+                  },
+                  "severity": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -297,26 +297,29 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
                         },
                         "failingPeriods": {
                           "value": "[parameters('failingPeriods')]"
                         },
                         "evaluationPeriods": {
                           "value": "[parameters('evaluationPeriods')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
@@ -329,15 +332,12 @@
                             "name": "QosDropBitsOutPerSecond",
                             "metricNamespace": "Microsoft.Network/expressRouteCircuits",
                             "criterionType": "DynamicThresholdCriterion",
-                            "metricName": "QosDropBitsOutPerSecond",
-                            "alertSensitivity": "Medium"
+                            "alertSensitivity": "Medium",
+                            "metricName": "QosDropBitsOutPerSecond"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "apiVersion": "2018-03-01",
                     "location": "global",

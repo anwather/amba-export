@@ -40,18 +40,6 @@
         },
         "type": "Array"
       },
-      "autoMitigate": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
-        "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
       "MonitorDisableTagName": {
         "defaultValue": "MonitorDisable",
         "metadata": {
@@ -75,6 +63,18 @@
         "metadata": {
           "description": "Window size for the alert",
           "displayName": "Window Size"
+        },
+        "type": "String"
+      },
+      "autoMitigate": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "metadata": {
+          "description": "Auto Mitigate for the alert",
+          "displayName": "Auto Mitigate"
         },
         "type": "String"
       },
@@ -105,11 +105,15 @@
         },
         "type": "String"
       },
-      "failingPeriods": {
-        "defaultValue": "2",
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
         "metadata": {
-          "description": "Number of failing periods before alert is fired",
-          "displayName": "Failing Periods"
+          "description": "Effect of the policy",
+          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -121,15 +125,11 @@
         },
         "type": "String"
       },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
+      "failingPeriods": {
+        "defaultValue": "2",
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
+          "description": "Number of failing periods before alert is fired",
+          "displayName": "Failing Periods"
         },
         "type": "String"
       },
@@ -239,11 +239,11 @@
                 "evaluationFrequency": {
                   "value": "[parameters('evaluationFrequency')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
+                },
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
@@ -251,11 +251,11 @@
                 "severity": {
                   "value": "[parameters('severity')]"
                 },
-                "failingPeriods": {
-                  "value": "[parameters('failingPeriods')]"
-                },
                 "evaluationPeriods": {
                   "value": "[parameters('evaluationPeriods')]"
+                },
+                "failingPeriods": {
+                  "value": "[parameters('failingPeriods')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -276,10 +276,10 @@
                   "evaluationFrequency": {
                     "type": "String"
                   },
-                  "autoMitigate": {
+                  "windowSize": {
                     "type": "String"
                   },
-                  "windowSize": {
+                  "autoMitigate": {
                     "type": "String"
                   },
                   "enabled": {
@@ -288,10 +288,10 @@
                   "severity": {
                     "type": "String"
                   },
-                  "failingPeriods": {
+                  "evaluationPeriods": {
                     "type": "String"
                   },
-                  "evaluationPeriods": {
+                  "failingPeriods": {
                     "type": "String"
                   },
                   "resourceName": {
@@ -306,7 +306,6 @@
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -317,11 +316,11 @@
                         "evaluationFrequency": {
                           "value": "[parameters('evaluationFrequency')]"
                         },
-                        "autoMitigate": {
-                          "value": "[parameters('autoMitigate')]"
-                        },
                         "windowSize": {
                           "value": "[parameters('windowSize')]"
+                        },
+                        "autoMitigate": {
+                          "value": "[parameters('autoMitigate')]"
                         },
                         "enabled": {
                           "value": "[parameters('enabled')]"
@@ -329,18 +328,18 @@
                         "severity": {
                           "value": "[parameters('severity')]"
                         },
-                        "failingPeriods": {
-                          "value": "[parameters('failingPeriods')]"
-                        },
                         "evaluationPeriods": {
                           "value": "[parameters('evaluationPeriods')]"
+                        },
+                        "failingPeriods": {
+                          "value": "[parameters('failingPeriods')]"
                         },
                         "alertSensitivity": {
                           "value": "[parameters('alertSensitivity')]"
                         }
                       },
-                      "autoMitigate": "[parameters('autoMitigate')]",
                       "windowSize": "[parameters('windowSize')]",
+                      "autoMitigate": "[parameters('autoMitigate')]",
                       "enabled": "[parameters('enabled')]",
                       "severity": "[parameters('severity')]",
                       "criteria": {
@@ -351,10 +350,10 @@
                               "minFailingPeriodsToAlert": "[parameters('failingPeriods')]"
                             },
                             "timeAggregation": "Average",
-                            "operator": "GreaterThan",
-                            "name": "BackendLastByteResponseTime",
                             "metricNamespace": "Microsoft.Network/applicationgateways",
+                            "operator": "GreaterThan",
                             "criterionType": "DynamicThresholdCriterion",
+                            "name": "BackendLastByteResponseTime",
                             "metricName": "BackendLastByteResponseTime",
                             "alertSensitivity": "[parameters('alertSensitivity')]"
                           }
@@ -373,6 +372,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"
