@@ -1,17 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_activitylog_ServiceHealth_HealthAdvisory",
+  "name": "Deploy_activitylog_RouteTable_Routes_Delete",
   "properties": {
-    "displayName": "Deploy Service Health Advisory Alert",
-    "description": "Policy to Deploy Service Health Advisory Alert",
+    "displayName": "[Preview] Deploy Activity Log Routes Delete Alert",
+    "description": "Policy to Deploy Activity Log Route Table Routes Delete Alert",
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.3.0",
-      "category": "Monitoring",
+      "version": "1.0.0",
+      "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
@@ -70,7 +70,7 @@
           "displayName": "Resource Group Tags"
         },
         "defaultValue": {
-          "_deployed_by_amba": true
+          "Project": "amba-monitoring"
         },
         "type": "Object"
       },
@@ -83,31 +83,15 @@
           "deployIfNotExists",
           "disabled"
         ],
-        "defaultValue": "disabled",
+        "defaultValue": "deployIfNotExists",
         "type": "String"
-      },
-      "ALZMonitorActionGroupEmail": {
-        "metadata": {
-          "description": "Email addresses to send alerts to",
-          "displayName": "Action Group Email Addresses"
-        },
-        "defaultValue": [],
-        "type": "Array"
-      },
-      "BYOActionGroup": {
-        "metadata": {
-          "description": "The Resource IDs of existing Action Groups currently deployed in the environment.",
-          "displayName": "Customer defined Action Group Resource IDs"
-        },
-        "defaultValue": [],
-        "type": "array"
       }
     },
     "policyRule": {
       "if": {
         "allOf": [
           {
-            "equals": "Microsoft.Resources/subscriptions",
+            "equals": "Microsoft.Network/routeTables",
             "field": "type"
           },
           {
@@ -127,44 +111,6 @@
                 "field": "Microsoft.Insights/ActivityLogAlerts/enabled"
               },
               {
-                "anyOf": [
-                  {
-                    "allOf": [
-                      {
-                        "value": "[empty(parameters('BYOActionGroup'))]",
-                        "equals": true
-                      },
-                      {
-                        "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
-                        "contains": "ag-AMBA-SH-"
-                      }
-                    ]
-                  },
-                  {
-                    "allOf": [
-                      {
-                        "value": "[empty(parameters('BYOActionGroup'))]",
-                        "equals": false
-                      },
-                      {
-                        "count": {
-                          "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*]",
-                          "where": {
-                            "anyOf": [
-                              {
-                                "field": "Microsoft.Insights/ActivityLogAlerts/actions.actionGroups[*].actionGroupId",
-                                "in": "[parameters('BYOActionGroup')]"
-                              }
-                            ]
-                          }
-                        },
-                        "greaterOrEquals": 1
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
                 "equals": 2,
                 "count": {
                   "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*]",
@@ -177,7 +123,7 @@
                             "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "equals": "ServiceHealth",
+                            "equals": "Administrative",
                             "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
@@ -185,12 +131,12 @@
                       {
                         "allOf": [
                           {
-                            "equals": "properties.incidentType",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].field"
+                            "equals": "operationName",
+                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "equals": "ActionRequired",
-                            "field": "Microsoft.Insights/ActivityLogAlerts/condition.allOf[*].equals"
+                            "equals": "Microsoft.Network/routeTables/routes/delete",
+                            "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
                       }
@@ -203,6 +149,7 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
+          "name": "ActivityUDRRoutesDelete",
           "deployment": {
             "properties": {
               "parameters": {
@@ -217,12 +164,6 @@
                 },
                 "alertResourceGroupTags": {
                   "value": "[parameters('alertResourceGroupTags')]"
-                },
-                "ALZMonitorActionGroupEmail": {
-                  "value": "[parameters('ALZMonitorActionGroupEmail')]"
-                },
-                "BYOActionGroup": {
-                  "value": "[parameters('BYOActionGroup')]"
                 }
               },
               "mode": "incremental",
@@ -239,27 +180,10 @@
                   },
                   "alertResourceGroupTags": {
                     "type": "object"
-                  },
-                  "ALZMonitorActionGroupEmail": {
-                    "type": "Array"
-                  },
-                  "BYOActionGroup": {
-                    "type": "array"
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {
-                  "copy": [
-                    {
-                      "name": "varActionGroupIds",
-                      "mode": "serial",
-                      "count": "[length(parameters('BYOActionGroup'))]",
-                      "input": {
-                        "actionGroupId": "[trim(parameters('BYOActionGroup')[copyIndex('varActionGroupIds')])]"
-                      }
-                    }
-                  ]
-                },
+                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Resources/resourceGroups",
@@ -278,12 +202,6 @@
                         },
                         "alertResourceGroupName": {
                           "value": "[parameters('alertResourceGroupName')]"
-                        },
-                        "ALZMonitorActionGroupEmail": {
-                          "value": "[parameters('ALZMonitorActionGroupEmail')]"
-                        },
-                        "BYOActionGroup": {
-                          "value": "[parameters('BYOActionGroup')]"
                         }
                       },
                       "mode": "Incremental",
@@ -294,12 +212,6 @@
                           },
                           "alertResourceGroupName": {
                             "type": "string"
-                          },
-                          "ALZMonitorActionGroupEmail": {
-                            "type": "Array"
-                          },
-                          "BYOActionGroup": {
-                            "type": "array"
                           }
                         },
                         "contentVersion": "1.0.0.0",
@@ -308,7 +220,7 @@
                           {
                             "type": "microsoft.insights/activityLogAlerts",
                             "properties": {
-                              "description": "Service Health Advisory Alert",
+                              "description": "Activity Log Route table Routes Delete",
                               "parameters": {
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
@@ -321,87 +233,48 @@
                               "condition": {
                                 "allOf": [
                                   {
-                                    "equals": "ServiceHealth",
+                                    "equals": "Administrative",
                                     "field": "category"
                                   },
                                   {
-                                    "equals": "ActionRequired",
-                                    "field": "properties.incidentType"
-                                  }
-                                ]
-                              },
-                              "actions": {
-                                "actionGroups": [
+                                    "equals": "Microsoft.Network/routeTables/routes/delete",
+                                    "field": "operationName"
+                                  },
                                   {
-                                    "actionGroupId": "[concat(subscription().Id, '/resourceGroups/', parameters('alertResourceGroupName'), '/providers/microsoft.insights/actionGroups/', 'ag-AMBA-SH-', subscription().displayName, '-001')]"
+                                    "field": "status",
+                                    "containsAny": [
+                                      "succeeded"
+                                    ]
                                   }
                                 ]
                               }
                             },
                             "apiVersion": "2020-10-01",
-                            "location": "Global",
-                            "name": "ServiceHealthAdvisoryEvent",
+                            "location": "global",
+                            "name": "ActivityUDRRoutesDelete",
                             "tags": {
                               "_deployed_by_amba": true
-                            },
-                            "condition": "[empty(parameters('BYOActionGroup'))]"
-                          },
-                          {
-                            "type": "microsoft.insights/activityLogAlerts",
-                            "properties": {
-                              "description": "Service Health Advisory Alert",
-                              "parameters": {
-                                "enabled": {
-                                  "value": "[parameters('enabled')]"
-                                }
-                              },
-                              "enabled": "[parameters('enabled')]",
-                              "scopes": [
-                                "[subscription().id]"
-                              ],
-                              "condition": {
-                                "allOf": [
-                                  {
-                                    "equals": "ServiceHealth",
-                                    "field": "category"
-                                  },
-                                  {
-                                    "equals": "ActionRequired",
-                                    "field": "properties.incidentType"
-                                  }
-                                ]
-                              },
-                              "actions": {
-                                "actionGroups": "[variables('varActionGroupIds')]"
-                              }
-                            },
-                            "apiVersion": "2020-10-01",
-                            "location": "Global",
-                            "name": "ServiceHealthAdvisoryEvent",
-                            "tags": {
-                              "_deployed_by_amba": true
-                            },
-                            "condition": "[not(empty(parameters('BYOActionGroup')))]"
+                            }
                           }
                         ],
                         "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
                       }
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ServiceHealthHealth",
+                    "name": "ActivityUDRRoutesDelete",
                     "dependsOn": [
-                      "[resourceId('Microsoft.Resources/resourceGroups', parameters('alertResourceGroupName'))]"
+                      "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
                   }
                 ],
-                "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#"
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               }
             },
             "location": "australiaeast"
           },
           "resourceGroupName": "[parameters('alertResourceGroupName')]",
           "deploymentScope": "subscription",
-          "existenceScope": "resourceGroup"
+          "existenceScope": "resourcegroup"
         }
       }
     }
