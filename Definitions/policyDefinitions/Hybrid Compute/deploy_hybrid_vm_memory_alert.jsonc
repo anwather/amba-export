@@ -3,14 +3,14 @@
   "name": "Deploy_Hybrid_VM_Memory_Alert",
   "properties": {
     "displayName": "Deploy Hybrid VM Memory Alert",
-    "description": "Policy to audit/deploy VM Memory Alert",
+    "description": "Policy to audit/deploy Hybrid VM Memory Alert",
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.3.0",
+      "version": "1.4.0",
       "category": "Hybrid Compute",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
@@ -42,6 +42,14 @@
         },
         "type": "Array"
       },
+      "MonitorDisableTagName": {
+        "defaultValue": "MonitorDisable",
+        "metadata": {
+          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
+          "displayName": "ALZ Monitoring disabled tag name"
+        },
+        "type": "String"
+      },
       "autoMitigate": {
         "allowedValues": [
           "true",
@@ -51,22 +59,6 @@
         "metadata": {
           "description": "Auto Mitigate for the alert",
           "displayName": "Auto Mitigate"
-        },
-        "type": "String"
-      },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
-        "metadata": {
-          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "type": "String"
-      },
-      "alertResourceGroupLocation": {
-        "defaultValue": "centralus",
-        "metadata": {
-          "description": "Location of the Resource group the alert is placed in",
-          "displayName": "Resource Group Location"
         },
         "type": "String"
       },
@@ -87,11 +79,11 @@
         },
         "type": "String"
       },
-      "alertResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
+      "alertResourceGroupLocation": {
+        "defaultValue": "centralus",
         "metadata": {
-          "description": "Resource group the alert is placed in",
-          "displayName": "Resource Group Name"
+          "description": "Location of the Resource group the alert is placed in",
+          "displayName": "Resource Group Location"
         },
         "type": "String"
       },
@@ -104,6 +96,14 @@
         "metadata": {
           "description": "Alert state for the alert",
           "displayName": "Alert State"
+        },
+        "type": "String"
+      },
+      "alertResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
+        "metadata": {
+          "description": "Resource group the alert is placed in",
+          "displayName": "Resource Group Name"
         },
         "type": "String"
       },
@@ -166,6 +166,18 @@
         },
         "type": "String"
       },
+      "effect": {
+        "allowedValues": [
+          "deployIfNotExists",
+          "disabled"
+        ],
+        "defaultValue": "deployIfNotExists",
+        "metadata": {
+          "description": "Effect of the policy",
+          "displayName": "Effect"
+        },
+        "type": "String"
+      },
       "UAMIResourceId": {
         "defaultValue": "",
         "metadata": {
@@ -181,18 +193,6 @@
         "defaultValue": "GreaterThan",
         "metadata": {
           "displayName": "Operator"
-        },
-        "type": "String"
-      },
-      "effect": {
-        "allowedValues": [
-          "deployIfNotExists",
-          "disabled"
-        ],
-        "defaultValue": "deployIfNotExists",
-        "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
         },
         "type": "String"
       },
@@ -281,7 +281,7 @@
                 "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].failingPeriods.minFailingPeriodsToAlert"
               },
               {
-                "equals": "[format('let policyThresholdString = \"{2}\"; let excludedResources = (arg(\"\").resources | where type =~ \"Microsoft.HybridCompute/machines\" | project _ResourceId = id, tags | where parse_json(tostring(tags.[\"{0}\"])) in~ (\"{1}\")); let overridenResource = (arg(\"\").resources | where type == \"microsoft.hybridcompute/machines\" | project _ResourceId = tolower(id), tags | where tags contains \"_amba-AvailableMemoryPercentage-threshold-Override_\"); InsightsMetrics | where _ResourceId has \"Microsoft.HybridCompute/machines\" | where _ResourceId !in~ (excludedResources) | where Origin == \"vm.azm.ms\" | where Namespace == \"Memory\" and Name == \"AvailableMB\" | extend TotalMemory = toreal(todynamic(Tags)[\"vm.azm.ms/memorySizeMB\"]) | extend AvailableMemoryPercentage = (toreal(Val) / TotalMemory) * 100.0 | summarize AggregatedValue = avg(AvailableMemoryPercentage) by bin(TimeGenerated, 15m), Computer, _ResourceId | join hint.remote=left kind=leftouter overridenResource on _ResourceId | project-away _ResourceId1 | extend appliedThresholdString = iif(tags contains \"_amba-AvailableMemoryPercentage-threshold-Override_\", tostring(tags.[\"_amba-AvailableMemoryPercentage-threshold-Override_\"]), policyThresholdString) | extend appliedThreshold = toint(appliedThresholdString) | where AggregatedValue < appliedThreshold | project TimeGenerated, Computer, _ResourceId, AggregatedValue', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), parameters('threshold'))]",
+                "equals": "[format('let policyThresholdString = \"{0}\"; let resourceTagging = (arg(\"\").resources | where type =~ \"Microsoft.HybridCompute/machines\" | where tags.[\"{1}\"] !in~ (\"{2}\") | project _ResourceId = tolower(id), resourceTags = tags); InsightsMetrics | where _ResourceId has \"Microsoft.HybridCompute/machines\" | where Origin == \"vm.azm.ms\" | where Namespace == \"Memory\" and Name == \"AvailableMB\" | extend TotalMemory = toreal(todynamic(Tags)[\"vm.azm.ms/memorySizeMB\"]) | extend AvailableMemoryPercentage = (toreal(Val) / TotalMemory) * 100.0 | summarize AggregatedValue = avg(AvailableMemoryPercentage) by bin(TimeGenerated, 15m), Computer, _ResourceId | join hint.remote=left kind=inner (resourceTagging ) on _ResourceId | project-away _ResourceId1 | extend newThresholdString = tostring(resourceTags.[\"{3}\"]) | extend appliedThreshold = iif(isempty(newThresholdString), toint(policyThresholdString), toint(newThresholdString)) | where AggregatedValue < appliedThreshold | project TimeGenerated, Computer, _ResourceId, AggregatedValue, appliedThreshold', parameters('threshold'), parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), '_amba-AvailableMemoryPercentage-threshold-Override_')]",
                 "field": "Microsoft.Insights/scheduledQueryRules/criteria.allOf[*].query"
               },
               {
@@ -302,23 +302,23 @@
                 "MonitorDisableTagValues": {
                   "value": "[parameters('MonitorDisableTagValues')]"
                 },
-                "autoMitigate": {
-                  "value": "[parameters('autoMitigate')]"
-                },
                 "MonitorDisableTagName": {
                   "value": "[parameters('MonitorDisableTagName')]"
                 },
-                "alertResourceGroupLocation": {
-                  "value": "[parameters('alertResourceGroupLocation')]"
+                "autoMitigate": {
+                  "value": "[parameters('autoMitigate')]"
                 },
                 "windowSize": {
                   "value": "[parameters('windowSize')]"
                 },
-                "alertResourceGroupName": {
-                  "value": "[parameters('alertResourceGroupName')]"
+                "alertResourceGroupLocation": {
+                  "value": "[parameters('alertResourceGroupLocation')]"
                 },
                 "enabled": {
                   "value": "[parameters('enabled')]"
+                },
+                "alertResourceGroupName": {
+                  "value": "[parameters('alertResourceGroupName')]"
                 },
                 "severity": {
                   "value": "[parameters('severity')]"
@@ -359,23 +359,23 @@
                   "MonitorDisableTagValues": {
                     "type": "Array"
                   },
+                  "MonitorDisableTagName": {
+                    "type": "String"
+                  },
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "MonitorDisableTagName": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "alertResourceGroupLocation": {
                     "type": "string"
                   },
-                  "windowSize": {
+                  "enabled": {
                     "type": "String"
                   },
                   "alertResourceGroupName": {
                     "type": "string"
-                  },
-                  "enabled": {
-                    "type": "String"
                   },
                   "severity": {
                     "type": "String"
@@ -426,11 +426,11 @@
                         "alertResourceGroupLocation": {
                           "value": "[parameters('alertResourceGroupLocation')]"
                         },
-                        "alertResourceGroupName": {
-                          "value": "[parameters('alertResourceGroupName')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
+                        },
+                        "alertResourceGroupName": {
+                          "value": "[parameters('alertResourceGroupName')]"
                         },
                         "UAMIResourceId": {
                           "value": "[parameters('UAMIResourceId')]"
@@ -441,10 +441,10 @@
                           "alertResourceGroupLocation": {
                             "type": "string"
                           },
-                          "alertResourceGroupName": {
+                          "enabled": {
                             "type": "string"
                           },
-                          "enabled": {
+                          "alertResourceGroupName": {
                             "type": "string"
                           },
                           "UAMIResourceId": {
@@ -467,23 +467,23 @@
                                 "MonitorDisableTagValues": {
                                   "value": "[parameters('MonitorDisableTagValues')]"
                                 },
-                                "autoMitigate": {
-                                  "value": "[parameters('autoMitigate')]"
-                                },
                                 "MonitorDisableTagName": {
                                   "value": "[parameters('MonitorDisableTagName')]"
                                 },
-                                "alertResourceGroupLocation": {
-                                  "value": "[parameters('alertResourceGroupLocation')]"
+                                "autoMitigate": {
+                                  "value": "[parameters('autoMitigate')]"
                                 },
                                 "windowSize": {
                                   "value": "[parameters('windowSize')]"
                                 },
-                                "alertResourceGroupName": {
-                                  "value": "[parameters('alertResourceGroupName')]"
+                                "alertResourceGroupLocation": {
+                                  "value": "[parameters('alertResourceGroupLocation')]"
                                 },
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
+                                },
+                                "alertResourceGroupName": {
+                                  "value": "[parameters('alertResourceGroupName')]"
                                 },
                                 "severity": {
                                   "value": "[parameters('severity')]"
@@ -531,7 +531,7 @@
                                         ]
                                       }
                                     ],
-                                    "query": "[format('let policyThresholdString = \"{2}\"; let excludedResources = (arg(\"\").resources | where type =~ \"Microsoft.HybridCompute/machines\" | project _ResourceId = id, tags | where parse_json(tostring(tags.[\"{0}\"])) in~ (\"{1}\")); let overridenResource = (arg(\"\").resources | where type == \"microsoft.hybridcompute/machines\" | project _ResourceId = tolower(id), tags | where tags contains \"_amba-AvailableMemoryPercentage-threshold-Override_\"); InsightsMetrics | where _ResourceId has \"Microsoft.HybridCompute/machines\" | where _ResourceId !in~ (excludedResources) | where Origin == \"vm.azm.ms\" | where Namespace == \"Memory\" and Name == \"AvailableMB\" | extend TotalMemory = toreal(todynamic(Tags)[\"vm.azm.ms/memorySizeMB\"]) | extend AvailableMemoryPercentage = (toreal(Val) / TotalMemory) * 100.0 | summarize AggregatedValue = avg(AvailableMemoryPercentage) by bin(TimeGenerated, 15m), Computer, _ResourceId | join hint.remote=left kind=leftouter overridenResource on _ResourceId | project-away _ResourceId1 | extend appliedThresholdString = iif(tags contains \"_amba-AvailableMemoryPercentage-threshold-Override_\", tostring(tags.[\"_amba-AvailableMemoryPercentage-threshold-Override_\"]), policyThresholdString) | extend appliedThreshold = toint(appliedThresholdString) | where AggregatedValue < appliedThreshold | project TimeGenerated, Computer, _ResourceId, AggregatedValue', parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), parameters('threshold'))]"
+                                    "query": "[format('let policyThresholdString = \"{0}\"; let resourceTagging = (arg(\"\").resources | where type =~ \"Microsoft.HybridCompute/machines\" | where tags.[\"{1}\"] !in~ (\"{2}\") | project _ResourceId = tolower(id), resourceTags = tags); InsightsMetrics | where _ResourceId has \"Microsoft.HybridCompute/machines\" | where Origin == \"vm.azm.ms\" | where Namespace == \"Memory\" and Name == \"AvailableMB\" | extend TotalMemory = toreal(todynamic(Tags)[\"vm.azm.ms/memorySizeMB\"]) | extend AvailableMemoryPercentage = (toreal(Val) / TotalMemory) * 100.0 | summarize AggregatedValue = avg(AvailableMemoryPercentage) by bin(TimeGenerated, 15m), Computer, _ResourceId | join hint.remote=left kind=inner (resourceTagging ) on _ResourceId | project-away _ResourceId1 | extend newThresholdString = tostring(resourceTags.[\"{3}\"]) | extend appliedThreshold = iif(isempty(newThresholdString), toint(policyThresholdString), toint(newThresholdString)) | where AggregatedValue < appliedThreshold | project TimeGenerated, Computer, _ResourceId, AggregatedValue, appliedThreshold', parameters('threshold'), parameters('MonitorDisableTagName'), join(parameters('MonitorDisableTagValues'), '\",\"'), '_amba-AvailableMemoryPercentage-threshold-Override_')]"
                                   }
                                 ]
                               },
