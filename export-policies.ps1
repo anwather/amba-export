@@ -28,7 +28,7 @@ $gs | Out-File ./Definitions/global-settings.jsonc -Verbose
 
 git clone https://github.com/Azure/azure-monitor-baseline-alerts.git tmp
 
-Copy-Item "./tmp/patterns/alz/scripts/Old scripts/Start-AMBACleanup.ps1" ./assets/Start-AMBACleanup.ps1 -Verbose
+Copy-Item "./tmp/patterns/alz/scripts/old-scripts/Start-AMBACleanup.ps1" ./assets/Start-AMBACleanup.ps1 -Verbose
 
 $pseudoRootManagementGroup = "amba"
 
