@@ -24,11 +24,11 @@
           "PT1H"
         ],
         "defaultValue": "PT1M",
+        "type": "String",
         "metadata": {
-          "description": "Evaluation frequency for the alert",
-          "displayName": "Evaluation Frequency"
-        },
-        "type": "String"
+          "displayName": "Evaluation Frequency",
+          "description": "Evaluation frequency for the alert"
+        }
       },
       "MonitorDisableTagValues": {
         "defaultValue": [
@@ -37,11 +37,19 @@
           "Dev",
           "Sandbox"
         ],
+        "type": "Array",
         "metadata": {
-          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled.",
-          "displayName": "ALZ Monitoring disabled tag values(s)"
-        },
-        "type": "Array"
+          "displayName": "ALZ Monitoring disabled tag values(s)",
+          "description": "Tag value(s) used to disable monitoring at the resource level. Set to true if monitoring should be disabled."
+        }
+      },
+      "MonitorDisableTagName": {
+        "defaultValue": "MonitorDisable",
+        "type": "String",
+        "metadata": {
+          "displayName": "ALZ Monitoring disabled tag name",
+          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled"
+        }
       },
       "autoMitigate": {
         "allowedValues": [
@@ -49,19 +57,23 @@
           "false"
         ],
         "defaultValue": "true",
+        "type": "String",
         "metadata": {
-          "description": "Auto Mitigate for the alert",
-          "displayName": "Auto Mitigate"
-        },
-        "type": "String"
+          "displayName": "Auto Mitigate",
+          "description": "Auto Mitigate for the alert"
+        }
       },
-      "MonitorDisableTagName": {
-        "defaultValue": "MonitorDisable",
+      "enabled": {
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true",
+        "type": "String",
         "metadata": {
-          "description": "Tag name to disable monitoring. Set to true if monitoring should be disabled",
-          "displayName": "ALZ Monitoring disabled tag name"
-        },
-        "type": "String"
+          "displayName": "Alert State",
+          "description": "Alert state for the alert"
+        }
       },
       "windowSize": {
         "allowedValues": [
@@ -75,23 +87,19 @@
           "P1D"
         ],
         "defaultValue": "PT5M",
+        "type": "String",
         "metadata": {
-          "description": "Window size for the alert",
-          "displayName": "Window Size"
-        },
-        "type": "String"
+          "displayName": "Window Size",
+          "description": "Window size for the alert"
+        }
       },
-      "enabled": {
-        "allowedValues": [
-          "true",
-          "false"
-        ],
-        "defaultValue": "true",
+      "threshold": {
+        "defaultValue": "0",
+        "type": "String",
         "metadata": {
-          "description": "Alert state for the alert",
-          "displayName": "Alert State"
-        },
-        "type": "String"
+          "displayName": "Threshold",
+          "description": "Threshold for the alert"
+        }
       },
       "severity": {
         "allowedValues": [
@@ -102,19 +110,11 @@
           "4"
         ],
         "defaultValue": "2",
+        "type": "String",
         "metadata": {
-          "description": "Severity of the Alert",
-          "displayName": "Severity"
-        },
-        "type": "String"
-      },
-      "threshold": {
-        "defaultValue": "0",
-        "metadata": {
-          "description": "Threshold for the alert",
-          "displayName": "Threshold"
-        },
-        "type": "String"
+          "displayName": "Severity",
+          "description": "Severity of the Alert"
+        }
       },
       "effect": {
         "allowedValues": [
@@ -122,11 +122,11 @@
           "disabled"
         ],
         "defaultValue": "deployIfNotExists",
+        "type": "String",
         "metadata": {
-          "description": "Effect of the policy",
-          "displayName": "Effect"
-        },
-        "type": "String"
+          "displayName": "Effect",
+          "description": "Effect of the policy"
+        }
       }
     },
     "policyRule": {
@@ -209,17 +209,17 @@
                 "autoMitigate": {
                   "value": "[parameters('autoMitigate')]"
                 },
-                "windowSize": {
-                  "value": "[parameters('windowSize')]"
-                },
                 "enabled": {
                   "value": "[parameters('enabled')]"
                 },
-                "severity": {
-                  "value": "[parameters('severity')]"
+                "windowSize": {
+                  "value": "[parameters('windowSize')]"
                 },
                 "threshold": {
                   "value": "[if(contains(field('tags'), '_amba-TotalJob-threshold-Override_'), field('tags._amba-TotalJob-threshold-Override_'), parameters('threshold'))]"
+                },
+                "severity": {
+                  "value": "[parameters('severity')]"
                 },
                 "resourceName": {
                   "value": "[field('name')]"
@@ -228,11 +228,11 @@
               "template": {
                 "parameters": {
                   "resourceId": {
+                    "type": "String",
                     "metadata": {
-                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison",
-                      "displayName": "resourceId"
-                    },
-                    "type": "String"
+                      "displayName": "resourceId",
+                      "description": "Resource ID of the resource emitting the metric that will be used for the comparison"
+                    }
                   },
                   "evaluationFrequency": {
                     "type": "String"
@@ -240,28 +240,27 @@
                   "autoMitigate": {
                     "type": "String"
                   },
-                  "windowSize": {
-                    "type": "String"
-                  },
                   "enabled": {
                     "type": "String"
                   },
-                  "severity": {
+                  "windowSize": {
                     "type": "String"
                   },
                   "threshold": {
                     "type": "String"
                   },
-                  "resourceName": {
-                    "metadata": {
-                      "description": "Name of the resource",
-                      "displayName": "resourceName"
-                    },
+                  "severity": {
                     "type": "String"
+                  },
+                  "resourceName": {
+                    "type": "String",
+                    "metadata": {
+                      "displayName": "resourceName",
+                      "description": "Name of the resource"
+                    }
                   }
                 },
                 "contentVersion": "1.0.0.0",
-                "variables": {},
                 "resources": [
                   {
                     "type": "Microsoft.Insights/metricAlerts",
@@ -275,33 +274,33 @@
                         "autoMitigate": {
                           "value": "[parameters('autoMitigate')]"
                         },
-                        "windowSize": {
-                          "value": "[parameters('windowSize')]"
-                        },
                         "enabled": {
                           "value": "[parameters('enabled')]"
                         },
-                        "severity": {
-                          "value": "[parameters('severity')]"
+                        "windowSize": {
+                          "value": "[parameters('windowSize')]"
                         },
                         "threshold": {
                           "value": "[parameters('threshold')]"
+                        },
+                        "severity": {
+                          "value": "[parameters('severity')]"
                         }
                       },
                       "autoMitigate": "[parameters('autoMitigate')]",
-                      "windowSize": "[parameters('windowSize')]",
                       "enabled": "[parameters('enabled')]",
+                      "windowSize": "[parameters('windowSize')]",
                       "severity": "[parameters('severity')]",
+                      "scopes": [
+                        "[parameters('resourceId')]"
+                      ],
                       "criteria": {
                         "allOf": [
                           {
-                            "threshold": "[parameters('threshold')]",
                             "timeAggregation": "Average",
+                            "threshold": "[parameters('threshold')]",
                             "operator": "GreaterThan",
                             "name": "TotalJob",
-                            "metricNamespace": "Microsoft.Automation/automationAccounts",
-                            "criterionType": "StaticThresholdCriterion",
-                            "metricName": "TotalJob",
                             "dimensions": [
                               {
                                 "operator": "Exclude",
@@ -310,14 +309,14 @@
                                   "Completed"
                                 ]
                               }
-                            ]
+                            ],
+                            "metricNamespace": "Microsoft.Automation/automationAccounts",
+                            "metricName": "TotalJob",
+                            "criterionType": "StaticThresholdCriterion"
                           }
                         ],
                         "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-                      },
-                      "scopes": [
-                        "[parameters('resourceId')]"
-                      ]
+                      }
                     },
                     "apiVersion": "2018-03-01",
                     "location": "global",
@@ -327,6 +326,7 @@
                     }
                   }
                 ],
+                "variables": {},
                 "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
               },
               "mode": "incremental"

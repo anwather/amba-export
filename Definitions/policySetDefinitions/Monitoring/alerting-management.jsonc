@@ -6,14 +6,22 @@
     "description": "Initiative to deploy AMBA alerts relevant to the ALZ Management management group",
     "metadata": {
       "_deployed_by_amba": true,
-      "version": "1.3.1",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
+      "version": "1.3.1",
       "category": "Monitoring",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
+      "ALZMonitorResourceGroupName": {
+        "defaultValue": "rg-amba-monitoring-001",
+        "metadata": {
+          "description": "Name of the resource group to deploy the ALZ monitoring resources to",
+          "displayName": "ALZ Monitoring Resource Group Name"
+        },
+        "type": "String"
+      },
       "ALZMonitorResourceGroupLocation": {
         "defaultValue": "centralus",
         "metadata": {
@@ -31,14 +39,6 @@
           "displayName": "ALZ Monitoring Resource Group Tags"
         },
         "type": "Object"
-      },
-      "ALZMonitorResourceGroupName": {
-        "defaultValue": "rg-amba-monitoring-001",
-        "metadata": {
-          "description": "Name of the resource group to deploy the ALZ monitoring resources to",
-          "displayName": "ALZ Monitoring Resource Group Name"
-        },
-        "type": "String"
       },
       "ALZMonitorDisableTagValues": {
         "defaultValue": [
@@ -193,6 +193,19 @@
         },
         "type": "string"
       },
+      "RVASRHealthMonitorPolicyEffect": {
+        "allowedValues": [
+          "modify",
+          "audit",
+          "disabled"
+        ],
+        "defaultValue": "modify",
+        "metadata": {
+          "description": "Policy effect for the alert, modify will modify the alert if it exists, or audit if it does not exist",
+          "displayName": "Recovery Vault ASR Health Monitor Policy Effect"
+        },
+        "type": "string"
+      },
       "AATotalJobAlertSeverity": {
         "allowedValues": [
           "0",
@@ -266,19 +279,6 @@
         "metadata": {
           "description": "Threshold for the alert",
           "displayName": "AA Total Job Alert Threshold"
-        },
-        "type": "string"
-      },
-      "RVASRHealthMonitorPolicyEffect": {
-        "allowedValues": [
-          "modify",
-          "audit",
-          "disabled"
-        ],
-        "defaultValue": "modify",
-        "metadata": {
-          "description": "Policy effect for the alert, modify will modify the alert if it exists, or audit if it does not exist",
-          "displayName": "Recovery Vault ASR Health Monitor Policy Effect"
         },
         "type": "string"
       },
@@ -474,17 +474,17 @@
           "enabled": {
             "value": "[parameters('activityLAWDeleteAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('activityLAWDeletePolicyEffect')]"
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('activityLAWDeletePolicyEffect')]"
           }
         }
       },
@@ -501,17 +501,17 @@
           "enabled": {
             "value": "[parameters('activityLAWKeyRegenAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('activityLAWKeyRegenPolicyEffect')]"
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('activityLAWKeyRegenPolicyEffect')]"
           }
         }
       },
@@ -522,23 +522,23 @@
           "evaluationFrequency": {
             "value": "[parameters('LAWDailyCapLimitEvaluationFrequency')]"
           },
-          "windowSize": {
-            "value": "[parameters('LAWDailyCapLimitWindowSize')]"
-          },
-          "autoMitigate": {
-            "value": "[parameters('LAWDailyCapLimitAutoMitigate')]"
-          },
           "MonitorDisableTagValues": {
             "value": "[parameters('ALZMonitorDisableTagValues')]"
           },
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "severity": {
-            "value": "[parameters('LAWDailyCapLimitSeverity')]"
+          "windowSize": {
+            "value": "[parameters('LAWDailyCapLimitWindowSize')]"
+          },
+          "autoMitigate": {
+            "value": "[parameters('LAWDailyCapLimitAutoMitigate')]"
           },
           "enabled": {
             "value": "[parameters('LAWDailyCapLimitAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('LAWDailyCapLimitSeverity')]"
           },
           "threshold": {
             "value": "[parameters('LAWDailyCapLimitThreshold')]"
@@ -570,20 +570,20 @@
           "evaluationFrequency": {
             "value": "[parameters('AATotalJobAlertEvaluationFrequency')]"
           },
-          "windowSize": {
-            "value": "[parameters('AATotalJobAlertWindowSize')]"
-          },
           "MonitorDisableTagValues": {
             "value": "[parameters('ALZMonitorDisableTagValues')]"
           },
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "severity": {
-            "value": "[parameters('AATotalJobAlertSeverity')]"
+          "windowSize": {
+            "value": "[parameters('AATotalJobAlertWindowSize')]"
           },
           "enabled": {
             "value": "[parameters('AATotalJobAlertAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('AATotalJobAlertSeverity')]"
           },
           "threshold": {
             "value": "[parameters('AATotalJobAlertThreshold')]"
@@ -630,20 +630,20 @@
           "evaluationFrequency": {
             "value": "[parameters('StorageAccountAvailabilityFrequency')]"
           },
-          "windowSize": {
-            "value": "[parameters('StorageAccountAvailabilityWindowSize')]"
-          },
           "MonitorDisableTagValues": {
             "value": "[parameters('ALZMonitorDisableTagValues')]"
           },
           "MonitorDisableTagName": {
             "value": "[parameters('ALZMonitorDisableTagName')]"
           },
-          "severity": {
-            "value": "[parameters('StorageAccountAvailabilityAlertSeverity')]"
+          "windowSize": {
+            "value": "[parameters('StorageAccountAvailabilityWindowSize')]"
           },
           "enabled": {
             "value": "[parameters('StorageAccountAvailabilityAlertState')]"
+          },
+          "severity": {
+            "value": "[parameters('StorageAccountAvailabilityAlertSeverity')]"
           },
           "threshold": {
             "value": "[parameters('StorageAccountAvailabilityThreshold')]"
@@ -666,17 +666,17 @@
           "enabled": {
             "value": "[parameters('StorageAccountDeleteAlertState')]"
           },
-          "effect": {
-            "value": "[parameters('StorageAccountDeletePolicyEffect')]"
+          "alertResourceGroupName": {
+            "value": "[parameters('ALZMonitorResourceGroupName')]"
           },
           "alertResourceGroupLocation": {
             "value": "[parameters('ALZMonitorResourceGroupLocation')]"
           },
-          "alertResourceGroupName": {
-            "value": "[parameters('ALZMonitorResourceGroupName')]"
-          },
           "alertResourceGroupTags": {
             "value": "[parameters('ALZMonitorResourceGroupTags')]"
+          },
+          "effect": {
+            "value": "[parameters('StorageAccountDeletePolicyEffect')]"
           }
         }
       }

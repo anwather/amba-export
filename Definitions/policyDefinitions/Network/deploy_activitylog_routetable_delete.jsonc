@@ -1,17 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-  "name": "Deploy_activitylog_KeyVault_Delete",
+  "name": "Deploy_activitylog_RouteTable_Delete",
   "properties": {
-    "displayName": "Deploy Activity Log Key Vault Delete Alert",
-    "description": "Policy to Deploy Activity Log Key Vault Delete Alert",
+    "displayName": "[Preview] Deploy Activity Log Route Table Delete Alert",
+    "description": "Policy to Deploy Activity Log Route Table Delete Alert",
     "mode": "All",
     "metadata": {
       "_deployed_by_amba": "True",
       "alzCloudEnvironments": [
         "AzureCloud"
       ],
-      "version": "1.1.0",
-      "category": "Key Vault",
+      "version": "1.0.0",
+      "category": "Network",
       "source": "https://github.com/Azure/azure-monitor-baseline-alerts/"
     },
     "parameters": {
@@ -66,7 +66,7 @@
       },
       "alertResourceGroupTags": {
         "defaultValue": {
-          "_deployed_by_amba": true
+          "Project": "amba-monitoring"
         },
         "metadata": {
           "description": "Tags on the Resource group the alert is placed in",
@@ -91,7 +91,7 @@
       "if": {
         "allOf": [
           {
-            "equals": "microsoft.keyvault/vaults",
+            "equals": "Microsoft.Network/routeTables",
             "field": "type"
           },
           {
@@ -135,7 +135,7 @@
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].field"
                           },
                           {
-                            "equals": "Microsoft.KeyVault/vaults/delete",
+                            "equals": "Microsoft.Network/routeTables/delete",
                             "field": "microsoft.insights/activityLogAlerts/condition.allOf[*].equals"
                           }
                         ]
@@ -149,7 +149,7 @@
           "roleDefinitionIds": [
             "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
           ],
-          "name": "ActivityKeyVaultDelete",
+          "name": "ActivityUDRDelete",
           "deployment": {
             "properties": {
               "parameters": {
@@ -218,7 +218,7 @@
                           {
                             "type": "microsoft.insights/activityLogAlerts",
                             "properties": {
-                              "description": "Activity Log Key Vault Delete",
+                              "description": "Activity Log Route table Delete",
                               "parameters": {
                                 "enabled": {
                                   "value": "[parameters('enabled')]"
@@ -235,7 +235,7 @@
                                     "field": "category"
                                   },
                                   {
-                                    "equals": "Microsoft.KeyVault/vaults/delete",
+                                    "equals": "Microsoft.Network/routeTables/delete",
                                     "field": "operationName"
                                   },
                                   {
@@ -249,7 +249,7 @@
                             },
                             "apiVersion": "2020-10-01",
                             "location": "global",
-                            "name": "ActivityKeyVaultDelete",
+                            "name": "ActivityUDRDelete",
                             "tags": {
                               "_deployed_by_amba": true
                             }
@@ -260,7 +260,7 @@
                       "mode": "Incremental"
                     },
                     "apiVersion": "2019-10-01",
-                    "name": "ActivityKeyVaultDelete",
+                    "name": "ActivityUDRDelete",
                     "dependsOn": [
                       "[concat('Microsoft.Resources/resourceGroups/', parameters('alertResourceGroupName'))]"
                     ]
